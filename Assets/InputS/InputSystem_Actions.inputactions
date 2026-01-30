@@ -491,7 +491,7 @@
                     "name": "Cancel",
                     "type": "Button",
                     "id": "15cef263-9014-4fd5-94d9-4e4a6234a6ef",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -572,6 +572,15 @@
                     "name": "Enter",
                     "type": "Button",
                     "id": "f48d64e4-3379-408e-8b10-160291216a63",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Escape",
+                    "type": "Button",
+                    "id": "ab22957c-95e8-455f-8346-b2d443000a9c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -1016,6 +1025,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Enter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6276ec9d-2f84-4f0c-8c77-3b329fd9d9fd",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Escape",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
