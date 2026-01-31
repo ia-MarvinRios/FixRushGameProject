@@ -138,6 +138,7 @@ public class VManager : MonoBehaviour
         ActiveVehicles.RemoveAt(index);
 
         UpdateLeader();
+        Destroy(v.gameObject); // destroy after getting index
 
         _readyToFix = false;
 

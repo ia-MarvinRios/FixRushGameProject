@@ -5,20 +5,24 @@ public abstract class Vehicle : MonoBehaviour
 {
     [Header("Vehicle Settings")]
     [Space(5)]
+    [SerializeField] private Transform _modelObject;
     [SerializeField] private Collider _vehicleCollider;
     [SerializeField] private NavMeshAgent _agent;
 
+    public Transform Model {  get { return _modelObject; } }
+    public BoxCollider Collider { get { return (BoxCollider)_vehicleCollider; } }
     public Vector3 Size { get { return _vehicleCollider.bounds.size; } }
     public NavMeshAgent Agent { get { return _agent; } }
     public int QueueIndex { get; set; }
 
     private void OnDestroy()
     {
-        VManager.Instance.RemoveVehicle(this);
+        Fix();
     }
 
     public abstract void Initialize();
     public void MoveTo(Vector3 target) { _agent.SetDestination(target); }
+    public void Fix() { VManager.Instance.RemoveVehicle(this); }
 
     public Vector3 GetNearestObjFromArray(Vector3 refPosition, Vector3[] objectsPositions)
     {

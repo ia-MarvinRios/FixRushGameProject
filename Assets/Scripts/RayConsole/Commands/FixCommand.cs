@@ -21,7 +21,7 @@ public class FixCommand : ConsoleCommand
 
         if (VManager.Instance.ActiveVehicles.Count > 0)
         {
-            Destroy(VManager.Instance.ActiveVehicles[0]);
+            VManager.Instance.RemoveVehicle(VManager.Instance.ActiveVehicles[0].GetComponent<Vehicle>());
         }
         else Debug.LogAssertion("No vehicles left to fix.");
 

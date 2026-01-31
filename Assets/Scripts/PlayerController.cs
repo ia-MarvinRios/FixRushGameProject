@@ -2,7 +2,7 @@ using FixRushGame;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Player
 {
     [Header("Player Settings")]
     [Tooltip("Movement speed of the player in units per second.")]
@@ -13,17 +13,10 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     [SerializeField] Transform _cameraTransform;
     [SerializeField] GameObject _playerPrefab;
-    
-    Rigidbody _rb;
-
-    InputSystem_Actions _inputActions;
-    InputAction _moveAction;
 
     GameObject _playerA;
     GameObject _playerB;
     GameObject _selected;
-
-    public Interactable FocusedObj { get; set; }
 
     private void Awake()
     {
@@ -42,12 +35,14 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+        UpdateFocused();
+        MoveGrabbedObj();
     }
 
     /// <summary>
     /// Enables player input actions.
     /// </summary>
-    void EnablePlayerInputs()
+    protected override void EnablePlayerInputs()
     {
         _moveAction = _inputActions.Player.Move;
         _inputActions.Player.Enable();
@@ -63,7 +58,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Disables player input actions.
     /// </summary>
-    void DisablePlayerInputs()
+    protected override void DisablePlayerInputs()
     {
         _inputActions.Player.Disable();
 
@@ -87,6 +82,14 @@ public class PlayerController : MonoBehaviour
         Debug.LogError("Failed to reference Main Camera on current scene.");
     }
 
+    /// <summary>
+    /// Initializes and spawns player models at their designated spawn points, replacing any existing player instances.
+    /// Sets the primary player model as the active player.
+    /// </summary>
+    /// <remarks>This method destroys any previously spawned player models before instantiating new ones. Both
+    /// player models are assigned the "Player" tag and positioned at their respective spawn points. The primary player
+    /// model is set as the active player using the SelectModel method. This method should be called when resetting or
+    /// starting a new player session to ensure correct player setup.</remarks>
     void SetUpPlayer()
     {
         if ( _playerA != null || _playerB != null)
@@ -109,6 +112,7 @@ public class PlayerController : MonoBehaviour
     void SelectModel(GameObject model)
     {
         _selected = model;
+
         _rb = _selected.GetComponent<Rigidbody>();
     }
 
@@ -130,6 +134,12 @@ public class PlayerController : MonoBehaviour
         _selected.transform.rotation = 
             Quaternion.Slerp(_selected.transform.rotation, Quaternion.LookRotation(new Vector3(move.x, 0, move.z), Vector3.up), 10 * Time.fixedDeltaTime);
     }
+    void MoveGrabbedObj()
+    {
+        if(GrabbedObj == null) return;
+
+        GrabbedObj.transform.position = _selected.transform.position + new Vector3(0, 2f, 0);
+    }
 
     void ToggleSelected(InputAction.CallbackContext ctx)
     {
@@ -139,8 +149,22 @@ public class PlayerController : MonoBehaviour
 
     void Interact(InputAction.CallbackContext ctx)
     {
-        if (FocusedObj == null) return;
+        // No focused obj
+        if (FocusedObj == null)
+        {
+            // Return on performed
+            if (!ctx.performed) return;
 
+            // Drop grabbed
+            if (GrabbedObj != null)
+            {
+                GrabbedObj.GetComponent<Pickable>().Drop(this);
+            }
+
+            return;
+        }
+
+        // There's focused obj then pass ctx
         FocusedObj.Interact(ctx);
     }
 
@@ -148,9 +172,15 @@ public class PlayerController : MonoBehaviour
     {
         if(_playerPrefab.TryGetComponent<BoxCollider>(out var c))
         {
-            Gizmos.color = UnityEngine.Color.yellow;
+            Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(_spawnPointA, c.size);
             Gizmos.DrawWireCube(_spawnPointB, c.size);
+        }
+
+        if (FocusedObj != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(_selected.transform.position, FocusedObj.transform.position);
         }
     }
 }
