@@ -1,6 +1,7 @@
 using FixRushGame;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 [System.Serializable]
 public struct GatoRoot
@@ -23,7 +24,6 @@ public class Car : Vehicle
     [Header("Car Settings")]
     [SerializeField] GatoRoot[] _gatoRoots;
     [SerializeField] float _gatoCheckerRadius = 0.3f;
-    [SerializeField] IssueType[] _issues;
     [SerializeField] WheelRoot[] _wheelRoots;
     [Space(10)]
     [Header("Gizmos Settings")]
@@ -49,7 +49,7 @@ public class Car : Vehicle
 
     IEnumerator FixCarCoroutine()
     {
-        foreach(var i in _issues)
+        foreach(var i in Issues)
         {
             switch (i)
             {
@@ -61,17 +61,25 @@ public class Car : Vehicle
                     TireIssue tIssue = new TireIssue(this);
                     yield return StartCoroutine(tIssue.FixingCoroutine());
                     yield return new WaitUntil(()=>!IsGatoed);
-                    Fix();
+                    tIssue = null;
+                    break;
+
+                case IssueType.Dirty:
+                    DirtIssue dIssue = new DirtIssue(this);
+                    yield return StartCoroutine(dIssue.FixingCoroutine());
+                    dIssue = null;
                     break;
             }
         }
+
+        yield return StartCoroutine(VManager.Instance.MoveToEndPoint(Agent, this));
     }
 
     /// <summary>
     /// Places the gato on the nearest GatoRoot Position.
     /// </summary>
     /// <param name="player"></param>
-    public void PlaceGato(Player player, int gatoRootIndex)
+    public void PlaceGato(AuxPlayer player, int gatoRootIndex)
     {
         if (player.GrabbedObj == null || IsGatoed)
             return;
@@ -104,7 +112,9 @@ public class Car : Vehicle
         Model.RotateAround(pivotWorld, Vector3.right, angle * sign);
 
         // Set gato pickable
-        gato.GetComponent<Pickable>().IsPickable = true;
+        Pickable pickable = gato.GetComponent<Pickable>();
+        pickable.ReleaseOwnership();
+        pickable.IsPickable = true;
         gato.GetComponent<Gato>().SetUpGato(this, gatoRootIndex);
 
         IsGatoed = true;

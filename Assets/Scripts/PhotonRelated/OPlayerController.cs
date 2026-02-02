@@ -100,6 +100,6 @@ public class OPlayerController : MonoBehaviourPunCallbacks
     {
         if (FocusedObj == null) return;
 
-        FocusedObj.Interact(ctx);
+        //FocusedObj.Interact(ctx);
     }
 }

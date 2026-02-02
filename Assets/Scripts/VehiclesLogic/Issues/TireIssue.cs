@@ -1,7 +1,6 @@
 using FixRushGame;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
@@ -104,7 +103,7 @@ public class TireIssue : IIssue
             c.transform.localPosition = root.Position;
 
             // Add necesary components
-            c.AddComponent<Interactable>().SetInteractable(InteractionType.Still, 1f, 0.7f);
+            c.AddComponent<Interactable>().SetInteractable(InteractionType.Still, 2.5f, 0.7f);
             c.AddComponent<Wheel>().SetUp(root.LinkedGatoRootID, root.Position, false);
 
             // Add object to the list
@@ -129,7 +128,7 @@ public class TireIssue : IIssue
         _objects.Add(c);
     }
 
-    void TireInteraction(Interactable obj, Player entity)
+    void TireInteraction(Interactable obj, AuxPlayer entity)
     {
         switch (obj.name)
         {
@@ -143,7 +142,10 @@ public class TireIssue : IIssue
 
                 if (_car.GatoRoots[wheel.GatoID].Object != null)
                 {
-                    if (entity.GrabbedObj != null) return;
+                    if (entity.GrabbedObj == null) return;
+                    if (!entity.GrabbedObj.CompareTag("Wrench")) return;
+
+                    entity.GrabbedObj.GetComponent<Pickable>().Drop();
 
                     GameObject item = Object.Instantiate(
                             GlobalItems.Instance.Items[0],
@@ -165,7 +167,10 @@ public class TireIssue : IIssue
             // Logic for fixing the tire
             case "EmptyWheelTrigger":
 
-                if (entity.GrabbedObj != null) return;
+                if (entity.GrabbedObj == null) return;
+                if (!entity.GrabbedObj.CompareTag("NewWheel")) return;
+
+                Object.Destroy(entity.GrabbedObj); // This is just for now
 
                 Debug.Log("Trying to fix tire...");
 
@@ -183,7 +188,7 @@ public class TireIssue : IIssue
         }
     }
 
-    void HandleInteraction(Interactable obj, Player entity)
+    public void HandleInteraction(Interactable obj, AuxPlayer entity)
     {
         if (!obj.transform.IsChildOf(_car.transform))
             return;

@@ -161,6 +161,7 @@ MonoBehaviour:
   _modelObject: {fileID: 6172213695398711840}
   _vehicleCollider: {fileID: 1805573291303183815}
   _agent: {fileID: 3817707875335549107}
+  _issues: 
   _gatoRoots:
   - Position: {x: 0, y: -0.87, z: 2.84}
     RotationPivot: {x: 0, y: -1.62, z: -2}
@@ -171,7 +172,6 @@ MonoBehaviour:
     EulerRotation: {x: 0, y: 0, z: 0}
     Object: {fileID: 0}
   _gatoCheckerRadius: 0.3
-  _issues: 00000000
   _wheelRoots:
   - LinkedGatoRootID: 0
     Position: {x: -2.25, y: -0.78, z: 1.6}

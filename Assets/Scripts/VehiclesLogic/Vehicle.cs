@@ -1,3 +1,4 @@
+using FixRushGame;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,7 +9,9 @@ public abstract class Vehicle : MonoBehaviour
     [SerializeField] private Transform _modelObject;
     [SerializeField] private Collider _vehicleCollider;
     [SerializeField] private NavMeshAgent _agent;
+    [SerializeField] private IssueType[] _issues;
 
+    public IssueType[] Issues { get { return _issues; } internal set { _issues = value; } }
     public Transform Model {  get { return _modelObject; } }
     public BoxCollider Collider { get { return (BoxCollider)_vehicleCollider; } }
     public Vector3 Size { get { return _vehicleCollider.bounds.size; } }

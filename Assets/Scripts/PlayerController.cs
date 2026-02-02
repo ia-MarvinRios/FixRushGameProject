@@ -18,6 +18,24 @@ public class PlayerController : Player
     GameObject _playerB;
     GameObject _selected;
 
+    AuxPlayer _auxA;
+    AuxPlayer _auxB;
+
+    internal override GameObject GrabbedObj
+    {
+        get => SelAux.GrabbedObj;
+        set => SelAux.GrabbedObj = value;
+    }
+    internal override Interactable FocusedObj
+    {
+        get => SelAux != null ? SelAux.FocusedObj : null;
+        set
+        {
+            if (SelAux != null)
+                SelAux.FocusedObj = value;
+        }
+    }
+
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
@@ -36,7 +54,7 @@ public class PlayerController : Player
     {
         MovePlayer();
         UpdateFocused();
-        MoveGrabbedObj();
+        MoveGrabbedObjs();
     }
 
     /// <summary>
@@ -101,17 +119,20 @@ public class PlayerController : Player
         // Model A
         _playerA = Instantiate(_playerPrefab, _spawnPointA, Quaternion.identity, transform);
         _playerA.gameObject.tag = "Player";
+        _auxA = _playerA.GetComponent<AuxPlayer>();
         // Model B
         _playerB = Instantiate(_playerPrefab, _spawnPointB, Quaternion.identity, transform);
         _playerB.gameObject.tag = "Player";
+        _auxB = _playerB.GetComponent<AuxPlayer>();
 
         // Set model A as active player
-        SelectModel(_playerA);
+        SelectModel(_playerA, _auxA);
     }
 
-    void SelectModel(GameObject model)
+    void SelectModel(GameObject model, AuxPlayer aux)
     {
         _selected = model;
+        SelAux = aux;
 
         _rb = _selected.GetComponent<Rigidbody>();
     }
@@ -134,17 +155,22 @@ public class PlayerController : Player
         _selected.transform.rotation = 
             Quaternion.Slerp(_selected.transform.rotation, Quaternion.LookRotation(new Vector3(move.x, 0, move.z), Vector3.up), 10 * Time.fixedDeltaTime);
     }
-    void MoveGrabbedObj()
+    void MoveGrabbedObjs()
     {
-        if(GrabbedObj == null) return;
-
-        GrabbedObj.transform.position = _selected.transform.position + new Vector3(0, 2f, 0);
+        if(_auxA.GrabbedObj != null)
+        {
+            _auxA.GrabbedObj.transform.position = _playerA.transform.position + new Vector3(0, 2f, 0);
+        }
+        if (_auxB.GrabbedObj != null)
+        {
+            _auxB.GrabbedObj.transform.position = _playerB.transform.position + new Vector3(0, 2f, 0);
+        }
     }
 
     void ToggleSelected(InputAction.CallbackContext ctx)
     {
-        if (_selected == _playerA) SelectModel(_playerB);
-        else SelectModel(_playerA);
+        if (_selected == _playerA) SelectModel(_playerB, _auxB);
+        else SelectModel(_playerA, _auxA);
     }
 
     void Interact(InputAction.CallbackContext ctx)
@@ -158,14 +184,14 @@ public class PlayerController : Player
             // Drop grabbed
             if (GrabbedObj != null)
             {
-                GrabbedObj.GetComponent<Pickable>().Drop(this);
+                GrabbedObj.GetComponent<Pickable>().Drop();
             }
 
             return;
         }
 
         // There's focused obj then pass ctx
-        FocusedObj.Interact(ctx);
+        FocusedObj.Interact(ctx, SelAux);
     }
 
     private void OnDrawGizmos()

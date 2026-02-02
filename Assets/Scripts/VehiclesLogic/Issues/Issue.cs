@@ -7,7 +7,7 @@ namespace FixRushGame
     {
         Tires,
         Dirty,
-        Engine,
+        //Engine,
     }
 
     public interface IIssue
@@ -17,5 +17,6 @@ namespace FixRushGame
 
         abstract void CleanUp();
         abstract IEnumerator FixingCoroutine();
+        abstract void HandleInteraction(Interactable obj, AuxPlayer entity);
     }
 }

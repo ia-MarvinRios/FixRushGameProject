@@ -1,3 +1,4 @@
+using FixRushGame;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,12 +14,15 @@ public class VManager : MonoBehaviour
     [SerializeField] GameObject[] _vehiclePrefabs;
     [SerializeField] Vector3 _spawnPoint;
     [SerializeField] Vector3 _WaitPoint1;
+    [SerializeField] Vector3 _endPoint;
     [SerializeField] float _waitPointOffset = 1f;
     [SerializeField, Range(0.1f, 5f)] float _spawnInterval = 0.5f;
     [SerializeField] Transform _target;
 
     NavMeshAgent _leader;
     bool _readyToFix = false;
+    private static IssueType[] _allIssues = (IssueType[])System.Enum.GetValues(typeof(IssueType));
+    List<IssueType> selected = new List<IssueType>();
 
     public List<GameObject> ActiveVehicles { get; private set; }
 
@@ -38,6 +42,28 @@ public class VManager : MonoBehaviour
         StartCoroutine(SpawnVehiclesCoroutine());
     }
 
+    IssueType[] AssignIssues(Vehicle v)
+    {
+        selected.Clear();
+
+        int t = Random.Range(1, 3);
+
+        for (int i = 0; i < t; i++)
+        {
+            IssueType issue = GetRandomIssue();
+            if (!selected.Contains(issue))
+                selected.Add(issue);
+        }
+
+        v.Issues = selected.ToArray();
+        return v.Issues;
+    }
+
+    IssueType GetRandomIssue()
+    {
+        return _allIssues[Random.Range(0, _allIssues.Length)];
+    }
+
     IEnumerator SpawnVehiclesCoroutine()
     {
         while (true)
@@ -51,6 +77,9 @@ public class VManager : MonoBehaviour
                     transform);
 
                 Vehicle v = obj.GetComponent<Vehicle>();
+
+                // Assign issues and show UI
+                UIManager.Instance.AddIssuesCard(AssignIssues(v));
 
                 // Add first
                 ActiveVehicles.Add(obj);
@@ -140,6 +169,9 @@ public class VManager : MonoBehaviour
         UpdateLeader();
         Destroy(v.gameObject); // destroy after getting index
 
+        // Update UI
+        UIManager.Instance.RemoveIssuesCard(UIManager.Instance.ActiveCards[index]);
+
         _readyToFix = false;
 
         if (_leader != null && _leader.isOnNavMesh)
@@ -156,6 +188,15 @@ public class VManager : MonoBehaviour
             StartCoroutine(SetUpForFixing(agent));
         }
     }
+    public IEnumerator MoveToEndPoint(NavMeshAgent agent, Car car)
+    {
+        agent.isStopped = false;
+        agent.SetDestination(_endPoint);
+        Debug.Log("Moving to endpoint...");
+        yield return new WaitUntil(() => HasReachedDestination(agent));
+        car.Fix();
+    }
+
     IEnumerator SetUpForFixing(NavMeshAgent agent)
     {
         if (agent == null)
@@ -198,7 +239,7 @@ public class VManager : MonoBehaviour
         return path.corners[0];
     }
 
-    bool HasReachedDestination(NavMeshAgent agent)
+    public bool HasReachedDestination(NavMeshAgent agent)
     {
         if (!agent || !agent.enabled || !agent.isOnNavMesh)
             return false;
@@ -216,6 +257,7 @@ public class VManager : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireCube(_spawnPoint, Vector3.one);
         Gizmos.DrawWireCube(_WaitPoint1, Vector3.one);
+        Gizmos.DrawWireCube(_endPoint, Vector3.one);
         Gizmos.color = Color.gold;
         Gizmos.DrawSphere(_target.position, 1f);
     }

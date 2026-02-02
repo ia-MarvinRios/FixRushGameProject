@@ -23,15 +23,14 @@ namespace FixRushGame
         [SerializeField] float _triggerRadius = 0.5f;
 
         SphereCollider _c;
-        Player _entity;
         Coroutine _holdCoroutine;
         Coroutine _stillCoroutine;
         InWorldTooltip tooltip;
         bool _isHolding = false;
         float _remainingTime = 0;
 
-        public delegate void InteractableDelegate(Interactable obj, Player entity);
-        public delegate void CancelInteractionDelegate(Interactable obj, Player entity);
+        public delegate void InteractableDelegate(Interactable obj, AuxPlayer entity);
+        public delegate void CancelInteractionDelegate(Interactable obj, AuxPlayer entity);
         public static event InteractableDelegate OnInteract;
         public static event CancelInteractionDelegate OnCancelInteraction;
 
@@ -50,19 +49,16 @@ namespace FixRushGame
         private void OnDestroy()
         {
             StopAllCoroutines();
+            HideTooltip();
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            Player i = other.GetComponentInParent<Player>();
-            if (i != null)
+            if (other.TryGetComponent(out AuxPlayer aux))
             {
-                _entity = i;
-                i.FocusCandidates.Add(this);
-
+                aux.FocusCandidates.Add(this);
                 ShowTooltip();
             }
-            
         }
         private void OnTriggerStay(Collider other)
         {
@@ -70,19 +66,15 @@ namespace FixRushGame
 
         private void OnTriggerExit(Collider other)
         {
-            Player i = other.GetComponentInParent<Player>();
-            if (i != null)
+            if (other.TryGetComponent(out AuxPlayer aux))
             {
-                i.FocusCandidates.Remove(this);
-                _entity = null;
+                aux.FocusCandidates.Remove(this);
 
-                // Still Interaction checker
                 if (_stillCoroutine != null)
                 {
                     StopCoroutine(_stillCoroutine);
                     _stillCoroutine = null;
-                    OnCancelInteraction?.Invoke(this, i);
-                    Debug.Log("Still canceled");
+                    OnCancelInteraction?.Invoke(this, aux);
                 }
 
                 HideTooltip();
@@ -102,20 +94,20 @@ namespace FixRushGame
             HoldTime = holdTime;
         }
 
-        public void Interact(InputAction.CallbackContext ctx)
+        public void Interact(InputAction.CallbackContext ctx, AuxPlayer entity)
         {
             switch (InteractionType){
 
                 case InteractionType.Simple:
-                    HandleSimple(ctx);
+                    HandleSimple(ctx, entity);
                     break;
 
                 case InteractionType.Hold:
-                    HandleHold(ctx);
+                    HandleHold(ctx, entity);
                     break;
 
                 case InteractionType.Still:
-                    HandleStill(ctx);
+                    HandleStill(ctx, entity);
                     break;
             }
         }
@@ -158,21 +150,20 @@ namespace FixRushGame
             }
         }
 
-        void HandleSimple(InputAction.CallbackContext ctx)
+        void HandleSimple(InputAction.CallbackContext ctx, AuxPlayer p)
         {
-            if (ctx.performed && _entity != null)
-            {
-                OnInteract?.Invoke(_entity.FocusedObj, _entity);
-            }
+            if (!ctx.performed) return;
+
+            OnInteract?.Invoke(this, p);
         }
 
-        void HandleHold(InputAction.CallbackContext ctx)
+        void HandleHold(InputAction.CallbackContext ctx, AuxPlayer p)
         {
             if (ctx.started)
             {
                 _isHolding = true;
 
-                _holdCoroutine = StartCoroutine(HoldInteractionCoroutine());
+                _holdCoroutine = StartCoroutine(HoldInteractionCoroutine(p));
 
                 Debug.Log("Started Hold... HoldTime: " + HoldTime);
             }
@@ -184,13 +175,13 @@ namespace FixRushGame
                 if (_holdCoroutine != null)
                     StopCoroutine(_holdCoroutine);
 
-                OnCancelInteraction?.Invoke(_entity.FocusedObj, _entity);
+                OnCancelInteraction?.Invoke(p.FocusedObj, p);
 
                 Debug.Log("Stopped Hold...");
             }
         }
 
-        IEnumerator HoldInteractionCoroutine()
+        IEnumerator HoldInteractionCoroutine(AuxPlayer p)
         {
             _remainingTime = HoldTime;
 
@@ -203,38 +194,38 @@ namespace FixRushGame
             if (_isHolding)
             {
                 // Done Holding (OnInteract pending to be developed...)
-                OnInteract?.Invoke(_entity.FocusedObj, _entity);
+                OnInteract?.Invoke(p.FocusedObj, p);
             }
 
             _isHolding = false;
             _holdCoroutine = null;
         }
 
-        void HandleStill(InputAction.CallbackContext ctx)
+        void HandleStill(InputAction.CallbackContext ctx, AuxPlayer p)
         {
-            if (!ctx.performed || _entity == null)
+            if (!ctx.performed || p == null)
                 return;
 
             if (_stillCoroutine != null)
                 StopCoroutine(_stillCoroutine);
 
-            _stillCoroutine = StartCoroutine(StillInteractionCoroutine());
+            _stillCoroutine = StartCoroutine(StillInteractionCoroutine(p));
 
             Debug.Log("Started Still interaction...");
         }
 
-        IEnumerator StillInteractionCoroutine()
+        IEnumerator StillInteractionCoroutine(AuxPlayer p)
         {
             float remainingTime = HoldTime;
 
-            while (_entity != null && remainingTime > 0f)
+            while (p != null && remainingTime > 0f)
             {
                 remainingTime -= Time.deltaTime;
                 yield return null;
             }
 
             // Canceled
-            if (_entity == null)
+            if (p == null)
             {
                 OnCancelInteraction?.Invoke(this, null);
                 Debug.Log("Still canceled");
@@ -242,7 +233,7 @@ namespace FixRushGame
             else
             {
                 // Done
-                OnInteract?.Invoke(this, _entity);
+                OnInteract?.Invoke(this, p);
                 Debug.Log("Still completed");
             }
 

@@ -1,16 +1,27 @@
+using FixRushGame;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] GameObject _pauseMenu;
+    public static UIManager Instance { get; private set; }
 
     InputSystem_Actions _inputActions;
 
+    List<Card> _activeCards = new List<Card>();
+
+    public List<Card> ActiveCards { get { return _activeCards; } }
+
+    [Header("References")]
+    [SerializeField] GameObject _pauseMenu;
+    [SerializeField] GameObject _missionsPanel;
+    [SerializeField] GameObject _cardPrefab;
+
     private void Awake()
     {
+        Instance = this;
         _inputActions = new InputSystem_Actions();
     }
     private void Start()
@@ -59,4 +70,20 @@ public class UIManager : MonoBehaviour
     // ----- PUBLIC METHODS -----
     public void GoToScene(string sceneName) { SceneManager.LoadScene(sceneName, LoadSceneMode.Single); }
     public void QuitGame() { Application.Quit(); }
+
+    public void AddIssuesCard(IssueType[] issues)
+    {
+        Card card = Instantiate(_cardPrefab, _missionsPanel.transform).GetComponent<Card>();
+
+        card.SetUpCard(issues);
+        _activeCards.Add(card);
+    }
+    public void RemoveIssuesCard(Card card)
+    {
+        if (_activeCards.Contains(card))
+        {
+            _activeCards.Remove(card);
+            Destroy(card.gameObject);
+        }
+    }
 }

@@ -1,5 +1,3 @@
-using FixRushGame;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,9 +5,9 @@ namespace FixRushGame
 {
     public abstract class Player : MonoBehaviour
     {
-        internal List<Interactable> FocusCandidates = new List<Interactable>();
-        internal Interactable FocusedObj;
-        internal GameObject GrabbedObj;
+        internal abstract Interactable FocusedObj { get; set; }
+        internal abstract GameObject GrabbedObj { get; set; }
+        internal AuxPlayer SelAux;
 
         protected Rigidbody _rb;
 
@@ -27,41 +25,44 @@ namespace FixRushGame
         /// object, or set to null if no suitable candidate is found.</remarks>
         protected void UpdateFocused()
         {
-            if (_rb == null)
+            if (_rb == null || SelAux == null)
             {
                 FocusedObj = null;
                 return;
             }
 
-            const float FOV_THRESHOLD = 0.5f;   // ~120° (Don't touch)
+            const float FOV_THRESHOLD = 0.5f;
             const float DIST_WEIGHT = 0.1f;
 
             float bestScore = float.MinValue;
             Interactable best = null;
 
-            Vector3 origin = _rb.transform.position;
+            Vector3 origin = _rb.position;
             Vector3 forward = _rb.transform.forward;
 
-            foreach (var i in FocusCandidates)
+            var candidates = SelAux.FocusCandidates;
+
+            for (int i = 0; i < candidates.Count; i++)
             {
-                if (!i) continue;
+                var interactable = candidates[i];
+                if (!interactable) continue;
 
-                Vector3 toObj = i.transform.position - origin;
+                Vector3 toObj = interactable.transform.position - origin;
                 float distance = toObj.magnitude;
+                if (distance <= 0.001f) continue;
 
-                Vector3 dir = toObj / distance; //Normalized
+                Vector3 dir = toObj / distance;
                 float dot = Vector3.Dot(forward, dir);
 
-                // Out of the FOV
                 if (dot < FOV_THRESHOLD)
                     continue;
 
-                float score = dot - (distance * DIST_WEIGHT);
+                float score = dot - distance * DIST_WEIGHT;
 
                 if (score > bestScore)
                 {
                     bestScore = score;
-                    best = i;
+                    best = interactable;
                 }
             }
 
