@@ -83,8 +83,8 @@ public class TireIssue : IIssue
         u.transform.localPosition = new Vector3(0, 0, -_car.Collider.size.z / 3);
 
         // Add necesary components
-        o.AddComponent<Interactable>().SetInteractable(InteractionType.Simple, 0f, _car.Collider.size.z /3);
-        u.AddComponent<Interactable>().SetInteractable(InteractionType.Simple, 0f, _car.Collider.size.z / 3);
+        o.AddComponent<Interactable>().SetInteractable(FixRushGame.InteractionType.Simple, 0f, _car.Collider.size.z /3);
+        u.AddComponent<Interactable>().SetInteractable(FixRushGame.InteractionType.Simple, 0f, _car.Collider.size.z / 3);
 
         // Add object to the list
         _objects.Add(o);
@@ -103,7 +103,7 @@ public class TireIssue : IIssue
             c.transform.localPosition = root.Position;
 
             // Add necesary components
-            c.AddComponent<Interactable>().SetInteractable(InteractionType.Still, 2.5f, 0.7f);
+            c.AddComponent<Interactable>().SetInteractable(FixRushGame.InteractionType.Still, 2.5f, 0.7f);
             c.AddComponent<Wheel>().SetUp(root.LinkedGatoRootID, root.Position, false);
 
             // Add object to the list
@@ -121,7 +121,7 @@ public class TireIssue : IIssue
         c.transform.localPosition = root.Position;
 
         // Add necesary components
-        c.AddComponent<Interactable>().SetInteractable(InteractionType.Simple, 1f, 0.7f);
+        c.AddComponent<Interactable>().SetInteractable(FixRushGame.InteractionType.Simple, 1f, 0.7f);
         c.AddComponent<EmptyWheelRoot>().SetUp(root.LinkedGatoRootID, root.Position);
 
         // Add object to the list

@@ -43,7 +43,7 @@ public class DirtIssue : IIssue
         o.transform.SetParent(_v.transform);
         o.transform.localPosition = new Vector3(0, 0, 0);
 
-        o.AddComponent<Interactable>().SetInteractable(InteractionType.Simple, 0f, _v.Collider.size.z / 2);
+        o.AddComponent<Interactable>().SetInteractable(FixRushGame.InteractionType.Simple, 0f, _v.Collider.size.z / 2);
 
         _objects.Add(o);
     }
