@@ -4,75 +4,90 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerNetwork : MonoBehaviourPun
 {
-    private PlayerController _player;
+    public bool IsLocalPlayer => photonView.IsMine || PhotonNetwork.OfflineMode;
+    public bool IsOfflineMode => PhotonNetwork.OfflineMode;
 
-    private void Awake()
+    internal void CleanupNetworkState()
     {
-        if (!photonView.IsMine) return;
+        if (!PhotonNetwork.IsMasterClient)
+            return;
 
-        _player = GetComponent<PlayerController>();
+        PhotonNetwork.RemoveBufferedRPCs(
+            photonView.ViewID,
+            "RPC_AttachPlayer"
+        );
     }
 
-    private void OnEnable()
+    internal GameObject[] SpawnPlayer(GameObject prefab, Vector3[] positions)
     {
-        if (!photonView.IsMine) return;
+        GameObject[] models;
 
-        _player.EnablePlayerInputs(PhotonNetwork.OfflineMode);
-        _player.CheckCameraTransformRef();
-        SpawnPlayer();
-    }
-    private void OnDisable()
-    {
-        if (!photonView.IsMine) return;
-
-        _player.DisablePlayerInputs(PhotonNetwork.OfflineMode);
-    }
-
-    private void FixedUpdate()
-    {
-        if (!photonView.IsMine) return;
-
-        _player.Move();
-    }
-
-    void SpawnPlayer()
-    {
         if (PhotonNetwork.OfflineMode)
         {
             Debug.Log("[PlayerNetwork] Spawning local player models...");
 
-            GameObject a = PhotonNetwork.Instantiate(_player.PlayerPrefab.name, Vector3.zero, Quaternion.identity, 0, null);
-            a.transform.parent = _player.transform;
-            a.tag = "Player";
+            GameObject a = 
+                PhotonNetwork.Instantiate(
+                    prefab.name,
+                    positions[0], 
+                    Quaternion.identity, 
+                    0, 
+                    null);
 
-            GameObject b = PhotonNetwork.Instantiate(_player.PlayerPrefab.name, Vector3.zero, Quaternion.identity, 0, null);
-            b.transform.parent = _player.transform;
-            b.tag = "Player";
+            GameObject b = 
+                PhotonNetwork.Instantiate(
+                    prefab.name,
+                    positions[1], 
+                    Quaternion.identity, 
+                    0, 
+                    null);
 
-            GameObject[] models = new GameObject[2] { a, b };
-
-            _player.SetUpPlayer(models);
+            models = new GameObject[2] { a, b };
         }
         else
         {
             Debug.Log("[PlayerNetwork] Spawning player over network...");
 
-            GameObject playerObj = PhotonNetwork.Instantiate(_player.PlayerPrefab.name, Vector3.zero, Quaternion.identity, 0, null);
-            playerObj.transform.parent = _player.transform;
-            playerObj.tag = "Player";
+            GameObject playerObj = 
+                PhotonNetwork.Instantiate(
+                    prefab.name,
+                    positions[0], 
+                    Quaternion.identity, 
+                    0, 
+                    null);
 
-            GameObject[] models = new GameObject[1] { playerObj };
-
-            _player.SetUpPlayer(models);
+            models = new GameObject[1] { playerObj };
         }
         
+        return models;
+
     }
 
-    #region NETWORK COMMANDS
+    internal void AttachPlayer(GameObject child)
+    {
+        PhotonView childPhotonView = child.GetComponent<PhotonView>();
+        PhotonView parentPhotonView = GetComponent<PhotonView>();
 
-    #endregion
+        photonView.RPC(
+            "RPC_AttachPlayer",
+            RpcTarget.AllBuffered,
+            childPhotonView.ViewID,
+            parentPhotonView.ViewID
+        );
+    }
 
     #region RPCs
+
+    [PunRPC]
+    void RPC_AttachPlayer(int childViewID, int parentViewID)
+    {
+        PhotonView child = PhotonView.Find(childViewID);
+        PhotonView parent = PhotonView.Find(parentViewID);
+
+        if (child == null || parent == null) return;
+
+        child.transform.SetParent(parent.transform, true);
+    }
 
     #endregion
 }

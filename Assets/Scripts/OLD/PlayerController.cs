@@ -1,4 +1,7 @@
+using ExitGames.Client.Photon;
 using FixRushGame;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
 

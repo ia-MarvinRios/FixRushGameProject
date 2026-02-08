@@ -5,7 +5,7 @@ namespace FixRushGame
 {
     public abstract class Player : MonoBehaviour
     {
-        internal abstract Interactable FocusedObj { get; set; }
+        internal abstract FixRushGame.Interactable FocusedObj { get; set; }
         internal abstract GameObject GrabbedObj { get; set; }
         internal AuxPlayer SelAux;
 

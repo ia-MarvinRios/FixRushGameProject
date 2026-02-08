@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _moveSpeed: 5
+  _spawnPointA: {x: 7.59, y: -3, z: 0}
+  _spawnPointB: {x: -5, y: -3, z: -4}
   _playerPrefab: {fileID: 8439203655850009881, guid: 241e15c1c2c5dac4e80c650c7e70b8f4, type: 3}
 --- !u!114 &3197220333093121028
 MonoBehaviour:

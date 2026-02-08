@@ -71,7 +71,7 @@ public class UIManager : MonoBehaviour
     public void GoToScene(string sceneName) { SceneManager.LoadScene(sceneName, LoadSceneMode.Single); }
     public void QuitGame() { Application.Quit(); }
 
-    public void AddIssuesCard(IssueType[] issues)
+    public void AddIssuesCard(FixRushGame.IssueType[] issues)
     {
         Card card = Instantiate(_cardPrefab, _missionsPanel.transform).GetComponent<Card>();
 

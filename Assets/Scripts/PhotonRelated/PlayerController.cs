@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,9 +14,13 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Player Settings")]
     [SerializeField] float _moveSpeed = 5f;
+    [SerializeField] Vector3 _spawnPointA = Vector3.zero;
+    [SerializeField] Vector3 _spawnPointB = Vector3.zero;
     [Space(10)]
     [Header("References")]
     [SerializeField] GameObject _playerPrefab;
+
+    PlayerNetwork _pNetwork;
     
     InputSystem_Actions _inputActions;
     InputAction _moveAction;
@@ -28,12 +34,49 @@ public class PlayerController : MonoBehaviour
     AuxPlayer _auxA;
     AuxPlayer _auxB;
 
-    internal GameObject PlayerPrefab { get => _playerPrefab; }
+    Coroutine _holdCoroutine;
+    Coroutine _stillCoroutine;
+
+    bool _isHolding = false;
+    float _remainingTime;
+
     internal AuxPlayer SelAux { get; private set; }
+    internal GameObject GrabbedObj
+    {
+        get => SelAux.GrabbedObj;
+        set => SelAux.GrabbedObj = value;
+    }
+    internal Interactable FocusedObj { get; private set; }
 
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
+        _pNetwork = GetComponent<PlayerNetwork>();
+    }
+
+    private void OnEnable()
+    {
+        if (!_pNetwork.IsLocalPlayer) {
+            enabled = false;
+            return;
+        }
+
+        EnablePlayerInputs(_pNetwork.IsLocalPlayer);
+        CheckCameraTransformRef();
+
+        SpawnPlayer();
+    }
+
+    private void OnDisable()
+    {
+        DisablePlayerInputs(_pNetwork.IsLocalPlayer);
+    }
+
+    private void FixedUpdate()
+    {
+        Move();
+        UpdateFocused();
+        MoveGrabbedObjs();
     }
 
     #region INPUT HANDLING
@@ -87,6 +130,11 @@ public class PlayerController : MonoBehaviour
         Debug.LogError("Failed to reference Main Camera on current scene.");
     }
 
+    private void SpawnPlayer()
+    {
+        SetUpPlayer(_pNetwork.SpawnPlayer(_playerPrefab, new Vector3[] { _spawnPointA, _spawnPointB}));
+    }
+
     public void SetUpPlayer(GameObject[] models)
     {
         if (_playerA != null || _playerB != null)
@@ -95,20 +143,18 @@ public class PlayerController : MonoBehaviour
             Destroy(_playerB);
         }
 
-        if (models.Length < 2)
-        {
-            _playerA = models[0];
-            _auxA = _playerA.GetComponent<AuxPlayer>();
-
-            SelectModel(_playerA, _auxA);
-
-            return;
-        }
-
         _playerA = models[0];
-        _auxA = _playerA.GetComponent<AuxPlayer>();
-        _playerB = models[1];
-        _auxB = _playerB.GetComponent<AuxPlayer>();
+        _pNetwork.AttachPlayer(_playerA);
+        _playerA.tag = "Player";
+        _auxA = _playerA.GetComponentInChildren<AuxPlayer>();
+
+        if (models.Length > 1)
+        {
+            _playerB = models[1];
+            _pNetwork.AttachPlayer(_playerB);
+            _playerB.tag = "Player";
+            _auxB = _playerB.GetComponentInChildren<AuxPlayer>();
+        }
 
         SelectModel(_playerA, _auxA);
     }
@@ -146,45 +192,59 @@ public class PlayerController : MonoBehaviour
             Quaternion.Slerp(_selected.transform.rotation, Quaternion.LookRotation(new Vector3(move.x, 0, move.z), Vector3.up), 10 * Time.fixedDeltaTime);
     }
 
-    
+    #region INTERACTION EVENTS
+
     public void Interact(InputAction.CallbackContext context)
     {
-        /*
-        switch (InteractionType)
+        // FOCUSED OBJ CHECKER
+        if (FocusedObj == null)
+        {
+            // Return on performed
+            if (!context.performed) return;
+
+            // Drop grabbed
+            if (GrabbedObj != null)
+            {
+                GrabbedObj.GetComponent<Pickable>().RequestDropObj(SelAux);
+            }
+
+            return;
+        }
+
+        switch (FocusedObj.InteractionType)
         {
 
             case InteractionType.Simple:
-                HandleSimple(ctx, entity);
+                HandleSimple(context, SelAux);
                 break;
 
             case InteractionType.Hold:
-                HandleHold(ctx, entity);
+                HandleHold(context, SelAux);
                 break;
 
             case InteractionType.Still:
-                HandleStill(ctx, entity);
+                HandleStill(context, SelAux);
                 break;
         }
-        */
     }
 
-    /*
-    void HandleSimple(InputAction.CallbackContext ctx, AuxPlayer p)
+
+    void HandleSimple(InputAction.CallbackContext ctx, AuxPlayer player)
     {
         if (!ctx.performed) return;
 
-        OnInteract?.Invoke(this, p);
+        FocusedObj.Interact(player);
     }
 
-    void HandleHold(InputAction.CallbackContext ctx, AuxPlayer p)
+    void HandleHold(InputAction.CallbackContext ctx, AuxPlayer player)
     {
         if (ctx.started)
         {
             _isHolding = true;
 
-            _holdCoroutine = StartCoroutine(HoldInteractionCoroutine(p));
+            _holdCoroutine = StartCoroutine(HoldInteractionCoroutine(player, player.FocusedObj.HoldTime));
 
-            Debug.Log("Started Hold... HoldTime: " + HoldTime);
+            Debug.Log("Started Hold... HoldTime: " + player.FocusedObj.HoldTime);
         }
 
         if (ctx.canceled)
@@ -194,15 +254,15 @@ public class PlayerController : MonoBehaviour
             if (_holdCoroutine != null)
                 StopCoroutine(_holdCoroutine);
 
-            OnCancelInteraction?.Invoke(p.FocusedObj, p);
+            //OnCancelInteraction?.Invoke(p.FocusedObj, p);
 
             Debug.Log("Stopped Hold...");
         }
     }
 
-    IEnumerator HoldInteractionCoroutine(AuxPlayer p)
+    IEnumerator HoldInteractionCoroutine(AuxPlayer player, float holdTime)
     {
-        _remainingTime = HoldTime;
+        _remainingTime = holdTime;
 
         while (_isHolding && _remainingTime > 0f)
         {
@@ -213,50 +273,136 @@ public class PlayerController : MonoBehaviour
         if (_isHolding)
         {
             // Done Holding (OnInteract pending to be developed...)
-            OnInteract?.Invoke(p.FocusedObj, p);
+            FocusedObj.Interact(player);
         }
 
         _isHolding = false;
         _holdCoroutine = null;
     }
 
-    void HandleStill(InputAction.CallbackContext ctx, AuxPlayer p)
+
+    void HandleStill(InputAction.CallbackContext ctx, AuxPlayer player)
     {
-        if (!ctx.performed || p == null)
+        if (!ctx.performed || player == null)
             return;
 
         if (_stillCoroutine != null)
             StopCoroutine(_stillCoroutine);
 
-        _stillCoroutine = StartCoroutine(StillInteractionCoroutine(p));
+        _stillCoroutine = StartCoroutine(StillInteractionCoroutine(player, player.FocusedObj.HoldTime));
 
         Debug.Log("Started Still interaction...");
     }
 
-    IEnumerator StillInteractionCoroutine(AuxPlayer p)
+    IEnumerator StillInteractionCoroutine(AuxPlayer player, float holdTime)
     {
-        float remainingTime = HoldTime;
+        float remainingTime = holdTime;
 
-        while (p != null && remainingTime > 0f)
+        while (player != null && remainingTime > 0f)
         {
             remainingTime -= Time.deltaTime;
             yield return null;
         }
 
         // Canceled
-        if (p == null)
+        if (player == null)
         {
-            OnCancelInteraction?.Invoke(this, null);
+            //OnCancelInteraction?.Invoke(this, null);
             Debug.Log("Still canceled");
         }
         else
         {
             // Done
-            OnInteract?.Invoke(this, p);
+            FocusedObj.Interact(player);
             Debug.Log("Still completed");
         }
 
         _stillCoroutine = null;
     }
-    */
+
+    #endregion
+
+    protected void UpdateFocused()
+    {
+        if (_rb == null || SelAux == null)
+        {
+            FocusedObj = null;
+            return;
+        }
+
+        const float FOV_THRESHOLD = 0.5f;
+        const float DIST_WEIGHT = 0.1f;
+
+        float bestScore = float.MinValue;
+        Interactable best = null;
+
+        Vector3 origin = _rb.position;
+        Vector3 forward = _rb.transform.forward;
+
+        List<Interactable> candidates = SelAux.FocusCandidates;
+
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            Interactable interactable = candidates[i];
+            if (!interactable) continue;
+            if (!interactable.Active) continue;
+
+            Vector3 toObj = interactable.transform.position - origin;
+            float distance = toObj.magnitude;
+            if (distance <= 0.001f) continue;
+
+            Vector3 dir = toObj / distance;
+            float dot = Vector3.Dot(forward, dir);
+
+            if (dot < FOV_THRESHOLD)
+                continue;
+
+            float score = dot - distance * DIST_WEIGHT;
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = interactable;
+            }
+        }
+
+        SelAux.FocusedObj = best;
+        FocusedObj = best;
+    }
+
+    void MoveGrabbedObjs()
+    {
+        if (_auxA != null && _auxA.GrabbedObj != null)
+        {
+            _auxA.GrabbedObj.transform.position =
+                _playerA.transform.position + new Vector3(0, 2f, 0);
+        }
+
+        if (_pNetwork.IsOfflineMode) return;
+
+        if (_auxB != null && _auxB.GrabbedObj != null)
+        {
+            _auxB.GrabbedObj.transform.position =
+                _playerB.transform.position + new Vector3(0, 2f, 0);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (TryGetComponent<BoxCollider>(out var c))
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(_spawnPointA, c.size);
+            Gizmos.DrawWireCube(_spawnPointB, c.size);
+        }
+
+        if (FocusedObj != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(_selected.transform.position, FocusedObj.transform.position);
+        }
+    }
+
+
+
 }

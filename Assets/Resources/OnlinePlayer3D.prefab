@@ -40,13 +40,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 58010370665562501}
-  - component: {fileID: 5003865307717118585}
+  - component: {fileID: 2251048399556995794}
   - component: {fileID: 8452362134210549705}
   - component: {fileID: 7704526898719776213}
+  - component: {fileID: 2541306961262175866}
   - component: {fileID: 8352465539916927436}
   - component: {fileID: -134295298004004080}
   - component: {fileID: -8976100010182319954}
-  - component: {fileID: -4488396691990647732}
+  - component: {fileID: 8799753026816111635}
   m_Layer: 0
   m_Name: OnlinePlayer3D
   m_TagString: Untagged
@@ -70,7 +71,7 @@ Transform:
   - {fileID: 7976594103401842157}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5003865307717118585
+--- !u!114 &2251048399556995794
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -79,7 +80,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8439203655850009881}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31f5a6defbc501840885f2c73ef7cc58, type: 3}
+  m_Script: {fileID: 11500000, guid: ca7054f4ed2c2ac488fbca5a48073efd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AuxPlayer
 --- !u!33 &8452362134210549705
@@ -139,6 +140,27 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &2541306961262175866
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8439203655850009881}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &8352465539916927436
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -206,11 +228,11 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: -4488396691990647732}
+  - {fileID: 8799753026816111635}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &-4488396691990647732
+--- !u!114 &8799753026816111635
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -219,10 +241,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8439203655850009881}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonRigidbodyView
-  m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 0
-  m_TeleportEnabled: 0
-  m_TeleportIfDistanceGreaterThan: 3
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonTransformView
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
