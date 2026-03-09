@@ -80,7 +80,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31f5a6defbc501840885f2c73ef7cc58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AuxPlayer
-  _grabbedObject: {fileID: 0}
 --- !u!33 &8452362134210549705
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -114,7 +113,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6922793697723135513, guid: 0a6762c26324dfe41872c1758d17e522, type: 3}
+  - {fileID: 2100000, guid: 4631cd7b3f1899041915a7330731c787, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
