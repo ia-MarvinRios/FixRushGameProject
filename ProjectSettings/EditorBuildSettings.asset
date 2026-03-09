@@ -9,11 +9,11 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 479d907bc2ba3704297cbafdae44c01c
   - enabled: 1
-    path: Assets/Scenes/Playground.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
     path: Assets/Scenes/OnlinePlayground.unity
     guid: 817c0ffe7eaab9249b4aff9434a47d4e
+  - enabled: 1
+    path: Assets/Scenes/Playground.unity
+    guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -16,7 +16,7 @@ namespace FixRushGame
             Interactable.OnInteract -= GenerateObject;
         }
 
-        void GenerateObject(Interactable obj, AuxPlayer p)
+        void GenerateObject(Interactable obj, FixRushGame.AuxPlayer p)
         {
             if (obj == this.GetComponent<Interactable>())
             {

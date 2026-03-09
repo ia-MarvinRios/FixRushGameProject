@@ -19,9 +19,9 @@ public class FixCommand : ConsoleCommand
         }
         */
 
-        if (VManager.Instance.ActiveVehicles.Count > 0)
+        if (FixRushGame.VManager.Instance.ActiveVehicles.Count > 0)
         {
-            VManager.Instance.RemoveVehicle(VManager.Instance.ActiveVehicles[0].GetComponent<Vehicle>());
+            FixRushGame.VManager.Instance.RemoveVehicle(FixRushGame.VManager.Instance.ActiveVehicles[0].GetComponent<FixRushGame.Vehicle>());
         }
         else Debug.LogAssertion("No vehicles left to fix.");
 

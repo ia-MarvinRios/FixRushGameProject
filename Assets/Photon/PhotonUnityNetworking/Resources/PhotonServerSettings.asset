@@ -28,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: 
+  DevRegion: us
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
@@ -36,9 +36,22 @@ MonoBehaviour:
   RpcList:
   - ClickRpc
   - DestroyRpc
-  - DestroySpaceship
-  - Fire
-  - RespawnSpaceship
+  - RPC_AttachPlayer
+  - RPC_AttachVehicle
+  - RPC_Drop
+  - RPC_InitializeVehicle
+  - RPC_MoveCarToEndPoint
+  - RPC_PickUp
+  - RPC_PlaceGato
+  - RPC_RemoveOldWheel
+  - RPC_RepairDirtIssue
+  - RPC_SetUpEmptyWheelRoot
+  - RPC_SetUpTires
+  - RPC_SetRbView
+  - RPC_RemoveGato
+  - RPC_SetUpGato
+  - RPC_UpdateOwnership
+  - RPC_SpawnRoomObjectRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
-  DevRegionSetOnce: 0
+  DevRegionSetOnce: 1
