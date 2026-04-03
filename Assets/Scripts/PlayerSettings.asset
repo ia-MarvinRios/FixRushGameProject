@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a12de0c98757c946aa7781028e469be, type: 3}
+  m_Name: PlayerSettings
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSettings
+  MoveSpeed: 10
+  SpawnPoint: {x: 0, y: 1, z: 0}
+  Hat: {fileID: 7072056493466437613, guid: d9011260904eec045829da6f66928bae, type: 3}
+  Body: {fileID: 2167341707901067848, guid: c34c2bcb0ecff644c8402affe58047df, type: 3}
+  SkinMaterial: {fileID: 2100000, guid: 4d6f4fa233df1a94c9db6b0fc87fb73a, type: 2}
