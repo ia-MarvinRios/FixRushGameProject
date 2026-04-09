@@ -125,7 +125,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         Debug.Log($"{LOG_FORMAT} Left room.");
-        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+
+        if (SceneManager.GetActiveScene().name != "MainMenu")
+        {
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        }
         PhotonNetwork.JoinLobby(TypedLobby.Default);
     }
 
@@ -200,7 +204,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.InRoom)
         {
-            PlayerSpawner.Instance.Controller.DisableAllInputs();
             PhotonNetwork.LeaveRoom();
             Debug.Log($"{LOG_FORMAT} Leaving room...");
         }

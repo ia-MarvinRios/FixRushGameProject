@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class RemotePlayerUI : MonoBehaviour
 {
+    public InfoPanel InfoPanel;
     public string Uid = string.Empty;
     public int BodyID = -1;
     public int HatID = -1;

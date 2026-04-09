@@ -7,6 +7,9 @@ public class PlayerList : MonoBehaviour
     [SerializeField] private GameContent _gameContent;
     [SerializeField] private PlayerSettings _playerSettings;
     [SerializeField] private Transform _characterBuilderParent;
+    [SerializeField] private Transform _InWorlCanvas;
+    [SerializeField] private GameObject _playerInfoPanelPrefab;
+    [SerializeField] private InfoPanel _localPlayerInfoPanel;
     [SerializeField] private RemotePlayerUI[] _remoteContainers;
 
     private int _hatIndex = -1;
@@ -22,6 +25,8 @@ public class PlayerList : MonoBehaviour
     {
         PhotonManager.Instance.OnPlayerListChanged -= UpdatePlayerList;
         PhotonManager.Instance.OnRemotePlayerLeave -= RemoveRemotePlayerUI;
+
+        RemoveAllRemotePlayersUI();
     }
 
     private void UpdatePlayerList(List<PlayerData> playersData)
@@ -44,6 +49,13 @@ public class PlayerList : MonoBehaviour
                 _playerSettings.Body = _gameContent.Bodies[data.BodyID].Prefab;
 
                 SetLayerRecursively(_characterBuilderParent.gameObject, 3);
+
+                if (_localPlayerInfoPanel != null)
+                {
+                    _localPlayerInfoPanel.PlayerName = data.PlayerName;
+                    _localPlayerInfoPanel.Ready = data.IsReady;
+                }
+                
             }
             else
             {
@@ -78,6 +90,8 @@ public class PlayerList : MonoBehaviour
                 Instantiate(_gameContent.Hats[data.HatID].Prefab, container.transform).layer = 3;
                 Instantiate(_gameContent.Bodies[data.BodyID].Prefab, container.transform).layer = 3;
 
+                container.InfoPanel.Ready = data.IsReady;
+
                 return;
             }
             else if (string.IsNullOrEmpty(container.Uid))
@@ -87,6 +101,10 @@ public class PlayerList : MonoBehaviour
 
                 Instantiate(_gameContent.Hats[data.HatID].Prefab, container.transform).layer = 3;
                 Instantiate(_gameContent.Bodies[data.BodyID].Prefab, container.transform).layer = 3;
+
+                container.InfoPanel.PlayerName = data.PlayerName;
+                container.InfoPanel.Ready = data.IsReady;
+
                 return;
             }
         }
@@ -101,7 +119,32 @@ public class PlayerList : MonoBehaviour
                 container.Uid = string.Empty;
                 container.BodyID = -1;
                 container.HatID = -1;
+
+                container.InfoPanel.PlayerName = "-";
+                container.InfoPanel.Ready = false;
+
+                foreach (Transform child in container.transform)
+                {
+                    Destroy(child.gameObject);
+                }
+
                 return;
+            }
+        }
+    }
+    private void RemoveAllRemotePlayersUI()
+    {
+        foreach (RemotePlayerUI container in _remoteContainers)
+        {
+            container.Uid = string.Empty;
+            container.BodyID = -1;
+            container.HatID = -1;
+            container.InfoPanel.PlayerName = "-";
+            container.InfoPanel.Ready = false;
+
+            foreach (Transform child in container.transform)
+            {
+                Destroy(child.gameObject);
             }
         }
     }
