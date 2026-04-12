@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using FixRush;
 
 public class RoomCard : MonoBehaviour
 {

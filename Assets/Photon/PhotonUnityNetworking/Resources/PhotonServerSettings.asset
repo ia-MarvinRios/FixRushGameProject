@@ -38,6 +38,10 @@ MonoBehaviour:
   - DestroyRpc
   - RPC_SyncPlayerSpawnOnServer
   - RPC_SyncSpawnOnClients
+  - RPC_SetCosmeticParent
+  - PickUpJack
+  - RPC_PickUpObj
+  - RPC_DropObj
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

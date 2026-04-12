@@ -1,7 +1,7 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
-using System.Collections.Generic;
 using UnityEngine;
+using FixRush;
 
 /// <summary>
 /// Handles the player spawning and the avatar loading for remote and local players.
@@ -12,9 +12,8 @@ public class PlayerSpawner : MonoBehaviourPun
 {
     public static PlayerSpawner Instance {  get; private set; }
 
-    [Header("Game Content Reference")]
-    [SerializeField] internal GameContent GameContent;
     [Header("Player Spawning")]
+    [SerializeField] private PlayerSettings _playerSettings;
     [SerializeField] private GameObject _playerPrefab;
 
     internal PlayerController Controller { get; private set; }
@@ -22,6 +21,9 @@ public class PlayerSpawner : MonoBehaviourPun
     private void Awake()
     {
         Instance = this;
+    }
+    private void Start()
+    {
         SpawnPlayer();
     }
 
@@ -36,7 +38,8 @@ public class PlayerSpawner : MonoBehaviourPun
             { "userID", data.Uid },
             { "playerName", data.PlayerName },
             { "bodyID", data.BodyID },
-            { "hatID", data.HatID }
+            { "hatID", data.HatID },
+            { "skinColorHex", data.SkinColorHex }
         };
     }
 
@@ -54,19 +57,17 @@ public class PlayerSpawner : MonoBehaviourPun
             playerName: (string)hashtable["playerName"],
             isReady: true,
             bodyID: (int)hashtable["bodyID"],
-            hatID: (int)hashtable["hatID"]
+            hatID: (int)hashtable["hatID"],
+            skinColorHex: (string)hashtable["skinColorHex"]
         );
     }
 
     private void SpawnPlayer()
     {
-        // Get prefab info
-        PlayerController playerController = _playerPrefab.GetComponent<PlayerController>();
-
         // Do spawning
-        playerController = PhotonNetwork.Instantiate(
+        PlayerController playerController = PhotonNetwork.Instantiate(
             _playerPrefab.name,
-            playerController.Player.SpawnPoint,
+            GameManager.Instance.LevelData.Spawnpoints[photonView.OwnerActorNr - 1],
             Quaternion.identity
         ).GetComponent<PlayerController>();
 
@@ -91,46 +92,6 @@ public class PlayerSpawner : MonoBehaviourPun
         );
     }
 
-    internal int LoadAvatar(int playerViewID, Hashtable spawnData)
-    {
-        // Get skin object and spawn data
-        PlayerData data = FromHashtable(spawnData);
-        //GameObject skinPrefab = GameContent.Skins[data.SkinID].Prefab;
-
-        // Spawn skin prefab
-        PhotonView avatarView = PhotonNetwork.Instantiate(
-            "REPLACE",
-            Vector3.up,
-            Quaternion.identity
-        ).GetComponent<PhotonView>();
-
-        return avatarView.ViewID;
-    }
-
-    internal void SetAvatarParent(int playerViewID, int avatarViewID)
-    {
-        // Get the references of the objects to use
-        Transform remotePlayer = PhotonView.Find(playerViewID).transform;
-        GameObject skinPrefab = PhotonView.Find(avatarViewID).gameObject;
-
-        // OWNERSHIP
-        // Get avatar viewID
-        if (skinPrefab.TryGetComponent(out PhotonView avatarPv))
-        {
-            // Fix Pivot
-            float pivotOffset = remotePlayer.GetComponent<Collider>().bounds.size.y / 2;
-            skinPrefab.transform.position = new Vector3(remotePlayer.position.x, remotePlayer.position.y - pivotOffset, remotePlayer.position.z);
-
-            // Set remote player parent of the avatar
-            skinPrefab.transform.SetParent(remotePlayer, true);
-
-            // Initialize player avatar
-            skinPrefab.GetComponent<Avatar>().Initialize();
-
-            // Set ownership to remote player
-            avatarPv.TransferOwnership(playerViewID);
-        }
-    }
 
     #region RPCs
 

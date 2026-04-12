@@ -1,4 +1,5 @@
 using UnityEngine;
+using FixRush;
 
 [CreateAssetMenu(fileName = "GameContent", menuName = "Scriptable Objects/GameContent")]
 public class GameContent : ScriptableObject

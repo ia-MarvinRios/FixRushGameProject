@@ -10,10 +10,6 @@ public class InGameUI : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private GameObject _pauseMenuPanel;
 
-    [Header("Mission References")]
-    [SerializeField] private GameObject _missionCardPrefab;
-    [SerializeField] private Transform _missionsPanel;
-
     internal PlayerNetworkHandler NetworkHandler { get; private set; }
 
     private void Awake()

@@ -4,11 +4,12 @@ using UnityEngine;
 public class PlayerSettings : ScriptableObject
 {
     [Header("In-Game Settings")]
+    public string Nickname = string.Empty;
     public float MoveSpeed = 5f;
-    public Vector3 SpawnPoint = new Vector3(0, 1f, 0);
     [Space(10)]
     [Header("Avatar")]
-    public GameObject Hat;
-    public GameObject Body;
-    public Material SkinMaterial;
+    public int Hat;
+    public int Body;
+    public Color SkinColor;
 }
+

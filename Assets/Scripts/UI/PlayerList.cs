@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using FixRush;
 
 public class PlayerList : MonoBehaviour
 {
@@ -12,8 +14,7 @@ public class PlayerList : MonoBehaviour
     [SerializeField] private InfoPanel _localPlayerInfoPanel;
     [SerializeField] private RemotePlayerUI[] _remoteContainers;
 
-    private int _hatIndex = -1;
-    private int _bodyIndex = -1;
+    private bool _getPreviousData = true;
 
     private void OnEnable()
     {
@@ -27,6 +28,7 @@ public class PlayerList : MonoBehaviour
         PhotonManager.Instance.OnRemotePlayerLeave -= RemoveRemotePlayerUI;
 
         RemoveAllRemotePlayersUI();
+        _getPreviousData = true;
     }
 
     private void UpdatePlayerList(List<PlayerData> playersData)
@@ -40,13 +42,34 @@ public class PlayerList : MonoBehaviour
                     Destroy(child.gameObject);
                 }
 
-                Instantiate(_gameContent.Hats[data.HatID].Prefab, _characterBuilderParent);
-                _hatIndex = data.HatID;
-                _playerSettings.Hat = _gameContent.Hats[data.HatID].Prefab;
+                if (!_getPreviousData)
+                {
+                    _playerSettings.Hat = data.HatID;
+                    _playerSettings.Body = data.BodyID;
+                }
 
-                Instantiate(_gameContent.Bodies[data.BodyID].Prefab, _characterBuilderParent);
-                _bodyIndex = data.BodyID;
-                _playerSettings.Body = _gameContent.Bodies[data.BodyID].Prefab;
+                // Instantiate hat
+                Instantiate(_gameContent.Hats[_playerSettings.Hat].Prefab, _characterBuilderParent);
+
+                // Instantiate body and get its mesh renderer
+                MeshRenderer mr = Instantiate(
+                    _gameContent.Bodies[_playerSettings.Body].Prefab, 
+                    _characterBuilderParent
+                ).GetComponent<MeshRenderer>();
+
+                // Set skin color creating a new material instance
+                if (mr != null)
+                {
+                    Material newMat = new Material(mr.material);
+                    Color color;
+                    if (ColorUtility.TryParseHtmlString("#" + data.SkinColorHex, out color))
+                    {
+                        newMat.color = color;
+                    }
+                    mr.material = newMat;
+                }
+
+                _getPreviousData = false;
 
                 SetLayerRecursively(_characterBuilderParent.gameObject, 3);
 
@@ -88,7 +111,8 @@ public class PlayerList : MonoBehaviour
                 }
 
                 Instantiate(_gameContent.Hats[data.HatID].Prefab, container.transform).layer = 3;
-                Instantiate(_gameContent.Bodies[data.BodyID].Prefab, container.transform).layer = 3;
+
+                ProcessRemoteBody(data, container.transform);
 
                 container.InfoPanel.Ready = data.IsReady;
 
@@ -100,7 +124,8 @@ public class PlayerList : MonoBehaviour
                 container.UpdateUI(data);
 
                 Instantiate(_gameContent.Hats[data.HatID].Prefab, container.transform).layer = 3;
-                Instantiate(_gameContent.Bodies[data.BodyID].Prefab, container.transform).layer = 3;
+
+                ProcessRemoteBody(data, container.transform);
 
                 container.InfoPanel.PlayerName = data.PlayerName;
                 container.InfoPanel.Ready = data.IsReady;
@@ -136,6 +161,8 @@ public class PlayerList : MonoBehaviour
     {
         foreach (RemotePlayerUI container in _remoteContainers)
         {
+            if (container == null) continue;
+
             container.Uid = string.Empty;
             container.BodyID = -1;
             container.HatID = -1;
@@ -148,19 +175,44 @@ public class PlayerList : MonoBehaviour
             }
         }
     }
+    private void ProcessRemoteBody(PlayerData data, Transform container)
+    {
+        MeshRenderer mr = Instantiate(
+                    _gameContent.Bodies[data.BodyID].Prefab,
+                    container.transform
+        ).GetComponent<MeshRenderer>();
+
+        mr.gameObject.layer = 3;
+
+        if (mr != null)
+        {
+            Material newMat = new Material(mr.material);
+            Color color;
+            if (ColorUtility.TryParseHtmlString("#" + data.SkinColorHex, out color))
+            {
+                newMat.color = color;
+            }
+            mr.material = newMat;
+        }
+    }
 
     public void SwitchHat(int factor)
     {
         int length = _gameContent.Hats.Length;
-        int newIndex = (_hatIndex + factor + length) % length;
+        int newIndex = (_playerSettings.Hat + factor + length) % length;
 
         PhotonManager.Instance.SetIntProperty("hat", newIndex);
     }
     public void SwitchBody(int factor)
     {
         int length = _gameContent.Bodies.Length;
-        int newIndex = (_bodyIndex + factor + length) % length;
+        int newIndex = (_playerSettings.Body + factor + length) % length;
 
         PhotonManager.Instance.SetIntProperty("body", newIndex);
+    }
+    public void SetSkinTone(Image skinTone)
+    {
+        _playerSettings.SkinColor = skinTone.color;
+        PhotonManager.Instance.SetStringProperty("skinColorHex", ColorUtility.ToHtmlStringRGBA(skinTone.color));
     }
 }

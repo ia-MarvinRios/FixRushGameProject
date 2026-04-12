@@ -4,7 +4,7 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - MissionItem
+  - Item
   layers:
   - Default
   - TransparentFX
@@ -12,7 +12,7 @@ TagManager:
   - CharacterBuilding
   - Water
   - UI
-  - 
+  - Ground
   - 
   - 
   - 
