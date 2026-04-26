@@ -35,7 +35,6 @@ public class UI : MonoBehaviour
 
     private void Start()
     {
-        PhotonManager.Instance.OnPhotonConnected += SetBuildInfoText;
         PhotonManager.Instance.OnRoomJoin += OpenLobbyScreen;
 
         // Set nickname field to the current Photon nickname if it exists
@@ -43,6 +42,9 @@ public class UI : MonoBehaviour
         {
             _nicknameField.text = PhotonManager.Instance.MyNickname;
         }
+
+        // Build Info
+        SetBuildInfoText();
 
         // Audio
         AudioManager.Instance.PlayAllMusic(true);
@@ -52,7 +54,6 @@ public class UI : MonoBehaviour
     {
         StopAllCoroutines();
 
-        PhotonManager.Instance.OnPhotonConnected -= SetBuildInfoText;
         PhotonManager.Instance.OnRoomJoin -= OpenLobbyScreen;
     }
 

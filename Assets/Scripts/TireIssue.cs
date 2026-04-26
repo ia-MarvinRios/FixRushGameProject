@@ -2,21 +2,21 @@ using FixRush;
 using System.Collections;
 using UnityEngine;
 
-public class DirtIssue : IIssue
+public class TireIssue : IIssue
 {
-    private Vehicle _vehicle;
+    private Car _car;
 
-    public DirtIssue(Vehicle v)
+    public TireIssue(Car car)
     {
-        _vehicle = v;
+        _car = car;
     }
 
-    IIssue.Type IIssue.IssueType => IIssue.Type.Dirty;
+    public IIssue.Type IssueType => IIssue.Type.Tires;
+
     public bool IsFixed { get; private set; } = false;
 
     public void CleanUp()
     {
-
         // Hide UI panel
         InGameUI.Instance.ShowTaskPanel(false);
 
@@ -27,10 +27,9 @@ public class DirtIssue : IIssue
     public IEnumerator FixingCoroutine()
     {
         // Show UI panel
-        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Dirty);
+        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Tires);
 
         yield return new WaitForSeconds(1f);
-        _vehicle.DirtAlpha = 0;
         IsFixed = true;
     }
 

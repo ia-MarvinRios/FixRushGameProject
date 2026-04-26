@@ -42,6 +42,7 @@ MonoBehaviour:
   - PickUpJack
   - RPC_PickUpObj
   - RPC_DropObj
+  - RPC_MoveCarToEndPoint
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

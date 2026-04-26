@@ -22,7 +22,46 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         }
 
         Vehicle v = GetComponent<Vehicle>();
-        v.Issues = Issues;
+        v.IssueTypes = Issues;
         //v.IsFixed = (bool)data[1];
     }
+
+    public void MoveCarToEndPoint(Vehicle v)
+    {
+        photonView.RPC(nameof(RPC_MoveCarToEndPoint),
+            RpcTarget.MasterClient,
+            v.GetComponent<PhotonView>().ViewID
+        );
+    }
+    internal void SyncDirt()
+    {
+        photonView.RPC(
+            nameof(RPC_SyncDirt),
+            RpcTarget.All,
+            photonView.ViewID
+        );
+    }
+
+    #region RPCs
+
+    [PunRPC]
+    void RPC_MoveCarToEndPoint(int vehicleViewID)
+    {
+        if (!PhotonNetwork.IsMasterClient) { return; }
+
+        // Find vehicle
+        Vehicle v = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
+
+        // Move it to the end point
+        VManager.Instance.MoveToEndPoint(v);
+    }
+    [PunRPC]
+    void RPC_SyncDirt(int vehicleViewID)
+    {
+        Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
+
+        vehicle.SetupDirt();
+    }
+
+    #endregion
 }

@@ -33,6 +33,16 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
                 Quaternion.identity
             );
 
+            // Skin color
+            if(body.TryGetComponent(out MeshRenderer bodyMeshRenderer))
+            {
+                Material newMat = new Material(bodyMeshRenderer.material);
+
+                newMat.color = PlayerSettings.SkinColor;
+
+                bodyMeshRenderer.material = newMat;
+            }
+
             // Set body and hat as children of the player
             photonView.RPC(
                 nameof(RPC_SetCosmeticParent),

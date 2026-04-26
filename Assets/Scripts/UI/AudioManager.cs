@@ -82,6 +82,17 @@ public class AudioManager : MonoBehaviour
         StartCoroutine(PlayAllMusicCoroutine(loop));
     }
 
+    public void PlayOnTarget(string name, Transform target)
+    {
+        foreach (var sound in _soundsLibrary)
+        {
+            if (sound.Name == name)
+            {
+                AudioSource.PlayClipAtPoint(sound.Clip, target.position);
+            }
+        }
+    }
+
     public void SetChannelVolume(string mixerChannel, float linearVolume) // valor 0.0 a 1.0
     {
         float volumeInDb = Mathf.Log10(Mathf.Clamp(linearVolume, 0.0001f, 1f)) * 20f;

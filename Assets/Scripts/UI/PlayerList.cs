@@ -1,7 +1,7 @@
+using FixRush;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using FixRush;
 
 public class PlayerList : MonoBehaviour
 {
@@ -46,6 +46,11 @@ public class PlayerList : MonoBehaviour
                 {
                     _playerSettings.Hat = data.HatID;
                     _playerSettings.Body = data.BodyID;
+
+                    if (ColorUtility.TryParseHtmlString("#" + data.SkinColorHex, out Color color))
+                    {
+                        _playerSettings.SkinColor = color;
+                    }
                 }
 
                 // Instantiate hat
@@ -61,11 +66,9 @@ public class PlayerList : MonoBehaviour
                 if (mr != null)
                 {
                     Material newMat = new Material(mr.material);
-                    Color color;
-                    if (ColorUtility.TryParseHtmlString("#" + data.SkinColorHex, out color))
-                    {
-                        newMat.color = color;
-                    }
+
+                    newMat.color = _playerSettings.SkinColor;
+
                     mr.material = newMat;
                 }
 
