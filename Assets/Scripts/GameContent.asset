@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89b4f05bd201e844f8f3933db302e7c4, type: 3}
+  m_Name: GameContent
+  m_EditorClassIdentifier: Assembly-CSharp::GameContent
+  Bodies:
+  - Name: Body01
+    Unlocked: 1
+    Prefab: {fileID: 2167341707901067848, guid: c34c2bcb0ecff644c8402affe58047df, type: 3}
+  - Name: ChubbyBody
+    Unlocked: 0
+    Prefab: {fileID: 207492592969973276, guid: ee0dc7035a3a99546b36f53378159866, type: 3}
+  Hats:
+  - Name: Hair01
+    Unlocked: 1
+    Prefab: {fileID: 7072056493466437613, guid: d9011260904eec045829da6f66928bae, type: 3}
+  - Name: Punk
+    Unlocked: 0
+    Prefab: {fileID: 4131390328049821397, guid: b921edb596feb6b4bb0ce35e5a8532d3, type: 3}

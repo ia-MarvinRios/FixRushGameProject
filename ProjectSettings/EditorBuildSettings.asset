@@ -6,11 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
-    guid: 479d907bc2ba3704297cbafdae44c01c
+    path: Assets/Scenes/Bootstrap.unity
+    guid: c94920c9617276d458941be1f5a46f43
   - enabled: 1
-    path: Assets/Scenes/Playground.unity
+    path: Assets/Scenes/MainMenu/MainMenu.unity
+    guid: 1615eb0a98949c249b72a9286a037ec5
+  - enabled: 1
+    path: Assets/Scenes/Overworld/Overworld.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Overworld/NewSetup.unity
+    guid: c740ff81897e6ae41b070891570a38e1
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
