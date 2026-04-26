@@ -189,7 +189,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             CurrentRoom.IsOpen = false;
             CurrentRoom.IsVisible = false;
 
-            PhotonNetwork.LoadLevel("NewSetup");
+            PhotonNetwork.LoadLevel("Overworld");
         }
         else
         {
