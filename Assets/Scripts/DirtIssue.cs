@@ -30,7 +30,7 @@ public class DirtIssue : IIssue
         InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Dirty);
 
         yield return new WaitForSeconds(1f);
-        _vehicle.DirtAlpha = 0;
+        _vehicle.NetworkHandler.SyncDirtAlpha(0);
         IsFixed = true;
     }
 

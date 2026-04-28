@@ -42,6 +42,16 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         );
     }
 
+    internal void SyncDirtAlpha(float value)
+    {
+        photonView.RPC(
+            nameof(RPC_SyncDirtAlpha),
+            RpcTarget.All,
+            photonView.ViewID,
+            value
+        );
+    }
+
     #region RPCs
 
     [PunRPC]
@@ -61,6 +71,13 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
 
         vehicle.SetupDirt();
+    }
+    [PunRPC]
+    void RPC_SyncDirtAlpha(int vehicleViewID, float value)
+    {
+        Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
+
+        vehicle.DirtAlpha = value;
     }
 
     #endregion

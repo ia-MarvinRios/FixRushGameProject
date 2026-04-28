@@ -1541,6 +1541,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
   _playerSettings: {fileID: 11400000, guid: 1b0cc9b4585edbd428823a59ca4dc910, type: 2}
   _playerPrefab: {fileID: 1549537976254818863, guid: 985f83cb500204f41be18e6ffdace15f, type: 3}
+  LevelData: {fileID: 11400000, guid: 5e8e57683cbcba941a953c6bd6449ab9, type: 2}
 --- !u!114 &1649195055
 MonoBehaviour:
   m_ObjectHideFlags: 0
