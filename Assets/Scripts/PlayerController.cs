@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using FixRush;
+using UnityEngine.VFX;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,6 +16,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CharacterController _characterController;
     [SerializeField] private PlayerNetworkHandler _networkHandler;
     [SerializeField] internal Transform ObjRoot;
+    
+    private VisualEffect _particulasEffects;
+
+
 
     private InputSystem_Actions _inputActions;
     private InputAction _moveAction;
@@ -53,6 +58,10 @@ public class PlayerController : MonoBehaviour
         EnableAllInputs();
     }
 
+    private void Start()
+    {
+        _particulasEffects = GetComponent<VisualEffect>();
+    }
     private void FixedUpdate()
     {
         if (!_networkHandler.PhotonViewIsMine) { return; }
@@ -395,6 +404,26 @@ public class PlayerController : MonoBehaviour
 
         FocusedObj = best;
     }
+
+   
+
+    /// <summary>
+    /// Particulas que se activaran cuando se este trabajando en una reparación, Se espera un bool, true = play, false = stop
+    /// </summary>
+    /// <param name="status"></param>
+    public void OnWorkParticle(bool status)
+    {
+        if (status)
+        {
+            _particulasEffects.Stop();
+        }
+        else
+        {
+            _particulasEffects.Play();
+        }
+    }
+
+
 
     private void OnDrawGizmos()
     {
