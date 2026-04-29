@@ -44,11 +44,8 @@ MonoBehaviour:
   - RPC_DropObj
   - RPC_MoveCarToEndPoint
   - RPC_SyncDirt
-<<<<<<< Updated upstream
   - RPC_SyncDirtAlpha
   - RPC_SyncSkinColor
-=======
->>>>>>> Stashed changes
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
