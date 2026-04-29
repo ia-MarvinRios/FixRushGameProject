@@ -1,9 +1,44 @@
 fileFormatVersion: 2
-guid: 3200ab3c24422e44aa7657ee7f944452
+guid: 3d2541f615713f64489a265a04cb219c
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Board_Diffuse1K
+    second: {fileID: 2800000, guid: 22a2c695af15bfb44be15b1abd1a276e, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Floor_Diffuse1K
+    second: {fileID: 2800000, guid: 94252e9a9bd7b75488ca52d4fbb69de8, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Highway_Diffuse1K
+    second: {fileID: 2800000, guid: 4afbdeecaef01c94385095f2b41e1029, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: agua
+    second: {fileID: 2800000, guid: fc59532f9ea470f45b2d6be26ec40ce2, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: anuncio
+    second: {fileID: 2800000, guid: 1b7e590aba2edaa4b8756642d69019dc, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: parca
+    second: {fileID: 2800000, guid: 230877b24f1bb4d41a91e277224dbdc8, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: ropatiendaprimer_capa
+    second: {fileID: 2800000, guid: 52aa4c06ad1acb34b9cfcffbcd5c1728, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
