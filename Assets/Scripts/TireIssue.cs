@@ -27,7 +27,7 @@ public class TireIssue : IIssue
     public IEnumerator FixingCoroutine()
     {
         // Show UI panel
-        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Tires);
+        _car.NetworkHandler.SyncTaskPanel(true, IIssue.Type.Tires);
 
         yield return new WaitForSeconds(1f);
         IsFixed = true;

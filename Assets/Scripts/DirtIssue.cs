@@ -27,7 +27,7 @@ public class DirtIssue : IIssue
     public IEnumerator FixingCoroutine()
     {
         // Show UI panel
-        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Dirty);
+        _vehicle.NetworkHandler.SyncTaskPanel(true, IIssue.Type.Dirty);
 
         yield return new WaitForSeconds(1f);
         _vehicle.NetworkHandler.SyncDirtAlpha(0);
