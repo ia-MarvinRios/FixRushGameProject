@@ -191,7 +191,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5458326458608636509}
-  - component: {fileID: -350091219972406684}
+  - component: {fileID: 790910699007782570}
   - component: {fileID: -560166049629438895}
   - component: {fileID: -790701046224642771}
   - component: {fileID: 7851146544130939229}
@@ -226,7 +226,7 @@ Transform:
   - {fileID: 4949795330324442951}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-350091219972406684
+--- !u!114 &790910699007782570
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -235,15 +235,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 3256836755851782842}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84c7998f5a338224ea080d8b17792483, type: 3}
+  m_Script: {fileID: 11500000, guid: 7098bc52e2a262441b2f2386d8cacd7e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Vehicle
+  m_EditorClassIdentifier: Assembly-CSharp::Car
   QueueIndex: -1
+  NetworkHandler: {fileID: -560166049629438895}
   Agent: {fileID: -790701046224642771}
   _collider: {fileID: 7851146544130939229}
   _dirtDecal: {fileID: 6021139444477895614}
   _dirtMaterial: {fileID: 2100000, guid: 6707faffe9b35be4cb4be7c306501066, type: 2}
-  _issues: 
+  _issueTypes: 
 --- !u!114 &-560166049629438895
 MonoBehaviour:
   m_ObjectHideFlags: 0

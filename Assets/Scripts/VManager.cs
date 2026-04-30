@@ -167,7 +167,7 @@ public class VManager : MonoBehaviourPun
         agent.SetDestination(_endPoint);
         Debug.Log("Moving to endpoint...");
         yield return new WaitUntil(() => HasReachedDestination(agent));
-        //v.Fix();
+        v.Fix();
     }
 
 

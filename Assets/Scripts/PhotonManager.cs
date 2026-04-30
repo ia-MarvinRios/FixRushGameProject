@@ -189,7 +189,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             CurrentRoom.IsOpen = false;
             CurrentRoom.IsVisible = false;
 
-            PhotonNetwork.LoadLevel("Overworld");
+            PhotonNetwork.LoadLevel("newSetUp");
         }
         else
         {
@@ -212,7 +212,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         bool isReady = player.CustomProperties.ContainsKey("ready") && (bool)player.CustomProperties["ready"];
         int bodyID = player.CustomProperties.ContainsKey("body") ? (int)player.CustomProperties["body"] : 0;
         int hatID = player.CustomProperties.ContainsKey("hat") ? (int)player.CustomProperties["hat"] : 0;
-        string skinColorHex = player.CustomProperties.ContainsKey("skinColorHex") ? (string)player.CustomProperties["skinColorHex"] : "#E6D1B1FF";
+        string skinColorHex = player.CustomProperties.ContainsKey("skinColorHex") ? (string)player.CustomProperties["skinColorHex"] : "E6D1B1FF";
 
         PlayerData playerData = new PlayerData(player.UserId, player.NickName, isReady, bodyID, hatID, skinColorHex);
         

@@ -10,11 +10,14 @@ using FixRush;
 /// </summary>
 public class PlayerSpawner : MonoBehaviourPun
 {
-    public static PlayerSpawner Instance {  get; private set; }
+    public static PlayerSpawner Instance { get; private set; }
 
     [Header("Player Spawning")]
     [SerializeField] private PlayerSettings _playerSettings;
     [SerializeField] private GameObject _playerPrefab;
+
+    [Header("Level Data Reference")]
+    [SerializeField] internal LevelData LevelData;
 
     internal PlayerController Controller { get; private set; }
 
@@ -67,8 +70,10 @@ public class PlayerSpawner : MonoBehaviourPun
         // Do spawning
         PlayerController playerController = PhotonNetwork.Instantiate(
             _playerPrefab.name,
-            GameManager.Instance.LevelData.Spawnpoints[photonView.OwnerActorNr - 1],
-            Quaternion.identity
+            LevelData.Spawnpoints[photonView.OwnerActorNr - 1],
+            Quaternion.identity,
+            0,
+            new object[] { ColorUtility.ToHtmlStringRGBA(_playerSettings.SkinColor) }
         ).GetComponent<PlayerController>();
 
         Controller = playerController;

@@ -38,12 +38,6 @@ public class GameManager : MonoBehaviourPun
         }
     }
 
-    private void Start()
-    {
-        // Audio
-        AudioManager.Instance.PlayAllMusic(true);
-    }
-
     internal void RegisterPlayer(int playerViewID, Hashtable spawnData)
     {
         // Find the player controller view in the scene

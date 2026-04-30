@@ -1,22 +1,37 @@
 using FixRush;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DirtIssue : IIssue
 {
-    public IIssue.Type IssueType => IIssue.Type.Dirty;
+    private Vehicle _vehicle;
 
+    public DirtIssue(Vehicle v)
+    {
+        _vehicle = v;
+    }
+
+    IIssue.Type IIssue.IssueType => IIssue.Type.Dirty;
     public bool IsFixed { get; private set; } = false;
 
     public void CleanUp()
     {
-        return;
+
+        // Hide UI panel
+        _vehicle.NetworkHandler.SyncTaskPanel(false);
+
+        // Audio
+        AudioManager.Instance.PlaySoundByName("TaskCompleted");
     }
 
     public IEnumerator FixingCoroutine()
     {
-        yield break;
+        // Show UI panel
+        _vehicle.NetworkHandler.SyncTaskPanel(true, IIssue.Type.Dirty);
+
+        yield return new WaitForSeconds(1f);
+        _vehicle.NetworkHandler.SyncDirtAlpha(0);
+        IsFixed = true;
     }
 
     public void HandleInteraction(IInteractable obj, PlayerController player)
