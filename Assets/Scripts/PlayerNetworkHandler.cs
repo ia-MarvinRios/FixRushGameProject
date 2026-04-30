@@ -87,6 +87,16 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
         );
     }
 
+    internal void SyncWorkParticles(bool show)
+    {
+        photonView.RPC(
+            nameof(RPC_SyncWorkParticles),
+            RpcTarget.All,
+            photonView.ViewID,
+            show
+        );
+    }
+
 
     #region RPCs
 
@@ -158,6 +168,12 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
         {
             objP.Drop(pc);
         }
+    }
+
+    [PunRPC]
+    private void RPC_SyncWorkParticles(int playerViewID, bool show)
+    {
+        PhotonView.Find(playerViewID).GetComponent<PlayerController>().OnWorkParticle(show);
     }
 
     #endregion
