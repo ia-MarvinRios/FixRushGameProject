@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1896001185540590989}
   - component: {fileID: 120686601043765687}
   m_Layer: 0
-  m_Name: GORRA
+  m_Name: Gorra
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

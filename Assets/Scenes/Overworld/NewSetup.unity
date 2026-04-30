@@ -1524,6 +1524,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2319163931111286258}
+        m_TargetAssemblyTypeName: Manual, Assembly-CSharp
+        m_MethodName: HideParticle
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1079852373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2778,7 +2790,7 @@ Transform:
   m_GameObject: {fileID: 8907445070685474617}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.0175, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4515,8 +4527,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.8943243, y: 0.0942702, z: 0.8943243}
-  m_Center: {x: -0.00000010430813, y: -0.00004213676, z: 0.000001206994}
+  m_Size: {x: 0.8943243, y: 0.27442965, z: 0.8943243}
+  m_Center: {x: -0.000000089406946, y: 0.090037525, z: 0.0000011920929}
 --- !u!4 &3456727344778147075
 Transform:
   m_ObjectHideFlags: 0
@@ -5815,13 +5827,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4228435698013727590}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -8.591988, y: 9.26, z: -1.9}
+  m_LocalRotation: {x: -0, y: 0.2588186, z: -0, w: 0.965926}
+  m_LocalPosition: {x: -10.4468, y: 8.94, z: -5.2800407}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6632237746298333976}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 30, z: 0}
 --- !u!1 &7152366082543276475
 GameObject:
   m_ObjectHideFlags: 0

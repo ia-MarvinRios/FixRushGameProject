@@ -92,7 +92,6 @@ MonoBehaviour:
   _characterController: {fileID: 2453003754471218011}
   _networkHandler: {fileID: 807180346065615471}
   ObjRoot: {fileID: 9191127004246503959}
-  particulasEffects: {fileID: -3542725918087135794}
 --- !u!114 &807180346065615471
 MonoBehaviour:
   m_ObjectHideFlags: 0
