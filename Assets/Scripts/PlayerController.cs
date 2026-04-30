@@ -423,6 +423,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ShowWorkParticle(bool show)
+    {
+        _networkHandler.SyncWorkParticles(show);
+    }
+
 
 
     private void OnDrawGizmos()
