@@ -18,7 +18,7 @@ public class DirtIssue : IIssue
     {
 
         // Hide UI panel
-        InGameUI.Instance.ShowTaskPanel(false);
+        _vehicle.NetworkHandler.SyncTaskPanel(false);
 
         // Audio
         AudioManager.Instance.PlaySoundByName("TaskCompleted");
