@@ -18,7 +18,7 @@ public class TireIssue : IIssue
     public void CleanUp()
     {
         // Hide UI panel
-        InGameUI.Instance.ShowTaskPanel(false);
+        _car.NetworkHandler.SyncTaskPanel(false);
 
         // Audio
         AudioManager.Instance.PlaySoundByName("TaskCompleted");
@@ -27,7 +27,7 @@ public class TireIssue : IIssue
     public IEnumerator FixingCoroutine()
     {
         // Show UI panel
-        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Tires);
+        _car.NetworkHandler.SyncTaskPanel(true, IIssue.Type.Tires);
 
         yield return new WaitForSeconds(1f);
         IsFixed = true;
