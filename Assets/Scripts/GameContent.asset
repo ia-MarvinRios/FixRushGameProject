@@ -15,23 +15,23 @@ MonoBehaviour:
   Bodies:
   - Name: Body01
     Unlocked: 1
-    Prefab: {fileID: 817766874751617688, guid: ae1cb2edeb11d9643999be55124926e7, type: 3}
+    Prefab: {fileID: 5066491826347664535, guid: 0ae4a93db575e834ead260816e761c65, type: 3}
   - Name: ChubbyBody
     Unlocked: 0
-    Prefab: {fileID: 6957872506153933952, guid: d0c10a8f65ba951429bb7ade553ba95d, type: 3}
+    Prefab: {fileID: 4315119664445337559, guid: 9a555d882a8ab0b458c115951d247489, type: 3}
   - Name: FemaleBody
     Unlocked: 0
-    Prefab: {fileID: 1466563555147957708, guid: 542a6485bf3e662449dad661ee783920, type: 3}
+    Prefab: {fileID: 3004252982231233445, guid: 567ddae4602d17c47a43c19c77d9f621, type: 3}
   Hats:
   - Name: Hair01
     Unlocked: 1
-    Prefab: {fileID: 111678785248838102, guid: 7db7faffe590cb740ad64b8fd8471147, type: 3}
+    Prefab: {fileID: 8297864872639466317, guid: 0ebb602e69c4c974d8bccf343aaa5bef, type: 3}
   - Name: Blonde
     Unlocked: 0
-    Prefab: {fileID: 4697563247961235335, guid: 22f611e85ea7f8c4784c66e15fede93e, type: 3}
+    Prefab: {fileID: 648907300441370630, guid: 4ea28f5ba4f1f3243a3ae6e1b5ef4b53, type: 3}
   - Name: 80
     Unlocked: 0
-    Prefab: {fileID: 6521093168560903390, guid: 6ff76a43377139047999d02624420d20, type: 3}
+    Prefab: {fileID: 2735528980077814136, guid: 3209d3eba2471f84ea58d7b2fb9799c7, type: 3}
   - Name: Cap
     Unlocked: 0
-    Prefab: {fileID: 8884070241276801436, guid: ed6b1fd57fb62da428cf11c46a96ef14, type: 3}
+    Prefab: {fileID: 3855904710626097197, guid: ed6b1fd57fb62da428cf11c46a96ef14, type: 3}

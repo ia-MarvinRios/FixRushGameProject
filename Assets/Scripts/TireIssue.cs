@@ -18,7 +18,7 @@ public class TireIssue : IIssue
     public void CleanUp()
     {
         // Hide UI panel
-        InGameUI.Instance.ShowTaskPanel(false);
+        _car.NetworkHandler.SyncTaskPanel(false);
 
         // Audio
         AudioManager.Instance.PlaySoundByName("TaskCompleted");

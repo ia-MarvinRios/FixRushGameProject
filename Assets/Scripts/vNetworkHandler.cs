@@ -52,6 +52,16 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         );
     }
 
+    internal void SyncTaskPanel(bool show, IIssue.Type issueType = IIssue.Type.Dirty)
+    {
+        photonView.RPC(
+            nameof(RPC_SyncTaskPanel),
+            RpcTarget.All,
+            show,
+            issueType
+        );
+    }
+
     #region RPCs
 
     [PunRPC]
@@ -78,6 +88,11 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
 
         vehicle.DirtAlpha = value;
+    }
+    [PunRPC]
+    void RPC_SyncTaskPanel(bool show, IIssue.Type issueType = IIssue.Type.Dirty)
+    {
+        InGameUI.Instance.ShowTaskPanel(show, issueType);
     }
 
     #endregion
