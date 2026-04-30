@@ -47,6 +47,7 @@ MonoBehaviour:
   - RPC_SyncDirtAlpha
   - RPC_SyncSkinColor
   - RPC_SyncTaskPanel
+  - RPC_SyncWorkParticles
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
