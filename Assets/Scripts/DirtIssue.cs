@@ -19,9 +19,6 @@ public class DirtIssue : IIssue
 
         // Hide UI panel
         _vehicle.NetworkHandler.SyncTaskPanel(false);
-
-        // Audio
-        AudioManager.Instance.PlaySoundByName("TaskCompleted");
     }
 
     public IEnumerator FixingCoroutine()

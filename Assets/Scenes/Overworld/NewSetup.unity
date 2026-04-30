@@ -1526,7 +1526,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 2319163931111286258}
         m_TargetAssemblyTypeName: Manual, Assembly-CSharp
-        m_MethodName: HideParticle
+        m_MethodName: HideParticles
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

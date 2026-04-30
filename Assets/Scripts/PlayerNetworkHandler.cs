@@ -3,6 +3,7 @@ using UnityEngine;
 using FixRush;
 using NUnit.Framework;
 using System.Collections.Generic;
+using UnityEngine.VFX;
 
 public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
@@ -173,7 +174,16 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
     [PunRPC]
     private void RPC_SyncWorkParticles(int playerViewID, bool show)
     {
-        PhotonView.Find(playerViewID).GetComponent<PlayerController>().OnWorkParticle(show);
+        VisualEffect partFX = PhotonView.Find(playerViewID).GetComponent<VisualEffect>();
+
+        if (!show)
+        {
+            partFX.Stop();
+        }
+        else
+        {
+            partFX.Play();
+        }
     }
 
     #endregion

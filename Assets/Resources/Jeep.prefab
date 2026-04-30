@@ -77,6 +77,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61b189b7d62472c40a0bb66deee8ba11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::vNetworkHandler
+  _triggerPrefab: {fileID: 0}
 --- !u!195 &2280545167127304173
 NavMeshAgent:
   m_ObjectHideFlags: 0

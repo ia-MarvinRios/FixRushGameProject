@@ -1,9 +1,13 @@
 using Photon.Pun;
 using UnityEngine;
 using FixRush;
+using System;
 
 public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
+    [Header("Utilities")]
+    [SerializeField] private GameObject _triggerPrefab;
+
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         // get th int issueIDs from the instantiation data int array
@@ -33,6 +37,17 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
             v.GetComponent<PhotonView>().ViewID
         );
     }
+
+    internal void CreateTrigger(float radius, float holdTime, Action onInteracted, IInteractable.Type interactionType = IInteractable.Type.Simple)
+    {
+        /*
+        Trigger t = PhotonNetwork.Instantiate(
+            _triggerPrefab,
+
+        );
+        */
+    }
+
     internal void SyncDirt()
     {
         photonView.RPC(
