@@ -1326,7 +1326,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119229507}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e90261dc1bfb944eb22fa71adc10bee, type: 3}
   m_Name: 
@@ -1334,6 +1334,7 @@ MonoBehaviour:
   _gameContent: {fileID: 11400000, guid: b0b1f3297d74f064c85ebcca653b63fe, type: 2}
   _pauseMenuPanel: {fileID: 1725812781}
   _taskPanelText: {fileID: 1829572452}
+  Manual: {fileID: 0}
   _animator: {fileID: 1119229513}
 --- !u!224 &1119229512
 RectTransform:

@@ -19,9 +19,6 @@ public class TireIssue : IIssue
     {
         // Hide UI panel
         _car.NetworkHandler.SyncTaskPanel(false);
-
-        // Audio
-        AudioManager.Instance.PlaySoundByName("TaskCompleted");
     }
 
     public IEnumerator FixingCoroutine()
