@@ -120,11 +120,9 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
 
         if (body.TryGetComponent(out MeshRenderer bodyMeshRenderer))
         {
-            Debug.Log("got component mesh renderer");
             Material newMat = new Material(bodyMeshRenderer.material);
 
             ColorUtility.TryParseHtmlString("#" + colorhex, out Color color);
-            Debug.Log(color);
 
             newMat.color = color;
 
