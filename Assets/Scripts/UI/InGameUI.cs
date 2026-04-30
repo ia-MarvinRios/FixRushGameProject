@@ -12,6 +12,7 @@ public class InGameUI : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private GameObject _pauseMenuPanel;
     [SerializeField] private TMP_Text _taskPanelText;
+    [SerializeField] internal GameObject Manual;
 
     [Header("Animations")]
     [SerializeField] private Animator _animator;
