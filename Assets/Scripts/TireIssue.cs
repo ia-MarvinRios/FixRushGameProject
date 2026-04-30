@@ -19,15 +19,12 @@ public class TireIssue : IIssue
     {
         // Hide UI panel
         _car.NetworkHandler.SyncTaskPanel(false);
-
-        // Audio
-        AudioManager.Instance.PlaySoundByName("TaskCompleted");
     }
 
     public IEnumerator FixingCoroutine()
     {
         // Show UI panel
-        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Tires);
+        _car.NetworkHandler.SyncTaskPanel(true, IIssue.Type.Tires);
 
         yield return new WaitForSeconds(1f);
         IsFixed = true;

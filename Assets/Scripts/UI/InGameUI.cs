@@ -24,6 +24,12 @@ public class InGameUI : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        // Audio
+        AudioManager.Instance.PlayAllMusic(true);
+    }
+
     public void MainMenu()
     {
         PhotonManager.Instance.LeaveRoom();
@@ -51,6 +57,12 @@ public class InGameUI : MonoBehaviour
         };
 
         _taskPanelText.text = show ? description : string.Empty;
+
+        if (!show)
+        {
+            // Audio
+            AudioManager.Instance.PlaySoundByName("TaskCompleted");
+        }
 
     }
 
