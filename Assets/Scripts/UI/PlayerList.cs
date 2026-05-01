@@ -35,7 +35,7 @@ public class PlayerList : MonoBehaviour
     {
         foreach (PlayerData data in playersData)
         {
-            if (data.Uid == PhotonManager.Instance.MyUserID)
+            if (data.ActorNumber == PhotonManager.Instance.MyActorNumber)
             {
                 foreach (Transform child in _characterBuilderParent)
                 {
@@ -100,41 +100,47 @@ public class PlayerList : MonoBehaviour
         }
     }
 
+    private void ApplyUI(RemotePlayerUI container, PlayerData data)
+    {
+        container.UpdateUI(data);
+
+        foreach (Transform child in container.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        Instantiate(_gameContent.Hats[data.HatID].Prefab, container.transform).layer = 3;
+
+        ProcessRemoteBody(data, container.transform);
+
+        container.InfoPanel.PlayerName = data.PlayerName;
+        container.InfoPanel.Ready = data.IsReady;
+
+        Debug.Log($"{container.name}: {data.PlayerName} | data AN: {data.ActorNumber}, container AN: {container.ActorNumber}");
+    }
+
     private void UpdateRemotePlayerUI(PlayerData data)
     {
-        foreach (RemotePlayerUI container in _remoteContainers)
+        RemotePlayerUI emptySlot = null;
+
+        foreach (var container in _remoteContainers)
         {
-            if (container.Uid == data.Uid)
+            if (container.ActorNumber == data.ActorNumber)
             {
-                container.UpdateUI(data);
-
-                foreach (Transform child in container.transform)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                Instantiate(_gameContent.Hats[data.HatID].Prefab, container.transform).layer = 3;
-
-                ProcessRemoteBody(data, container.transform);
-
-                container.InfoPanel.Ready = data.IsReady;
-
+                ApplyUI(container, data);
                 return;
             }
-            else if (string.IsNullOrEmpty(container.Uid))
+
+            if (container.ActorNumber == 0 && emptySlot == null)
             {
-                container.Uid = data.Uid;
-                container.UpdateUI(data);
-
-                Instantiate(_gameContent.Hats[data.HatID].Prefab, container.transform).layer = 3;
-
-                ProcessRemoteBody(data, container.transform);
-
-                container.InfoPanel.PlayerName = data.PlayerName;
-                container.InfoPanel.Ready = data.IsReady;
-
-                return;
+                emptySlot = container;
             }
+        }
+
+        if (emptySlot != null)
+        {
+            emptySlot.ActorNumber = data.ActorNumber;
+            ApplyUI(emptySlot, data);
         }
     }
 
@@ -142,9 +148,9 @@ public class PlayerList : MonoBehaviour
     {
         foreach (RemotePlayerUI container in _remoteContainers)
         {
-            if (container.Uid == data.Uid)
+            if (container.ActorNumber == data.ActorNumber)
             {
-                container.Uid = string.Empty;
+                container.ActorNumber = 0;
                 container.BodyID = -1;
                 container.HatID = -1;
 
@@ -166,7 +172,7 @@ public class PlayerList : MonoBehaviour
         {
             if (container == null) continue;
 
-            container.Uid = string.Empty;
+            container.ActorNumber = 0;
             container.BodyID = -1;
             container.HatID = -1;
             container.InfoPanel.PlayerName = "-";

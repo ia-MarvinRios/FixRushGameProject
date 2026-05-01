@@ -189,7 +189,7 @@ public class VManager : MonoBehaviourPun
             Vehicle v = ActiveVehicles[i].GetComponent<Vehicle>();
             v.QueueIndex = i;
 
-            float distance = GetQueueDistance(v.Size, i);
+            float distance = GetQueueDistance(i);
             distance = Mathf.Min(distance, pathLength - v.Size.z);
 
             Vector3 point =
@@ -204,7 +204,18 @@ public class VManager : MonoBehaviourPun
     /// <param name="size">The size of the vehicle.</param>
     /// <param name="index">The index of the vehicle in the queue.</param>
     /// <returns>The distance along the path for the vehicle.</returns>
-    float GetQueueDistance(Vector3 size, int index) { return (size.z + 0.5f + _waitPointOffset) * index; }
+    float GetQueueDistance(int index)
+    {
+        float distance = 0f;
+
+        for (int i = 0; i < index; i++)
+        {
+            Vehicle prev = ActiveVehicles[i].GetComponent<Vehicle>();
+            distance += prev.Size.z + _waitPointOffset + 0.2f;
+        }
+
+        return distance;
+    }
     /// <summary>
     /// Gets the total length of a NavMeshPath by summing the distances between its corners.
     /// </summary>
