@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
 
+[RequireComponent(typeof(vNetworkHandler))]
 public abstract class Vehicle : MonoBehaviour
 {
     [Header("Vehicle Settings")]
