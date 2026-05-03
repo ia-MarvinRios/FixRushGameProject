@@ -244,7 +244,15 @@ MonoBehaviour:
   _collider: {fileID: 7851146544130939229}
   _dirtDecal: {fileID: 6021139444477895614}
   _dirtMaterial: {fileID: 2100000, guid: 6707faffe9b35be4cb4be7c306501066, type: 2}
-  _issueTypes: 
+  _issueTypes: 0100000000000000
+  _jackRootFront: {fileID: 0}
+  _tiresFront:
+  - {fileID: 1908578168133917806}
+  - {fileID: 3180633232103902300}
+  _jackRootRear: {fileID: 0}
+  _tiresRear:
+  - {fileID: 8894471337947044396}
+  - {fileID: 5337345252758405421}
 --- !u!114 &-560166049629438895
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,21 +1,20 @@
 using FixRush;
 using System.Collections;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Car : Vehicle
 {
+    [Header("Car References")]
+    [SerializeField] private Transform _jackRootFront;
+    [SerializeField] private GameObject[] _tiresFront;
+    [SerializeField] private Transform _jackRootRear;
+    [SerializeField] private GameObject[] _tiresRear;
+
     internal bool IsJacked = false;
 
     public override void InitializeVehicle()
     {
         StartCoroutine(FixCarCoroutine());
-    }
-
-    public void OnInteracted(PlayerController player)
-    {
-        Debug.Log($"[Car] {player.FocusedObj} {player}");
-        //CurrentIssue.HandleInteraction(player.FocusedObj, player);
     }
 
     private IEnumerator FixCarCoroutine()

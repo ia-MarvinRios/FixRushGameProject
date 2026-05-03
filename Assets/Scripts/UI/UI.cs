@@ -16,6 +16,7 @@ public class UI : MonoBehaviour
     [Header("Player Settings")]
     [SerializeField] private PlayerSettings _playerSettings;
     [Header("MainMenu References")]
+    [SerializeField] private GameObject _loginPanel;
     [SerializeField] private GameObject _mainMenuPanel;
     [SerializeField] private Animator _uiAnimator;
     [SerializeField] private TMP_InputField _nicknameField;
@@ -123,7 +124,11 @@ public class UI : MonoBehaviour
         _roomSelectionPanel.SetActive(true);
         _mainMenuPanel.SetActive(false);
     }
-
+    public void Enterlobby()
+    {
+        if (!CheckNickname()) { return; }
+        _loginPanel.SetActive(false);
+    }
     public void CreateRoom()
     {
         _lobbyTitle.text = 
