@@ -6,14 +6,16 @@ public class Car : Vehicle
 {
     [Header("Car References")]
     [SerializeField] private Transform _jackRootFront;
-    [SerializeField] private GameObject[] _tiresFront;
+    [SerializeField] internal GameObject[] TiresFront;
     [SerializeField] private Transform _jackRootRear;
-    [SerializeField] private GameObject[] _tiresRear;
+    [SerializeField] internal GameObject[] TiresRear;
 
     internal bool IsJacked = false;
 
     public override void InitializeVehicle()
     {
+        base.InitializeVehicle();
+
         StartCoroutine(FixCarCoroutine());
     }
 

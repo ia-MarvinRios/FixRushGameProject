@@ -2296,7 +2296,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960, y: -39.9113}
+  m_AnchoredPosition: {x: 960, y: -7.087982}
   m_SizeDelta: {x: 1214.9185, y: 140.5322}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &478009657
@@ -2891,7 +2891,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RemotePlayerUI
   InfoPanel: {fileID: 2047936975}
-  Uid: 
+  ActorNumber: 0
   BodyID: -1
   HatID: -1
 --- !u!1 &561933428
@@ -4586,7 +4586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RemotePlayerUI
   InfoPanel: {fileID: 1163340650}
-  Uid: 
+  ActorNumber: 0
   BodyID: -1
   HatID: -1
 --- !u!1 &966507254
@@ -5549,7 +5549,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960, y: -535.2661}
+  m_AnchoredPosition: {x: 960, y: -436.79614}
   m_SizeDelta: {x: 1600, y: 550}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1168002976
@@ -5596,6 +5596,7 @@ MonoBehaviour:
   _InWorlCanvas: {fileID: 884971061}
   _playerInfoPanelPrefab: {fileID: 8984592964142286175, guid: 9c47383abe8ec8541a4d822bebacdda1, type: 3}
   _localPlayerInfoPanel: {fileID: 1996407883}
+  _rotatePlayerButton: {fileID: 2024405869}
   _remoteContainers:
   - {fileID: 544469090}
   - {fileID: 965172708}
@@ -6145,7 +6146,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RemotePlayerUI
   InfoPanel: {fileID: 1182919455}
-  Uid: 
+  ActorNumber: 0
   BodyID: -1
   HatID: -1
 --- !u!1 &1280400944
@@ -6996,7 +6997,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960, y: -965.0887}
+  m_AnchoredPosition: {x: 960, y: -800.97217}
   m_SizeDelta: {x: 1200, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1413617195
@@ -8845,6 +8846,7 @@ GameObject:
   - component: {fileID: 2024405868}
   - component: {fileID: 2024405867}
   - component: {fileID: 2024405869}
+  - component: {fileID: 2024405870}
   m_Layer: 5
   m_Name: RawImage
   m_TagString: Untagged
@@ -8885,7 +8887,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -8950,6 +8952,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2024405870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2024405865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3852049391e3b734795d05b6f19e6239, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DragRotateInput
 --- !u!1 &2044656074
 GameObject:
   m_ObjectHideFlags: 0

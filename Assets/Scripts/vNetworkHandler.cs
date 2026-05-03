@@ -5,9 +5,6 @@ using System;
 
 public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
-    [Header("Utilities")]
-    [SerializeField] private GameObject _triggerPrefab;
-
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         // get th int issueIDs from the instantiation data int array
@@ -38,21 +35,11 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         );
     }
 
-    internal void CreateTrigger(float radius, float holdTime, Action onInteracted, IInteractable.Type interactionType = IInteractable.Type.Simple)
-    {
-        /*
-        Trigger t = PhotonNetwork.Instantiate(
-            _triggerPrefab,
-
-        );
-        */
-    }
-
-    internal void SyncDirt()
+    internal void SyncInitialization()
     {
         photonView.RPC(
-            nameof(RPC_SyncDirt),
-            RpcTarget.All,
+            nameof(RPC_SyncInitialization), 
+            RpcTarget.Others,
             photonView.ViewID
         );
     }
@@ -67,13 +54,12 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         );
     }
 
-    internal void SyncTaskPanel(bool show, IIssue.Type issueType = IIssue.Type.Dirty)
+    internal void RequestResolveDirtIssue(Vehicle v)
     {
         photonView.RPC(
-            nameof(RPC_SyncTaskPanel),
+            nameof(RPC_RepairDirtIssue),
             RpcTarget.All,
-            show,
-            issueType
+            v.GetComponent<PhotonView>().ViewID
         );
     }
 
@@ -91,11 +77,11 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         VManager.Instance.MoveToEndPoint(v);
     }
     [PunRPC]
-    void RPC_SyncDirt(int vehicleViewID)
+    void RPC_SyncInitialization(int vehicleViewID)
     {
         Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
 
-        vehicle.SetupDirt();
+        vehicle.InitializeVehicle();
     }
     [PunRPC]
     void RPC_SyncDirtAlpha(int vehicleViewID, float value)
@@ -105,9 +91,13 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         vehicle.DirtAlpha = value;
     }
     [PunRPC]
-    void RPC_SyncTaskPanel(bool show, IIssue.Type issueType = IIssue.Type.Dirty)
+    void RPC_RepairDirtIssue(int vehicleViewID)
     {
-        InGameUI.Instance.ShowTaskPanel(show, issueType);
+        Vehicle v = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
+
+        DirtIssue i = v.CurrentIssue as DirtIssue;
+        if (i == null) return;
+        i.ResolveDirtIssue();
     }
 
     #endregion

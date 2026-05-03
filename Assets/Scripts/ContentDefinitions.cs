@@ -73,8 +73,14 @@ namespace FixRush
         public void Drop(PlayerController player);
     }
 
+    /// <summary>
+    /// Interface that represents an issue that can occur in the game, such as a flat tire or a dirty car.
+    /// </summary>
     public interface IIssue
     {
+        /// <summary>
+        /// Specifies the category or status type for an issue.
+        /// </summary>
         public enum Type
         {
             Tires,
@@ -85,8 +91,13 @@ namespace FixRush
         public Type IssueType { get; }
         public bool IsFixed { get; }
 
-        abstract void CleanUp();
-        abstract IEnumerator FixingCoroutine();
-        abstract void HandleInteraction(IInteractable obj, PlayerController player);
+        /// <summary>
+        /// Cleans up the issue, such as hiding UI elements, resetting variables, etc. This method is called after the issue has been fixed and is no longer needed.
+        /// </summary>
+        void CleanUp();
+        /// <summary>
+        /// Coroutine that handles the process of fixing the issue. This method is called when the player starts interacting with the issue.
+        /// </summary>
+        IEnumerator FixingCoroutine();
     }
 }

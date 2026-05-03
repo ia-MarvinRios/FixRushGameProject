@@ -15,13 +15,16 @@ public abstract class Vehicle : MonoBehaviour
     [SerializeField] private BoxCollider _collider;
     [SerializeField] private DecalProjector _dirtDecal;
     [SerializeField] private Material _dirtMaterial;
+    [SerializeField] internal GameObject TriggerPrefab;
     [SerializeField] private IIssue.Type[] _issueTypes;
+
+    private bool _isInitialized = false;
 
     internal Vector3 Size => _collider.size;
     internal IIssue.Type[] IssueTypes
     { 
         get => _issueTypes; 
-        set => _issueTypes = value; 
+        set => _issueTypes = value;
     }
     internal IIssue CurrentIssue { get; set; }
     internal float DirtAlpha 
@@ -37,19 +40,27 @@ public abstract class Vehicle : MonoBehaviour
         if (!PhotonManager.Instance.IsMasterClient)
         {
             Agent.enabled = false;
-            enabled = false;
             return;
         }
     }
     private void Start()
     {
-        NetworkHandler.SyncDirt();
+        SetupDirt();
     }
 
-    public abstract void InitializeVehicle();
+    public virtual void InitializeVehicle()
+    {
+        if (PhotonManager.Instance.IsMasterClient && !_isInitialized)
+        {
+            _isInitialized = true;
+            NetworkHandler.SyncInitialization();
+        }
+    }
 
     public void Fix()
     {
+        if (!PhotonManager.Instance.IsMasterClient) { return; }
+
         VManager.Instance.RemoveVehicle(this);
         IsFixed = true;
 
@@ -59,6 +70,8 @@ public abstract class Vehicle : MonoBehaviour
 
     internal void MoveTo(Vector3 destination)
     {
+        if (!PhotonManager.Instance.IsMasterClient) { return; }
+
         Agent.SetDestination(destination);
     }
 

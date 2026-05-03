@@ -12,14 +12,23 @@ public class PlayerList : MonoBehaviour
     [SerializeField] private Transform _InWorlCanvas;
     [SerializeField] private GameObject _playerInfoPanelPrefab;
     [SerializeField] private InfoPanel _localPlayerInfoPanel;
+    [SerializeField] private Button _rotatePlayerButton;
     [SerializeField] private RemotePlayerUI[] _remoteContainers;
 
     private bool _getPreviousData = true;
+    private float _rotationSpeed = 0.5f;
 
     private void OnEnable()
     {
         PhotonManager.Instance.OnPlayerListChanged += UpdatePlayerList;
         PhotonManager.Instance.OnRemotePlayerLeave += RemoveRemotePlayerUI;
+
+        if (_rotatePlayerButton != null)
+        {
+            var drag = _rotatePlayerButton.GetComponent<DragRotateInput>();
+
+            drag.OnDragDelta += RotateCharacter;
+        }
     }
 
     private void OnDisable()
@@ -29,6 +38,13 @@ public class PlayerList : MonoBehaviour
 
         RemoveAllRemotePlayersUI();
         _getPreviousData = true;
+
+        if (_rotatePlayerButton != null)
+        {
+            var drag = _rotatePlayerButton.GetComponent<DragRotateInput>();
+
+            drag.OnDragDelta -= RotateCharacter;
+        }
     }
 
     private void UpdatePlayerList(List<PlayerData> playersData)
@@ -203,6 +219,11 @@ public class PlayerList : MonoBehaviour
             }
             mr.material = newMat;
         }
+    }
+
+    private void RotateCharacter(float deltaX)
+    {
+        _characterBuilderParent.Rotate(Vector3.up, -deltaX * _rotationSpeed);
     }
 
     public void SwitchHat(int factor)

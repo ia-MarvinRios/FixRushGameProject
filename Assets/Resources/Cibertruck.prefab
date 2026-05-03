@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: -790701046224642771}
   - component: {fileID: 7851146544130939229}
   - component: {fileID: 1778500874662495818}
-  - component: {fileID: 6271170971073340738}
+  - component: {fileID: 1413811027107462482}
   m_Layer: 0
   m_Name: Cibertruck
   m_TagString: Untagged
@@ -244,13 +244,14 @@ MonoBehaviour:
   _collider: {fileID: 7851146544130939229}
   _dirtDecal: {fileID: 6021139444477895614}
   _dirtMaterial: {fileID: 2100000, guid: 6707faffe9b35be4cb4be7c306501066, type: 2}
+  TriggerPrefab: {fileID: 7018675178099524341, guid: 647d3c08175fa484c9f11faf5ffae2d1, type: 3}
   _issueTypes: 0100000000000000
   _jackRootFront: {fileID: 0}
-  _tiresFront:
+  TiresFront:
   - {fileID: 1908578168133917806}
   - {fileID: 3180633232103902300}
   _jackRootRear: {fileID: 0}
-  _tiresRear:
+  TiresRear:
   - {fileID: 8894471337947044396}
   - {fileID: 5337345252758405421}
 --- !u!114 &-560166049629438895
@@ -265,7 +266,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61b189b7d62472c40a0bb66deee8ba11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::vNetworkHandler
-  _triggerPrefab: {fileID: 0}
 --- !u!195 &-790701046224642771
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -328,11 +328,11 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 6271170971073340738}
+  - {fileID: 1413811027107462482}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &6271170971073340738
+--- !u!114 &1413811027107462482
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -341,30 +341,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3256836755851782842}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8efc6b1d64977384eb3405357896c656, type: 3}
+  m_Script: {fileID: 11500000, guid: 35144820bcc25444bb8f0fd767d9423e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonTransformViewClassic
-  m_PositionModel:
-    SynchronizeEnabled: 1
-    TeleportEnabled: 1
-    TeleportIfDistanceGreaterThan: 3
-    InterpolateOption: 2
-    InterpolateMoveTowardsSpeed: 1
-    InterpolateLerpSpeed: 1
-    ExtrapolateOption: 0
-    ExtrapolateSpeed: 1
-    ExtrapolateIncludingRoundTripTime: 1
-    ExtrapolateNumberOfStoredPositions: 1
-  m_RotationModel:
-    SynchronizeEnabled: 1
-    InterpolateOption: 1
-    InterpolateRotateTowardsSpeed: 180
-    InterpolateLerpSpeed: 5
-  m_ScaleModel:
-    SynchronizeEnabled: 0
-    InterpolateOption: 0
-    InterpolateMoveTowardsSpeed: 1
-    InterpolateLerpSpeed: 0
+  m_EditorClassIdentifier: PhotonUnityNetworking.Utilities::Photon.Pun.UtilityScripts.SmoothSyncMovement
+  SmoothingDelay: 5
 --- !u!1 &4961752064979368305
 GameObject:
   m_ObjectHideFlags: 0
