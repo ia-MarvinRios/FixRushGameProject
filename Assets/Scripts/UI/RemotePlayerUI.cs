@@ -4,13 +4,13 @@ using FixRush;
 public class RemotePlayerUI : MonoBehaviour
 {
     public InfoPanel InfoPanel;
-    public string Uid = string.Empty;
+    public int ActorNumber = 0;
     public int BodyID = -1;
     public int HatID = -1;
 
     internal void UpdateUI(PlayerData data)
     {
-        Uid = data.Uid;
+        ActorNumber = data.ActorNumber;
         BodyID = data.BodyID;
         HatID = data.HatID;
     }

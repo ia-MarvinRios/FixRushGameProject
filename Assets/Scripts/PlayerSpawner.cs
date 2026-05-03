@@ -38,7 +38,7 @@ public class PlayerSpawner : MonoBehaviourPun
     private Hashtable ToHashtable(PlayerData data)
     {
         return new Hashtable {
-            { "userID", data.Uid },
+            { "actorNumber", data.ActorNumber },
             { "playerName", data.PlayerName },
             { "bodyID", data.BodyID },
             { "hatID", data.HatID },
@@ -56,7 +56,7 @@ public class PlayerSpawner : MonoBehaviourPun
     private PlayerData FromHashtable(Hashtable hashtable)
     {
         return new PlayerData(
-            userID: (string)hashtable["userID"],
+            actorNumber: (int)hashtable["actorNumber"],
             playerName: (string)hashtable["playerName"],
             isReady: true,
             bodyID: (int)hashtable["bodyID"],
@@ -70,7 +70,7 @@ public class PlayerSpawner : MonoBehaviourPun
         // Do spawning
         PlayerController playerController = PhotonNetwork.Instantiate(
             _playerPrefab.name,
-            LevelData.Spawnpoints[photonView.OwnerActorNr - 1],
+            LevelData.Spawnpoints[PhotonNetwork.LocalPlayer.ActorNumber - 1],
             Quaternion.identity,
             0,
             new object[] { ColorUtility.ToHtmlStringRGBA(_playerSettings.SkinColor) }

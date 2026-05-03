@@ -9,15 +9,15 @@ namespace FixRush
     /// </summary>
     public class PlayerData
     {
-        internal string Uid { get; private set; }
+        internal int ActorNumber { get; private set; }
         public string PlayerName { get; private set; }
         public bool IsReady { get; private set; }
         public int BodyID { get; private set; }
         public int HatID { get; private set; }
         public string SkinColorHex { get; private set; }
-        public PlayerData(string userID, string playerName, bool isReady, int bodyID, int hatID, string skinColorHex)
+        public PlayerData(int actorNumber, string playerName, bool isReady, int bodyID, int hatID, string skinColorHex)
         {
-            Uid = userID;
+            ActorNumber = actorNumber;
             PlayerName = playerName;
             IsReady = isReady;
             BodyID = bodyID;
