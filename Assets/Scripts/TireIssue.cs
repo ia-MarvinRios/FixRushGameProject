@@ -7,7 +7,7 @@ public class TireIssue : IIssue
 {
     private Car _car;
     private Trigger _tempTrigger;
-    private List<Trigger> _triggers = new List<Trigger>();
+    private Dictionary<Trigger, GameObject> _triggers = new Dictionary<Trigger, GameObject>();
 
     private int _counter = 0;
 
@@ -37,16 +37,16 @@ public class TireIssue : IIssue
 
         foreach (GameObject tire in _car.TiresFront)
         {
-            CreateTireTrigger(tire.transform);
+            CreateRemoveTireTrigger(tire.transform);
         }
 
         foreach (GameObject tire in _car.TiresRear)
         {
-            CreateTireTrigger(tire.transform);
+            CreateRemoveTireTrigger(tire.transform);
         }
     }
 
-    private void CreateTireTrigger(Transform parent)
+    private void CreateRemoveTireTrigger(Transform parent)
     {
         // Create trigger
         _tempTrigger = GameObject.Instantiate(_car.TriggerPrefab).GetComponent<Trigger>().Set(
@@ -56,11 +56,11 @@ public class TireIssue : IIssue
             IInteractable.Type.Simple
         );
 
-        _tempTrigger.transform.SetParent(parent.transform);
+        _tempTrigger.transform.SetParent(parent);
         _tempTrigger.transform.localPosition = Vector3.zero;
-        _tempTrigger.gameObject.name = $"TireTrigger";
+        _tempTrigger.gameObject.name = "RemoveTireTrigger";
 
-        _triggers.Add(_tempTrigger);
+        _triggers.Add(_tempTrigger, parent.gameObject);
     }
 
     public IEnumerator FixingCoroutine()
@@ -73,14 +73,24 @@ public class TireIssue : IIssue
 
     public void HandleTireInteraction(PlayerController player, Trigger trigger)
     {
-        _counter--;
-
-        _triggers.Remove(trigger);
-        GameObject.Destroy(trigger.gameObject);
-
-        if (_counter <= 0)
+        if (trigger.name == "RemoveTireTrigger")
         {
-            IsFixed = true;
+            _counter--;
+
+            // Deactivate tire
+            _triggers.TryGetValue(trigger, out GameObject tire);
+            if (tire != null)
+            {
+                tire.SetActive(false);
+            }
+
+            _triggers.Remove(trigger);
+            GameObject.Destroy(trigger.gameObject);
+
+            if (_counter <= 0)
+            {
+                IsFixed = true;
+            }
         }
     }
 }

@@ -36,4 +36,9 @@ public class Trigger : MonoBehaviour, IInteractable
     {
         _onInteracted?.Invoke(player, this);
     }
+
+    public void CancelInteraction(PlayerController player)
+    {
+        return;
+    }
 }

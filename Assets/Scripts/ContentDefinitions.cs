@@ -61,6 +61,7 @@ namespace FixRush
         public Type InteractionType { get; }
         public float HoldTime { get; }
         public void Interact(PlayerController player);
+        public void CancelInteraction(PlayerController player);
     }
 
     /// <summary>

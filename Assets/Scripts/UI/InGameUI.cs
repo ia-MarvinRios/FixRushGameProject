@@ -1,4 +1,5 @@
 using FixRush;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ public class InGameUI : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private GameObject _pauseMenuPanel;
     [SerializeField] private TMP_Text _taskPanelText;
+    [SerializeField] private TMP_Text _hintDescription;
     [SerializeField] internal GameObject Manual;
 
     [Header("Animations")]
@@ -64,6 +66,21 @@ public class InGameUI : MonoBehaviour
             AudioManager.Instance.PlaySoundByName("TaskCompleted");
         }
 
+    }
+
+    public void ShowHint(string hint, float duration = 2f)
+    {
+        _hintDescription.text = hint;
+
+        StartCoroutine(ShowHintCoroutine(duration));
+    }
+    private IEnumerator ShowHintCoroutine(float delay)
+    {
+        _animator.SetBool("ShowHint", true);
+
+        yield return new WaitForSeconds(delay);
+
+        _animator.SetBool("ShowHint", false);
     }
 
     internal void LinkNetworkHandler(PlayerNetworkHandler networkHandler) { NetworkHandler = networkHandler; }
