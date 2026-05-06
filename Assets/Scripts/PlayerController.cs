@@ -395,6 +395,16 @@ public class PlayerController : MonoBehaviour
         }
 
         FocusedObj = best;
+
+        // Update selector
+        if (FocusedObj != null)
+        {
+            InWorldCanvas.Instance.SetSelector(FocusedObj.transform.position);
+        }
+        else
+        {
+            InWorldCanvas.Instance.ShowSelector(false);
+        }
     }
 
     /// <summary>
