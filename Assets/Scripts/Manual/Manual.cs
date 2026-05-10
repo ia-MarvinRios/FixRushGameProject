@@ -26,5 +26,10 @@ public class Manual : MonoBehaviour, IInteractable
         _pcCache.ShowWorkParticle(false);
         _pcCache = null;
     }
+
+    public void CancelInteraction(PlayerController player)
+    {
+        return;
+    }
 }
 

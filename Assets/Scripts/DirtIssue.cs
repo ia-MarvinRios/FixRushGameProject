@@ -12,8 +12,6 @@ public class DirtIssue : IIssue
     public DirtIssue(Vehicle v)
     {
         _vehicle = v;
-
-        SetUp();
     }
 
     // IIssue implementation
@@ -43,6 +41,7 @@ public class DirtIssue : IIssue
 
         _trigger.transform.SetParent(_vehicle.transform);
         _trigger.transform.localPosition = Vector3.zero;
+        _trigger.name = "WashTrigger";
     }
 
     internal void ResolveDirtIssue()
@@ -57,6 +56,8 @@ public class DirtIssue : IIssue
         // Show UI Panel
         InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Dirty);
 
+        SetUp();
+
         yield return new WaitUntil(()=> IsFixed);
     }
 
@@ -64,10 +65,21 @@ public class DirtIssue : IIssue
     {
         Debug.Log("<color=#FF69B4> SAQUENME DE LA CARRERA YA NO AGUANTO PROGRAMAR TANTA VAINA!! </color>");
 
+        if (player.GrabbedObj == null)
+        {
+            InGameUI.Instance.ShowHint("You need to grab a wash tool to clean the car", 2f);
+            return;
+        }
+
+        if (player.GrabbedObj.tag != "WashTool")
+        {
+            InGameUI.Instance.ShowHint("This tool can't be used to clean the car", 2f);
+            return;
+        }
+
+        // Fix the issue
         _vehicle.NetworkHandler.SyncDirtAlpha(0);
-
         _vehicle.NetworkHandler.RequestResolveDirtIssue(_vehicle);
-
         IsFixed = true;
     }
 }

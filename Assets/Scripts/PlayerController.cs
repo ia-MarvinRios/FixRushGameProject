@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using FixRush;
-using UnityEngine.VFX;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
+    private const float FOV_THRESHOLD = 0.5f;
+    private const float DIST_WEIGHT = 0.1f;
+
     [Header("Player Settings")]
     [SerializeField] internal PlayerSettings Player;
 
@@ -40,6 +43,9 @@ public class PlayerController : MonoBehaviour
     private Coroutine _stillCoroutine;
     private bool _isHolding = false;
     private float _remainingTime;
+
+    internal Action<IInteractable, PlayerController> OnGrabbedObjInteraction;
+    internal Action<IInteractable, PlayerController> OnGrabbedObjInteractionCanceled;
 
     private void OnEnable()
     {
@@ -197,6 +203,11 @@ public class PlayerController : MonoBehaviour
     {
         if (!ctx.performed) return;
 
+        if (GrabbedObj != null)
+        {
+            OnGrabbedObjInteraction?.Invoke(interactable, player);
+        }
+
         interactable?.Interact(player);
     }
 
@@ -218,7 +229,12 @@ public class PlayerController : MonoBehaviour
             if (_holdCoroutine != null)
                 StopCoroutine(_holdCoroutine);
 
-            //OnCancelInteraction?.Invoke(p.FocusedObj, p);
+            if (GrabbedObj != null)
+            {
+                OnGrabbedObjInteractionCanceled?.Invoke(interactable, player);
+            }
+
+            interactable.CancelInteraction(player);
 
             Debug.Log("Stopped Hold...");
         }
@@ -237,6 +253,11 @@ public class PlayerController : MonoBehaviour
         if (_isHolding)
         {
             // Done Holding (OnInteract pending to be developed...)
+            if (GrabbedObj != null)
+            {
+                OnGrabbedObjInteraction?.Invoke(interactable, player);
+            }
+
             interactable?.Interact(player);
         }
 
@@ -271,13 +292,25 @@ public class PlayerController : MonoBehaviour
         // Canceled
         if (player == null)
         {
-            //OnCancelInteraction?.Invoke(this, null);
+            if (GrabbedObj != null)
+            {
+                OnGrabbedObjInteractionCanceled?.Invoke(interactable, player);
+            }
+
+            interactable.CancelInteraction(player);
+
             Debug.Log("Still canceled");
         }
         else
         {
             // Done
+            if (GrabbedObj != null)
+            {
+                OnGrabbedObjInteraction?.Invoke(interactable, player);
+            }
+
             interactable?.Interact(player);
+
             Debug.Log("Still completed");
         }
 
@@ -357,9 +390,6 @@ public class PlayerController : MonoBehaviour
             FocusedObj = null;
             return;
         }
-
-        const float FOV_THRESHOLD = 0.5f;
-        const float DIST_WEIGHT = 0.1f;
 
         float bestScore = float.MinValue;
         GameObject best = null;
