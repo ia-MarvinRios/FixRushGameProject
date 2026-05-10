@@ -9,12 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8421346935905492020}
-  - component: {fileID: -4749268564874661156}
+  - component: {fileID: 5161564234407941580}
   - component: {fileID: -8886895257451304577}
   - component: {fileID: 2280545167127304173}
   - component: {fileID: 7230443037918401744}
   - component: {fileID: 445062166251024855}
-  - component: {fileID: 2528650301990155111}
+  - component: {fileID: -3076293207498256503}
   m_Layer: 0
   m_Name: Jeep
   m_TagString: Untagged
@@ -46,7 +46,7 @@ Transform:
   - {fileID: 5511478764476620718}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-4749268564874661156
+--- !u!114 &5161564234407941580
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -55,15 +55,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 81186785566514930}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84c7998f5a338224ea080d8b17792483, type: 3}
+  m_Script: {fileID: 11500000, guid: 7098bc52e2a262441b2f2386d8cacd7e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Vehicle
+  m_EditorClassIdentifier: Assembly-CSharp::Car
   QueueIndex: -1
+  NetworkHandler: {fileID: -8886895257451304577}
   Agent: {fileID: 2280545167127304173}
   _collider: {fileID: 7230443037918401744}
   _dirtDecal: {fileID: 1582213242461436174}
   _dirtMaterial: {fileID: 2100000, guid: 6707faffe9b35be4cb4be7c306501066, type: 2}
-  _issues: 
+  TriggerPrefab: {fileID: 7018675178099524341, guid: 647d3c08175fa484c9f11faf5ffae2d1, type: 3}
+  _issueTypes: 0100000000000000
+  _jackRootFront: {fileID: 0}
+  TiresFront:
+  - {fileID: 5294424614357234976}
+  - {fileID: 640862923507001270}
+  _jackRootRear: {fileID: 0}
+  TiresRear:
+  - {fileID: 4351963690080167560}
+  - {fileID: 7016126486968856583}
 --- !u!114 &-8886895257451304577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,11 +148,11 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 2528650301990155111}
+  - {fileID: -3076293207498256503}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &2528650301990155111
+--- !u!114 &-3076293207498256503
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -151,30 +161,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 81186785566514930}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8efc6b1d64977384eb3405357896c656, type: 3}
+  m_Script: {fileID: 11500000, guid: 35144820bcc25444bb8f0fd767d9423e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonTransformViewClassic
-  m_PositionModel:
-    SynchronizeEnabled: 1
-    TeleportEnabled: 1
-    TeleportIfDistanceGreaterThan: 3
-    InterpolateOption: 2
-    InterpolateMoveTowardsSpeed: 1
-    InterpolateLerpSpeed: 1
-    ExtrapolateOption: 0
-    ExtrapolateSpeed: 1
-    ExtrapolateIncludingRoundTripTime: 1
-    ExtrapolateNumberOfStoredPositions: 1
-  m_RotationModel:
-    SynchronizeEnabled: 1
-    InterpolateOption: 1
-    InterpolateRotateTowardsSpeed: 180
-    InterpolateLerpSpeed: 5
-  m_ScaleModel:
-    SynchronizeEnabled: 0
-    InterpolateOption: 0
-    InterpolateMoveTowardsSpeed: 1
-    InterpolateLerpSpeed: 0
+  m_EditorClassIdentifier: PhotonUnityNetworking.Utilities::Photon.Pun.UtilityScripts.SmoothSyncMovement
+  SmoothingDelay: 5
 --- !u!1 &640862923507001270
 GameObject:
   m_ObjectHideFlags: 0

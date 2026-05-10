@@ -35,12 +35,12 @@ public class VManager : MonoBehaviourPun
     WaitForSeconds _spawnIntervalWaitTime;
     bool _readyToFix = false;
 
+    int _prefabIndex = -1;
+    Vehicle _temp = null;
+
     internal List<GameObject> ActiveVehicles { get; private set; }
 
-    // Issues (!!!Make sure not to set more max issues than the available issue types)
-    private const int MAX_ISSUES = 2;
-    private const int MIN_ISSUES = 1;
-    private static IIssue.Type[] _allIssues = (IIssue.Type[])System.Enum.GetValues(typeof(IIssue.Type));
+    private static IIssue.Type[] _selectableIssues = (IIssue.Type[])System.Enum.GetValues(typeof(IIssue.Type));
     private HashSet<IIssue.Type> _selected = new HashSet<IIssue.Type>();
 
     private void Awake()
@@ -73,12 +73,19 @@ public class VManager : MonoBehaviourPun
             {
                 Debug.Log("[VManager] Spawning vehicle...");
 
+                // Get a random prefab from the list
+                _prefabIndex = Random.Range(0, _vehiclePrefabs.Length);
+
+                // Get the Vehicle component from the prefab to assign issues before instantiating
+                _temp = _vehiclePrefabs[_prefabIndex].GetComponent<Vehicle>();
+
+                // Instantiate the vehicle
                 GameObject obj = PhotonNetwork.InstantiateRoomObject(
-                    _vehiclePrefabs[Random.Range(0, _vehiclePrefabs.Length)].name,
+                    _vehiclePrefabs[_prefabIndex].name,
                     _spawnPoint,
                     Quaternion.identity,
                     0,
-                    new object[] { IssuesToIntArray(AssignIssues()) }
+                    new object[] { IssuesToIntArray(AssignIssues(_temp)) }
                 );
 
                 if (obj == null) { continue; }
@@ -167,7 +174,7 @@ public class VManager : MonoBehaviourPun
         agent.SetDestination(_endPoint);
         Debug.Log("Moving to endpoint...");
         yield return new WaitUntil(() => HasReachedDestination(agent));
-        //v.Fix();
+        v.Fix();
     }
 
 
@@ -189,7 +196,7 @@ public class VManager : MonoBehaviourPun
             Vehicle v = ActiveVehicles[i].GetComponent<Vehicle>();
             v.QueueIndex = i;
 
-            float distance = GetQueueDistance(v.Size, i);
+            float distance = GetQueueDistance(i);
             distance = Mathf.Min(distance, pathLength - v.Size.z);
 
             Vector3 point =
@@ -204,7 +211,18 @@ public class VManager : MonoBehaviourPun
     /// <param name="size">The size of the vehicle.</param>
     /// <param name="index">The index of the vehicle in the queue.</param>
     /// <returns>The distance along the path for the vehicle.</returns>
-    float GetQueueDistance(Vector3 size, int index) { return (size.z + 0.5f + _waitPointOffset) * index; }
+    float GetQueueDistance(int index)
+    {
+        float distance = 0f;
+
+        for (int i = 0; i < index; i++)
+        {
+            Vehicle prev = ActiveVehicles[i].GetComponent<Vehicle>();
+            distance += prev.Size.z + _waitPointOffset + 0.2f;
+        }
+
+        return distance;
+    }
     /// <summary>
     /// Gets the total length of a NavMeshPath by summing the distances between its corners.
     /// </summary>
@@ -288,26 +306,28 @@ public class VManager : MonoBehaviourPun
         }
     }
 
-    IIssue.Type[] AssignIssues()
+    IIssue.Type[] AssignIssues(Vehicle v)
     {
         _selected.Clear();
 
         // Calculate the number of issues based on the current level difficulty
         // FORMULA: (MAX_ISSUES * CurrentDifficulty) / MAX_DIFFICULTY
-        float issuesCount = MAX_ISSUES * (float)_levelData.LevelDifficulty / LevelData.MAX_DIFFICULTY;
+        float issuesCount = v.IssueTypes.Length * (float)_levelData.LevelDifficulty / LevelData.MAX_DIFFICULTY;
         issuesCount = (int)System.Math.Round(issuesCount, System.MidpointRounding.AwayFromZero);
 
         while (_selected.Count < issuesCount)
         {
-            IIssue.Type issue = GetRandomIssue();
+            IIssue.Type issue = GetRandomIssue(v);
             _selected.Add(issue);
         }
 
         return new List<IIssue.Type>(_selected).ToArray();
     }
-    IIssue.Type GetRandomIssue()
+    IIssue.Type GetRandomIssue(Vehicle v)
     {
-        return _allIssues[Random.Range(0, _allIssues.Length)];
+        _selectableIssues = v.IssueTypes;
+
+        return _selectableIssues[Random.Range(0, _selectableIssues.Length)];
     }
     int[] IssuesToIntArray(IIssue.Type[] issues)
     {

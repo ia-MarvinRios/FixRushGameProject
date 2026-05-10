@@ -1,6 +1,9 @@
 using Photon.Pun;
 using UnityEngine;
 using FixRush;
+using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEngine.VFX;
 
 public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
@@ -12,46 +15,48 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
-        if (!photonView.IsMine) { return; }
+        object[] data = photonView.InstantiationData;
+        string colorhex = (string)data[0];
 
-        // Offline mode: 2 models, Online mode: 1 model
-        int times = PhotonManager.Instance.OfflineMode ? 2 : 1;
-
-        for (int i = 0; i < times; i++)
+        if (photonView.IsMine)
         {
-            transform.position = GameManager.Instance.LevelData.Spawnpoints[i];
+            // Offline mode: 2 models, Online mode: 1 model
+            int times = PhotonManager.Instance.OfflineMode ? 2 : 1;
 
-            // Load body and hat
-            GameObject body = PhotonNetwork.Instantiate(
-                GameContent.Bodies[PlayerSettings.Body].Prefab.name,
-                transform.position,
-                Quaternion.identity
-            );
-            GameObject hat = PhotonNetwork.Instantiate(
-                GameContent.Hats[PlayerSettings.Hat].Prefab.name,
-                transform.position,
-                Quaternion.identity
-            );
-
-            // Skin color
-            if(body.TryGetComponent(out MeshRenderer bodyMeshRenderer))
+            for (int i = 0; i < times; i++)
             {
-                Material newMat = new Material(bodyMeshRenderer.material);
+                transform.position = PlayerSpawner.Instance.LevelData.Spawnpoints[i];
 
-                newMat.color = PlayerSettings.SkinColor;
+                // Load body and hat
+                GameObject body = PhotonNetwork.Instantiate(
+                    GameContent.Bodies[PlayerSettings.Body].Prefab.name,
+                    transform.position,
+                    Quaternion.identity
+                );
+                GameObject hat = PhotonNetwork.Instantiate(
+                    GameContent.Hats[PlayerSettings.Hat].Prefab.name,
+                    transform.position,
+                    Quaternion.identity
+                );
 
-                bodyMeshRenderer.material = newMat;
+                // Skin Color
+                photonView.RPC(
+                    nameof(RPC_SyncSkinColor),
+                    RpcTarget.All,
+                    body.GetComponent<PhotonView>().ViewID,
+                    colorhex
+                );
+
+                // Set body and hat as children of the player
+                photonView.RPC(
+                    nameof(RPC_SetCosmeticParent),
+                    RpcTarget.All,
+                    body.GetComponent<PhotonView>().ViewID,
+                    hat.GetComponent<PhotonView>().ViewID,
+                    photonView.ViewID,
+                    i + 1
+                );
             }
-
-            // Set body and hat as children of the player
-            photonView.RPC(
-                nameof(RPC_SetCosmeticParent),
-                RpcTarget.All,
-                body.GetComponent<PhotonView>().ViewID,
-                hat.GetComponent<PhotonView>().ViewID,
-                photonView.ViewID,
-                i + 1
-            );
         }
     }
 
@@ -83,6 +88,16 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
         );
     }
 
+    internal void SyncWorkParticles(bool show)
+    {
+        photonView.RPC(
+            nameof(RPC_SyncWorkParticles),
+            RpcTarget.All,
+            photonView.ViewID,
+            show
+        );
+    }
+
 
     #region RPCs
 
@@ -106,6 +121,23 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
             // Position the body and hat at the player's position
             bodyView.transform.localPosition = Vector3.zero;
             hatView.transform.localPosition = Vector3.zero;
+        }
+    }
+
+    [PunRPC]
+    private void RPC_SyncSkinColor(int bodyViewID, string colorhex)
+    {
+        GameObject body = PhotonView.Find(bodyViewID).gameObject;
+
+        if (body.TryGetComponent(out MeshRenderer bodyMeshRenderer))
+        {
+            Material newMat = new Material(bodyMeshRenderer.material);
+
+            ColorUtility.TryParseHtmlString("#" + colorhex, out Color color);
+
+            newMat.color = color;
+
+            bodyMeshRenderer.material = newMat;
         }
     }
 
@@ -136,6 +168,21 @@ public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallba
         if (objView != null && playerView != null)
         {
             objP.Drop(pc);
+        }
+    }
+
+    [PunRPC]
+    private void RPC_SyncWorkParticles(int playerViewID, bool show)
+    {
+        VisualEffect partFX = PhotonView.Find(playerViewID).GetComponent<VisualEffect>();
+
+        if (!show)
+        {
+            partFX.Stop();
+        }
+        else
+        {
+            partFX.Play();
         }
     }
 

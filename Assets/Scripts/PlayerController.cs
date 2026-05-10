@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using FixRush;
+using UnityEngine.VFX;
 
 public class PlayerController : MonoBehaviour
 {
@@ -394,7 +395,28 @@ public class PlayerController : MonoBehaviour
         }
 
         FocusedObj = best;
+
+        // Update selector
+        if (FocusedObj != null)
+        {
+            InWorldCanvas.Instance.SetSelector(FocusedObj.transform.position);
+        }
+        else
+        {
+            InWorldCanvas.Instance.ShowSelector(false);
+        }
     }
+
+    /// <summary>
+    /// Particulas que se activaran cuando se este trabajando en una reparación, Se espera un bool, true = play, false = stop
+    /// </summary>
+    /// <param name="status"></param>
+    public void ShowWorkParticle(bool show)
+    {
+        _networkHandler.SyncWorkParticles(show);
+    }
+
+
 
     private void OnDrawGizmos()
     {

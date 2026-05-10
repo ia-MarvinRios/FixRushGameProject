@@ -27,7 +27,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     private bool _startSinglePlayer = false;
 
     internal bool IsMasterClient => PhotonNetwork.IsMasterClient;
-    internal string MyUserID => PhotonNetwork.LocalPlayer.UserId;
+    internal int MyActorNumber => PhotonNetwork.LocalPlayer.ActorNumber;
     internal string MyNickname => PhotonNetwork.NickName;
     internal bool OfflineMode { get => PhotonNetwork.OfflineMode; set => PhotonNetwork.OfflineMode = value; }
 
@@ -45,6 +45,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        PhotonNetwork.AuthValues = new AuthenticationValues(System.Guid.NewGuid().ToString());
+
         ConnectToPhoton();
     }
 
@@ -189,7 +191,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             CurrentRoom.IsOpen = false;
             CurrentRoom.IsVisible = false;
 
-            PhotonNetwork.LoadLevel("Overworld");
+            PhotonNetwork.LoadLevel("newSetUp");
         }
         else
         {
@@ -212,9 +214,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         bool isReady = player.CustomProperties.ContainsKey("ready") && (bool)player.CustomProperties["ready"];
         int bodyID = player.CustomProperties.ContainsKey("body") ? (int)player.CustomProperties["body"] : 0;
         int hatID = player.CustomProperties.ContainsKey("hat") ? (int)player.CustomProperties["hat"] : 0;
-        string skinColorHex = player.CustomProperties.ContainsKey("skinColorHex") ? (string)player.CustomProperties["skinColorHex"] : "#E6D1B1FF";
+        string skinColorHex = player.CustomProperties.ContainsKey("skinColorHex") ? (string)player.CustomProperties["skinColorHex"] : "E6D1B1FF";
 
-        PlayerData playerData = new PlayerData(player.UserId, player.NickName, isReady, bodyID, hatID, skinColorHex);
+        PlayerData playerData = new PlayerData(player.ActorNumber, player.NickName, isReady, bodyID, hatID, skinColorHex);
         
         return playerData;
     }
@@ -327,16 +329,18 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        // If MasterClient leaves, leave too
-        if (otherPlayer.IsMasterClient)
-        {
-            PhotonNetwork.LeaveRoom();
-            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
-        }
-
         // Handle delegates
         OnRemotePlayerLeave?.Invoke(GetRemotePlayerData(otherPlayer));
         OnPlayerListChanged?.Invoke(GetCurrentPlayerList());
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        Debug.Log("Nuevo Master: " + newMasterClient.NickName);
+
+        // Si no quieres continuar sin el master original:
+        PhotonNetwork.LeaveRoom();
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 
     public override void OnLeftRoom()
