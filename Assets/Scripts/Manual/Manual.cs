@@ -12,6 +12,8 @@ public class Manual : MonoBehaviour, IInteractable
     public IInteractable.Type InteractionType => _interactionType;
     public float HoldTime => _holdTime;
 
+    public bool Shared => false;
+
     public void Interact(PlayerController player)
     {
         _pcCache = player;
@@ -28,6 +30,11 @@ public class Manual : MonoBehaviour, IInteractable
     }
 
     public void CancelInteraction(PlayerController player)
+    {
+        return;
+    }
+
+    public void InteractionStarted(PlayerController player)
     {
         return;
     }

@@ -18,6 +18,11 @@ public class DirtIssue : IIssue
     IIssue.Type IIssue.IssueType => IIssue.Type.Dirty;
     public bool IsFixed { get; private set; } = false;
 
+    private bool _passedCheck = false;
+    internal int WashCounter = 2;
+    private int _maxWashCounter = 2;
+    private bool _readyToGo;
+
     public void CleanUp()
     {
         if (_trigger != null)
@@ -33,10 +38,13 @@ public class DirtIssue : IIssue
     {
         // Create trigger
         _trigger = GameObject.Instantiate(_vehicle.TriggerPrefab).GetComponent<Trigger>().Set(
-            _vehicle.Size.z, 
-            1f, 
+            _vehicle.Size.z,
+            2f,
+            true,
+            HandleInteractionStarted,
             HandleInteraction,
-            IInteractable.Type.Simple
+            HandleInteractionCancel,
+            IInteractable.Type.Hold
         );
 
         _trigger.transform.SetParent(_vehicle.transform);
@@ -57,14 +65,36 @@ public class DirtIssue : IIssue
         InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Dirty);
 
         SetUp();
-
+        yield return new WaitUntil(() => _readyToGo);
+        yield return new WaitForSeconds(1.5f);
         yield return new WaitUntil(()=> IsFixed);
     }
 
     public void HandleInteraction(PlayerController player, Trigger trigger)
     {
-        Debug.Log("<color=#FF69B4> SAQUENME DE LA CARRERA YA NO AGUANTO PROGRAMAR TANTA VAINA!! </color>");
+        if (!_passedCheck) { return; }
 
+        WashCounter--;
+
+        _vehicle.NetworkHandler.SyncWashCounterDirtIssue(WashCounter);
+
+        float alpha = (float)WashCounter / _maxWashCounter;
+
+        player.GrabbedObj.GetComponent<Bucket>().IsFull = false;
+
+        _vehicle.NetworkHandler.SyncSuds(false);
+        _vehicle.NetworkHandler.SyncDirtAlpha(alpha);
+
+        if (WashCounter == 0)
+        {
+            // Fix the issue
+            _vehicle.NetworkHandler.RequestResolveDirtIssue(_vehicle);
+            _readyToGo = true;
+        }
+    }
+
+    public void HandleInteractionStarted(PlayerController player, Trigger trigger)
+    {
         if (player.GrabbedObj == null)
         {
             InGameUI.Instance.ShowHint("You need to grab a wash tool to clean the car", 2f);
@@ -77,9 +107,21 @@ public class DirtIssue : IIssue
             return;
         }
 
-        // Fix the issue
-        _vehicle.NetworkHandler.SyncDirtAlpha(0);
-        _vehicle.NetworkHandler.RequestResolveDirtIssue(_vehicle);
-        IsFixed = true;
+        if (!player.GrabbedObj.GetComponent<Bucket>().IsFull)
+        {
+            InGameUI.Instance.ShowHint("The bucket is empty, find a water source to refill it", 2f);
+            return;
+        }
+
+        _passedCheck = true;
+
+        _vehicle.NetworkHandler.SyncSuds(true, trigger.HoldTime);
+        InGameUI.Instance.StartTaskProgress(trigger.HoldTime);
+    }
+
+    public void HandleInteractionCancel(PlayerController player, Trigger trigger)
+    {
+        _vehicle.NetworkHandler.SyncSuds(false);
+        InGameUI.Instance.StopTaskProgress(false);
     }
 }

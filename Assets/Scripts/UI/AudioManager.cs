@@ -93,6 +93,11 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public void StopAllFX()
+    {
+        _sfxSource.Stop();
+    }
+
     public void SetChannelVolume(string mixerChannel, float linearVolume) // valor 0.0 a 1.0
     {
         float volumeInDb = Mathf.Log10(Mathf.Clamp(linearVolume, 0.0001f, 1f)) * 20f;
