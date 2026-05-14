@@ -50,6 +50,10 @@ MonoBehaviour:
   - RPC_SyncWorkParticles
   - RPC_SyncInitialization
   - RPC_RepairDirtIssue
+  - RPC_SyncSuds
+  - RPC_GetReleaseBucket
+  - RPC_SyncWashCounterDirtIssue
+  - RPC_SetObjectActive
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

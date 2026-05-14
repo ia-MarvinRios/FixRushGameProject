@@ -10,12 +10,15 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
 {
     [Header("Interaction Settings")]
     [SerializeField] private IInteractable.Type _interactionType = IInteractable.Type.Simple;
+    [Tooltip("If true, the interaction can be shared among multiple players. If false, only one player can interact with it at a time.")]
+    [SerializeField] private bool _shared = false;
     [SerializeField] private float _holdTime = 2f;
     [Header("Pickable Settings")]
     [SerializeField] private Rigidbody _rigidbody;
     [SerializeField] private Collider _collider;
 
     public IInteractable.Type InteractionType => _interactionType;
+    public bool Shared => _shared;
     public float HoldTime => _holdTime;
 
     /// <summary>
@@ -33,6 +36,11 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
     /// </summary>
     /// <param name="player">The player who is canceling the interaction.</param>
     public virtual void CancelInteraction(PlayerController player)
+    {
+        return;
+    }
+
+    public virtual void InteractionStarted(PlayerController player)
     {
         return;
     }

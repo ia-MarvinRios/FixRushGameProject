@@ -34,8 +34,6 @@ public class PlayerController : MonoBehaviour
 
     private bool _paused = false;
 
-    internal Avatar Avatar;
-
     private readonly List<GameObject> _focusCandidates = new();
     internal GameObject FocusedObj = null;
     internal GameObject GrabbedObj = null;
@@ -203,6 +201,8 @@ public class PlayerController : MonoBehaviour
     {
         if (!ctx.performed) return;
 
+        interactable?.InteractionStarted(player);
+
         if (GrabbedObj != null)
         {
             OnGrabbedObjInteraction?.Invoke(interactable, player);
@@ -242,6 +242,8 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator HoldInteractionCoroutine(PlayerController player, IInteractable interactable)
     {
+        interactable?.InteractionStarted(player);
+
         _remainingTime = interactable.HoldTime;
 
         while (_isHolding && _remainingTime > 0f)
@@ -281,16 +283,18 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator StillInteractionCoroutine(PlayerController player, IInteractable interactable)
     {
+        interactable?.InteractionStarted(player);
+
         float remainingTime = interactable.HoldTime;
 
-        while (player != null && remainingTime > 0f)
+        while (_currentVelocity == Vector3.zero && remainingTime > 0f)
         {
             remainingTime -= Time.deltaTime;
             yield return null;
         }
 
         // Canceled
-        if (player == null)
+        if (_currentVelocity != Vector3.zero)
         {
             if (GrabbedObj != null)
             {
@@ -380,7 +384,6 @@ public class PlayerController : MonoBehaviour
         }
 
         // Animations
-        if (Avatar != null) { Avatar.ProcessAnimations(); }
     }
 
     protected void UpdateFocused()

@@ -2,6 +2,7 @@ using FixRush;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(vNetworkHandler))]
 public abstract class Vehicle : MonoBehaviour
@@ -15,6 +16,7 @@ public abstract class Vehicle : MonoBehaviour
     [SerializeField] private BoxCollider _collider;
     [SerializeField] private DecalProjector _dirtDecal;
     [SerializeField] private Material _dirtMaterial;
+    [SerializeField] private VisualEffect _sudsParticles;
     [SerializeField] internal GameObject TriggerPrefab;
     [SerializeField] private IIssue.Type[] _issueTypes;
 
@@ -95,5 +97,14 @@ public abstract class Vehicle : MonoBehaviour
                 break;
             }
         }
+    }
+
+    internal void ShowSuds(float duration)
+    {
+        _sudsParticles.Play();
+    }
+    internal void HideSuds()
+    {
+        _sudsParticles.Stop();
     }
 }
