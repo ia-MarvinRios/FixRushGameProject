@@ -8,40 +8,40 @@ using System;
 public class PlayerController : MonoBehaviour
 {
     private const float FOV_THRESHOLD = 0.5f;
-    private const float DIST_WEIGHT = 0.1f;
+    private const float DIST_WEIGHT   = 0.1f;
 
     [Header("Player Settings")]
     [SerializeField] internal PlayerSettings Player;
 
     [Header("References")]
+    [SerializeField] private  CharacterController _characterController;
+    [SerializeField] private  PlayerNetworkHandler _networkHandler;
     [SerializeField] internal GameObject Model1;
     [SerializeField] internal GameObject Model2;
-    [SerializeField] private CharacterController _characterController;
-    [SerializeField] private PlayerNetworkHandler _networkHandler;
     [SerializeField] internal Transform ObjRoot;
 
     private InputSystem_Actions _inputActions;
     private InputAction _moveAction;
 
     private Camera _camera;
+    private bool _paused = false;
 
+    // Movement
     private Vector2 _moveInput;
     private Vector3 _moveDirection;
     private Vector3 _velocity;
     private Vector3 _currentVelocity;
-    private float _acceleration = 10f;
-    private float _deceleration = 15f;
+    private float   _acceleration = 10f;
+    private float   _deceleration = 15f;
 
-    private bool _paused = false;
-
-    private readonly List<GameObject> _focusCandidates = new();
-    internal GameObject FocusedObj = null;
-    internal GameObject GrabbedObj = null;
-    private Coroutine _holdCoroutine;
-    private Coroutine _stillCoroutine;
+    // Interactions
     private bool _isHolding = false;
     private float _remainingTime;
-
+    private Coroutine _holdCoroutine;
+    private Coroutine _stillCoroutine;
+    private List<GameObject> _focusCandidates = new();
+    internal GameObject FocusedObj = null;
+    internal GameObject GrabbedObj = null;
     internal Action<IInteractable, PlayerController> OnGrabbedObjInteraction;
     internal Action<IInteractable, PlayerController> OnGrabbedObjInteractionCanceled;
 
@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
         }
 
         _inputActions = new InputSystem_Actions();
-        _camera = Camera.main;
+        _camera       = Camera.main;
 
         EnableAllInputs();
     }
@@ -74,7 +74,9 @@ public class PlayerController : MonoBehaviour
         // Items logic
         if (other.TryGetComponent(out IInteractable interactable))
         {
-            _focusCandidates.Add(((MonoBehaviour)interactable).gameObject);
+            _focusCandidates.Add(
+                ((MonoBehaviour)interactable).gameObject
+            );
         }
     }
 
@@ -85,7 +87,9 @@ public class PlayerController : MonoBehaviour
         // Items logic
         if (other.TryGetComponent(out IInteractable interactable))
         {
-            _focusCandidates.Remove(((MonoBehaviour)interactable).gameObject);
+            _focusCandidates.Remove(
+                ((MonoBehaviour)interactable).gameObject
+            );
         }
     }
 
@@ -209,6 +213,8 @@ public class PlayerController : MonoBehaviour
         }
 
         interactable?.Interact(player);
+
+        FocusedObj = null;
     }
 
     void HandleHold(InputAction.CallbackContext ctx, PlayerController player, IInteractable interactable)
@@ -263,7 +269,8 @@ public class PlayerController : MonoBehaviour
             interactable?.Interact(player);
         }
 
-        _isHolding = false;
+        FocusedObj     = null;
+        _isHolding     = false;
         _holdCoroutine = null;
     }
 
@@ -303,6 +310,8 @@ public class PlayerController : MonoBehaviour
 
             interactable.CancelInteraction(player);
 
+            FocusedObj = null;
+
             Debug.Log("Still canceled");
         }
         else
@@ -331,59 +340,6 @@ public class PlayerController : MonoBehaviour
     internal void DropObject(GameObject obj)
     {
         _networkHandler.DropRequest(obj);
-    }
-
-    #endregion
-
-    private void ApplyGravity()
-    {
-        if (_characterController.isGrounded && _velocity.y < 0)
-            _velocity.y = -2f;
-
-        _velocity += Physics.gravity * Time.fixedDeltaTime;
-
-        _characterController.Move(_velocity * Time.fixedDeltaTime);
-    }
-
-    private void Move()
-    {
-        // Process movement input
-        _moveInput = _moveAction.ReadValue<Vector2>();
-        _moveDirection = _camera.transform.forward.normalized * _moveInput.y + _camera.transform.right.normalized * _moveInput.x;
-        _moveDirection.y = 0;
-
-        if (_moveDirection.magnitude > 0)
-        {
-            // Accelerates the player smoothly
-            _currentVelocity = Vector3.MoveTowards(
-                _currentVelocity,
-                _moveDirection * Player.MoveSpeed,
-                _acceleration * Time.deltaTime
-            );
-        }
-        else
-        {
-            // Slows down the player smoothly when there's no input
-            _currentVelocity = Vector3.MoveTowards(
-                _currentVelocity,
-                Vector3.zero,
-                _deceleration * Time.deltaTime
-            );
-        }
-
-        _characterController.Move(_currentVelocity * Time.deltaTime);
-
-        // Rotate
-        if (_moveDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                Quaternion.LookRotation(_moveDirection),
-                10 * Time.fixedDeltaTime
-            );
-        }
-
-        // Animations
     }
 
     protected void UpdateFocused()
@@ -429,7 +385,7 @@ public class PlayerController : MonoBehaviour
 
         FocusedObj = best;
 
-        // Update selector
+        // --- Update selector ---
         if (FocusedObj != null)
         {
             InWorldCanvas.Instance.SetSelector(FocusedObj.transform.position);
@@ -440,6 +396,67 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region PHYSICS
+
+    private void ApplyGravity()
+    {
+        if (_characterController.isGrounded && _velocity.y < 0) { _velocity.y = -2f; }
+
+        _velocity += Physics.gravity 
+                   * Time.fixedDeltaTime;
+
+        _characterController.Move(_velocity * Time.fixedDeltaTime);
+    }
+
+    private void Move()
+    {
+        // Process movement input
+        _moveInput       = _moveAction.ReadValue<Vector2>();
+        _moveDirection   = _camera.transform.forward.normalized * _moveInput.y +
+                           _camera.transform.right.normalized   * _moveInput.x;
+        _moveDirection.y = 0;
+
+        // Calc
+        if (_moveDirection.magnitude > 0)
+        {
+            // Accelerates the player smoothly
+            _currentVelocity = Vector3.MoveTowards(
+                _currentVelocity,
+                _moveDirection * Player.MoveSpeed,
+                _acceleration  * Time.deltaTime
+            );
+        }
+        else
+        {
+            // Slows down the player smoothly when there's no input
+            _currentVelocity = Vector3.MoveTowards(
+                _currentVelocity,
+                Vector3.zero,
+                _deceleration * Time.deltaTime
+            );
+        }
+
+        _characterController.Move(_currentVelocity * Time.deltaTime);
+
+        // Rotate
+        if (_moveDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                Quaternion.LookRotation(_moveDirection),
+                10 * Time.fixedDeltaTime
+            );
+        }
+
+        // Animations
+    }
+
+    #endregion
+
+    #region VISUALS
+
     /// <summary>
     /// Particulas que se activaran cuando se este trabajando en una reparación, Se espera un bool, true = play, false = stop
     /// </summary>
@@ -449,14 +466,21 @@ public class PlayerController : MonoBehaviour
         _networkHandler.SyncWorkParticles(show);
     }
 
+    #endregion
 
+    #region UNITY_DEBUGGING_AND_EDITOR
 
     private void OnDrawGizmos()
     {
         if (FocusedObj != null)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, FocusedObj.transform.position);
+            Gizmos.DrawLine(
+                transform.position, 
+                FocusedObj.transform.position
+            );
         }
     }
+
+    #endregion
 }

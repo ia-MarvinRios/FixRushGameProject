@@ -13,23 +13,17 @@ public class GameManager : MonoBehaviourPun
 
     [Header("Level Data Reference")]
     [SerializeField] internal LevelData LevelData;
-    [Header("Player Spawner Reference")]
-    [SerializeField] private PlayerSpawner _spawner;
+
+    [Header("UI Reference")]
+    [SerializeField] InGameUI _ui;
+
     [Header("Room Physics Objects")]
     [SerializeField] private Rigidbody[] _roomPhysicObjects;
 
-
-    private List<PhotonView> _onlinePlayers = new List<PhotonView>();
+    private int _globalCash;
 
     private void Awake()
     {
-        // Disable this component for non-MasterClients
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            enabled = false;
-            return;
-        }
-
         Instance = this;
 
         foreach (Rigidbody rb in _roomPhysicObjects)
@@ -38,25 +32,20 @@ public class GameManager : MonoBehaviourPun
         }
     }
 
-    internal void RegisterPlayer(int playerViewID, Hashtable spawnData)
+    internal void AddCashMaster(int cash)
     {
-        // Find the player controller view in the scene
-        PhotonView playerView = PhotonView.Find(playerViewID);
+        if (!PhotonNetwork.IsMasterClient) { return; }
 
-        if (playerView == null)
-        {
-            Debug.Log($"{LOG_FORMAT} Couldn't find player controller with photonViewID: {playerViewID}");
-            return;
-        }
+        _globalCash += cash;
+        Debug.Log($"{LOG_FORMAT} Current Cash: {_globalCash}");
 
-        _onlinePlayers.Add(playerView);
+        // Update Everyone's UI
+        photonView.RPC(
+            nameof(RPC_SyncCashUI),
+            RpcTarget.All,
+            _globalCash
+        );
     }
-    internal void UnregisterPlayer(int playerViewID)
-    {
-        PhotonView playerView = PhotonView.Find(playerViewID);
-        _onlinePlayers.Remove(playerView);
-    }
-
 
     private void OnDrawGizmos()
     {
@@ -69,5 +58,15 @@ public class GameManager : MonoBehaviourPun
             }
         }
     }
+
+    #region RPCs
+
+    [PunRPC]
+    private void RPC_SyncCashUI(int cash)
+    {
+        _ui.UpdateCashUI(cash);
+    }
+
+    #endregion
 
 }

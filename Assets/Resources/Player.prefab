@@ -87,10 +87,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   Player: {fileID: 11400000, guid: 1b0cc9b4585edbd428823a59ca4dc910, type: 2}
-  Model1: {fileID: 3252203373830510300}
-  Model2: {fileID: 7865679350224227619}
   _characterController: {fileID: 2453003754471218011}
   _networkHandler: {fileID: 807180346065615471}
+  Model1: {fileID: 3252203373830510300}
+  Model2: {fileID: 7865679350224227619}
   ObjRoot: {fileID: 9191127004246503959}
 --- !u!114 &807180346065615471
 MonoBehaviour:

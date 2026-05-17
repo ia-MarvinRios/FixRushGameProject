@@ -17,6 +17,7 @@ public class DirtIssue : IIssue
     // IIssue implementation
     IIssue.Type IIssue.IssueType => IIssue.Type.Dirty;
     public bool IsFixed { get; private set; } = false;
+    public int ReparationFee { get; private set; } = 10;
 
     private bool _passedCheck = false;
     internal int WashCounter = 2;
@@ -68,19 +69,19 @@ public class DirtIssue : IIssue
         yield return new WaitUntil(() => _readyToGo);
         yield return new WaitForSeconds(1.5f);
         yield return new WaitUntil(()=> IsFixed);
+
+        // Add Cash
+        if (PhotonManager.Instance.IsMasterClient)
+        {
+            GameManager.Instance.AddCashMaster(ReparationFee);
+        }
     }
 
-    public void HandleInteraction(PlayerController player, Trigger trigger)
+    internal void Wash()
     {
-        if (!_passedCheck) { return; }
-
         WashCounter--;
 
-        _vehicle.NetworkHandler.SyncWashCounterDirtIssue(WashCounter);
-
         float alpha = (float)WashCounter / _maxWashCounter;
-
-        player.GrabbedObj.GetComponent<Bucket>().IsFull = false;
 
         _vehicle.NetworkHandler.SyncSuds(false);
         _vehicle.NetworkHandler.SyncDirtAlpha(alpha);
@@ -91,6 +92,15 @@ public class DirtIssue : IIssue
             _vehicle.NetworkHandler.RequestResolveDirtIssue(_vehicle);
             _readyToGo = true;
         }
+    }
+
+    public void HandleInteraction(PlayerController player, Trigger trigger)
+    {
+        if (!_passedCheck) { return; }
+
+        _vehicle.NetworkHandler.SyncWashDirtIssue();
+
+        player.GrabbedObj.GetComponent<Bucket>().IsFull = false;
     }
 
     public void HandleInteractionStarted(PlayerController player, Trigger trigger)

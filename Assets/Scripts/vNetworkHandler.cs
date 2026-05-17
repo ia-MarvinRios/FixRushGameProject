@@ -53,13 +53,12 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         );
     }
 
-    internal void SyncWashCounterDirtIssue(int value)
+    internal void SyncWashDirtIssue()
     {
         photonView.RPC(
-            nameof(RPC_SyncWashCounterDirtIssue),
+            nameof(RPC_WashDirtIssue),
             RpcTarget.All,
-            photonView.ViewID,
-            value
+            photonView.ViewID
         );
     }
 
@@ -125,6 +124,29 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         }
     }
 
+    internal void DestroyChildren(GameObject parent, string childrenName)
+    {
+        if (parent.TryGetComponent(out PhotonView objPhotonView))
+        {
+            photonView.RPC(
+                nameof(RPC_DestroyChildren),
+                RpcTarget.All,
+                objPhotonView.ViewID,
+                childrenName
+            );
+        }
+    }
+
+    internal void SyncJacked(bool jacked)
+    {
+        photonView.RPC(
+            nameof(RPC_SyncJackedState),
+            RpcTarget.All,
+            photonView.ViewID,
+            jacked
+        );
+    }
+
     #region RPCs
 
     [PunRPC]
@@ -137,6 +159,13 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 
         // Move it to the end point
         VManager.Instance.MoveToEndPoint(v);
+    }
+    [PunRPC]
+    private void RPC_SyncJackedState(int carViewID, bool jacked)
+    {
+        Car car = PhotonView.Find(carViewID).GetComponent<Car>();
+
+        car.IsJacked = jacked;
     }
     [PunRPC]
     void RPC_SyncInitialization(int vehicleViewID)
@@ -166,7 +195,7 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         }
     }
     [PunRPC]
-    private void RPC_SyncWashCounterDirtIssue(int vehicleViewID, int value)
+    private void RPC_WashDirtIssue(int vehicleViewID)
     {
         Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
 
@@ -174,7 +203,7 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 
         if (dirtIssue != null)
         {
-            dirtIssue.WashCounter = value;
+            dirtIssue.Wash();
         }
     }
     [PunRPC]
@@ -185,6 +214,43 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         DirtIssue i = v.CurrentIssue as DirtIssue;
         if (i == null) return;
         i.ResolveDirtIssue();
+    }
+    [PunRPC]
+    private void RPC_DestroyChildren(int parentViewID, string childrenName)
+    {
+        PhotonView pv = PhotonView.Find(parentViewID);
+
+        if (pv == null) { return; }
+
+        GameObject obj = pv.gameObject;
+
+        // No child specified affect root object
+        if (string.IsNullOrEmpty(childrenName))
+        {
+            Debug.Log("[vNetworkHandler] No children specified. Skipping RPC...");
+            return;
+        }
+
+        // Affect all direct children
+        if (childrenName == "*all")
+        {
+            foreach (Transform child in obj.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            return;
+        }
+
+        // Affect specific child
+        foreach (Transform child in obj.transform)
+        {
+            if (child.name == childrenName)
+            {
+                Destroy(child.gameObject);
+                return;
+            }
+        }
     }
     [PunRPC]
     void RPC_SetObjectActive(int objectViewID, bool active, string childrenName)

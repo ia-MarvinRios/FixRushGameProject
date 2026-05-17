@@ -54,6 +54,11 @@ MonoBehaviour:
   - RPC_GetReleaseBucket
   - RPC_SyncWashCounterDirtIssue
   - RPC_SetObjectActive
+  - RPC_SyncCashUI
+  - RPC_RequestPaymentToMaster
+  - RPC_WashDirtIssue
+  - RPC_SyncJackedState
+  - RPC_DestroyChildren
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

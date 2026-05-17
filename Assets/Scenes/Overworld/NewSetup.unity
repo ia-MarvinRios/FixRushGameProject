@@ -1845,7 +1845,7 @@ GameObject:
   - component: {fileID: 959525735}
   - component: {fileID: 959525734}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: CashText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2443,10 +2443,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InGameUI
   _gameContent: {fileID: 11400000, guid: b0b1f3297d74f064c85ebcca653b63fe, type: 2}
   _pauseMenuPanel: {fileID: 1725812781}
-  _taskPanelText: {fileID: 1829572452}
   _hintDescription: {fileID: 1961145256}
+  _taskPanelText: {fileID: 1829572452}
   _taskProgressPanel: {fileID: 720029231}
   _taskProgressSlider: {fileID: 842808583}
+  _cashText: {fileID: 959525734}
   Manual: {fileID: 920874225}
   _animator: {fileID: 1119229513}
 --- !u!224 &1119229512
@@ -2708,7 +2709,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   LevelData: {fileID: 11400000, guid: 5e8e57683cbcba941a953c6bd6449ab9, type: 2}
-  _spawner: {fileID: 1649195054}
+  _ui: {fileID: 1119229511}
   _roomPhysicObjects:
   - {fileID: 758055650478375831}
   - {fileID: 5903538639710443135}

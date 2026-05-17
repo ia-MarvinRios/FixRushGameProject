@@ -13,6 +13,7 @@ public abstract class Vehicle : MonoBehaviour
     [Header("Vechicle References")]
     [SerializeField] internal vNetworkHandler NetworkHandler;
     [SerializeField] internal NavMeshAgent Agent;
+    [SerializeField] internal Animator mAnimator;
     [SerializeField] private BoxCollider _collider;
     [SerializeField] private DecalProjector _dirtDecal;
     [SerializeField] private Material _dirtMaterial;
@@ -63,8 +64,9 @@ public abstract class Vehicle : MonoBehaviour
     {
         if (!PhotonManager.Instance.IsMasterClient) { return; }
 
-        VManager.Instance.RemoveVehicle(this);
+        // Set fixed and destroy.
         IsFixed = true;
+        VManager.Instance.RemoveVehicle(this);
 
         // Audio
         AudioManager.Instance.PlaySoundByName("CarDone");

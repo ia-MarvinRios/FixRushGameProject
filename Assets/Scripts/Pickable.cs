@@ -104,6 +104,33 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
         player.GrabbedObj = null;
     }
 
+    internal void DisablePicking()
+    {
+        // --- Disable some components ---
+        // Collider
+        _collider.enabled = false;
+
+        // Rigidbody (only on master client to avoid conflicts)
+        if (PhotonManager.Instance.IsMasterClient && _rigidbody != null)
+        {
+            _rigidbody.isKinematic = true;
+        }
+    }
+
+    internal void EnablePicking()
+    {
+        // --- Re-enable components ---
+        // Collider
+        _collider.enabled = true;
+
+        // Rigidbody (only on master client to avoid conflicts)
+        if (PhotonManager.Instance.IsMasterClient && _rigidbody != null)
+        {
+            _rigidbody.isKinematic = false;
+            _rigidbody.linearVelocity = Vector3.zero;
+        }
+    }
+
     private void OnValidate()
     {
         // Ensure that the Rigidbody and Collider references are assigned in the inspector,

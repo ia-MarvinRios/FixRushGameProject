@@ -1,4 +1,5 @@
 using FixRush;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,8 +11,6 @@ public class TireIssue : IIssue
     private Trigger _tempTrigger;
     private Dictionary<Trigger, GameObject> _triggers = new Dictionary<Trigger, GameObject>();
 
-    private int _counter = 0;
-
     public TireIssue(Car car)
     {
         _car = car;
@@ -22,6 +21,7 @@ public class TireIssue : IIssue
     public IIssue.Type IssueType => IIssue.Type.Tires;
 
     public bool IsFixed { get; private set; } = false;
+    public int ReparationFee { get; private set; } = 160;
 
     private bool _passedCheck = false;
 
@@ -31,6 +31,22 @@ public class TireIssue : IIssue
 
         // Hide UI Panel
         InGameUI.Instance.ShowTaskPanel(false, IIssue.Type.Tires);
+    }
+
+    public IEnumerator FixingCoroutine()
+    {
+        // Show UI Panel
+        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Tires);
+
+        yield return new WaitUntil(() => IsFixed);
+        yield return new WaitUntil(() => !_car.IsJacked);
+        yield return new WaitForSeconds(1.5f);
+
+        // Add cash
+        if (PhotonManager.Instance.IsMasterClient)
+        {
+            GameManager.Instance.AddCashMaster(ReparationFee);
+        }
     }
 
     private void SetUp()
@@ -51,8 +67,6 @@ public class TireIssue : IIssue
         _jackTrigger.name = "JackTrigger";
 
         // --- Create remove tire triggers ---
-        _counter = _car.TiresFront.Length + _car.TiresRear.Length;
-        Debug.Log($"[TireIssue] Counter set to {_counter}");
 
         foreach (GameObject tire in _car.TiresFront)
         {
@@ -63,6 +77,23 @@ public class TireIssue : IIssue
         {
             CreateRemoveTireTrigger(tire.transform, true);
         }
+    }
+
+    private void UpdateTriggerDictionary(Trigger trigger) 
+    {
+        _triggers.Remove(trigger);
+
+        if (_triggers.Count <= 0)
+        {
+            // Reactivate jack trigger
+            _car.NetworkHandler.SetActiveChildren(_car.gameObject, _jackTrigger.name, true);
+
+            Debug.Log("[TireIssue] All tires completely fixed, fixing issue...");
+
+            IsFixed = true;
+        }
+
+        Debug.Log("[TireIssue] Triggers Count: " + _triggers.Count);
     }
 
     private void CreateRemoveTireTrigger(Transform parent, bool disableOnCreation)
@@ -78,9 +109,11 @@ public class TireIssue : IIssue
             IInteractable.Type.Hold
         );
 
+        _tempTrigger.OnDestroyTrigger(UpdateTriggerDictionary);
+
         _tempTrigger.transform.SetParent(parent);
         _tempTrigger.transform.localPosition = Vector3.zero;
-        _tempTrigger.gameObject.name = "RemoveTireTrigger";
+        _tempTrigger.gameObject.name = $"RemoveTireTrigger({parent.name})";
 
         // Add to dictionary
         _triggers.Add(_tempTrigger, parent.gameObject);
@@ -89,21 +122,83 @@ public class TireIssue : IIssue
         _tempTrigger.gameObject.SetActive(!disableOnCreation);
     }
 
-    public IEnumerator FixingCoroutine()
+    private void CreateReplaceTireTrigger(Transform parent, Transform tire)
     {
-        // Show UI Panel
-        InGameUI.Instance.ShowTaskPanel(true, IIssue.Type.Tires);
+        // Create trigger
+        _tempTrigger = GameObject.Instantiate(_car.TriggerPrefab).GetComponent<Trigger>().Set(
+            1f,
+            5f,
+            true,
+            HandleReplaceTireInteractionStarted,
+            HandleReplaceTireInteraction,
+            HandleReplaceTireInteractionCanceled,
+            IInteractable.Type.Hold
+        );
 
-        yield return new WaitUntil(() => IsFixed);
+        _tempTrigger.OnDestroyTrigger(UpdateTriggerDictionary);
+
+        _tempTrigger.transform.SetParent(parent);
+        _tempTrigger.transform.position = tire.position;
+        _tempTrigger.gameObject.name = $"ReplaceTireTrigger({tire.name})";
+
+        // Add to dictionary
+        _triggers.Add(_tempTrigger, tire.gameObject);
+    }
+
+    private void SetActiveTireTriggers(int zPos, bool active)
+    {
+        if (zPos == 0) { return; }
+
+        // Front
+        if (zPos > 0)
+        {
+            foreach (GameObject tire in _car.TiresFront)
+            {
+                _car.NetworkHandler.SetActiveChildren(tire, active);
+            }
+        }
+        // Rear
+        else
+        {
+            foreach (GameObject tire in _car.TiresRear)
+            {
+                _car.NetworkHandler.SetActiveChildren(tire, active);
+            }
+        }
+    }
+
+    private void SetActiveTireTriggers(bool active)
+    {
+        // Front
+        foreach (GameObject tire in _car.TiresFront)
+        {
+            _car.NetworkHandler.SetActiveChildren(tire, active);
+        }
+        // Rear
+        foreach (GameObject tire in _car.TiresRear)
+        {
+            _car.NetworkHandler.SetActiveChildren(tire, active);
+        }
     }
 
     #region JACK_INTERACTIONS
 
     private void JackInteractionStarted(PlayerController player, Trigger trigger)
     {
-        if (player.GrabbedObj == null)
+        if (player.GrabbedObj == null && !_car.IsJacked)
         {
             InGameUI.Instance.ShowHint("You need to grab a Jack tool first", 2f);
+            return;
+        }
+
+        if (player.GrabbedObj == null && _car.IsJacked)
+        {
+            _passedCheck = true;
+
+            // Audio and UI
+            AudioManager.Instance.PlaySoundByName("Jack");
+            InGameUI.    Instance.StartTaskProgress(trigger.HoldTime);
+
             return;
         }
 
@@ -117,34 +212,28 @@ public class TireIssue : IIssue
 
         // Audio and UI
         AudioManager.Instance.PlaySoundByName("Jack");
-        InGameUI.Instance.StartTaskProgress(trigger.HoldTime);
+        InGameUI.    Instance.StartTaskProgress(trigger.HoldTime);
     }
     private void JackInteraction(PlayerController player, Trigger trigger)
     {
         if (!_passedCheck) { return; }
 
-        // logic
-        if (player.GrabbedObj.TryGetComponent(out Jack jack))
+        // --- If it's jacked ---
+        if (_car.IsJacked)
         {
-            jack.Drop(player);
-            
-            // If it's not jacked, jack
-            if (!_car.IsJacked)
-            {
-                _car.NetworkHandler.SetActiveChildren(_car.gameObject, _jackTrigger.name, false);
-                foreach (var t in _triggers)
-                {
-                    _car.NetworkHandler.SetActiveChildren(t.Value.gameObject, true);
-                }
-            }
+            _car.UnjackCar(player);
+            SetActiveTireTriggers(false);
         }
 
-        if (IsFixed)
+        // --- If it's not jacked ---
+        else if (player.GrabbedObj.TryGetComponent(out Jack jack) && !_car.IsJacked)
         {
-            _car.NetworkHandler.SetActiveChildren(_car.gameObject, _jackTrigger.name, false);
-        }
+            int z = _car.JackCar(player);
 
-        _car.IsJacked = !_car.IsJacked;
+            SetActiveTireTriggers(z, true);
+
+            player.GrabbedObj = null;
+        }
 
         _passedCheck = false;
     }
@@ -186,8 +275,6 @@ public class TireIssue : IIssue
     {
         if (!_passedCheck) { return; }
 
-        _counter--;
-
         // Deactivate tire
         _triggers.TryGetValue(trigger, out GameObject tire);
         if (tire != null)
@@ -195,24 +282,51 @@ public class TireIssue : IIssue
             _car.NetworkHandler.SetActiveObject(tire, false);
         }
 
-        _triggers.Remove(trigger);
-        GameObject.Destroy(trigger.gameObject);
+        // Destroy it's trigger
+        _car.NetworkHandler.DestroyChildren(tire, trigger.name);
+
+        // Create replace trigger
+        CreateReplaceTireTrigger(_car.transform, tire.transform);
 
         _passedCheck = false;
-
-        if (_counter <= 0)
-        {
-            // Reactivate jack trigger
-            _car.NetworkHandler.SetActiveChildren(_car.gameObject, _jackTrigger.name, true);
-
-            IsFixed = true;
-        }
     }
 
     private void HandleTireInteractionCanceled(PlayerController player, Trigger trigger)
     {
         _passedCheck = false;
 
+        // Audio and UI
+        AudioManager.Instance.StopAllFX();
+        InGameUI.Instance.StopTaskProgress(false);
+    }
+
+    #endregion
+
+    #region REPLACE_TIRES
+
+    private void HandleReplaceTireInteractionStarted(PlayerController controller, Trigger trigger)
+    {
+        // Audio and UI
+        AudioManager.Instance.PlaySoundByName("Jack");
+        InGameUI.Instance.StartTaskProgress(trigger.HoldTime);
+
+    }
+
+    private void HandleReplaceTireInteraction(PlayerController controller, Trigger trigger)
+    {
+        // Activate tire
+        _triggers.TryGetValue(trigger, out GameObject tire);
+        if (tire != null)
+        {
+            _car.NetworkHandler.SetActiveObject(tire, true);
+        }
+
+        // Destroy it's trigger
+        _car.NetworkHandler.DestroyChildren(_car.gameObject, trigger.name);
+    }
+
+    private void HandleReplaceTireInteractionCanceled(PlayerController controller, Trigger trigger)
+    {
         // Audio and UI
         AudioManager.Instance.StopAllFX();
         InGameUI.Instance.StopTaskProgress(false);

@@ -14,10 +14,11 @@ public class InGameUI : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private GameObject _pauseMenuPanel;
-    [SerializeField] private TMP_Text _taskPanelText;
     [SerializeField] private TMP_Text _hintDescription;
+    [SerializeField] private TMP_Text _taskPanelText;
     [SerializeField] private GameObject _taskProgressPanel;
     [SerializeField] private Slider _taskProgressSlider;
+    [SerializeField] private TMP_Text _cashText;
     [SerializeField] internal GameObject Manual;
 
     [Header("Animations")]
@@ -27,6 +28,9 @@ public class InGameUI : MonoBehaviour
     private float _currentProgress = 0f;
     private float _modifier = 1f;
     private Coroutine _taskProgressCoroutine;
+
+    // Cash
+    private Coroutine _cashGrowCoroutine;
 
     internal PlayerNetworkHandler NetworkHandler { get; private set; }
 
@@ -56,6 +60,9 @@ public class InGameUI : MonoBehaviour
         _pauseMenuPanel.SetActive(!_pauseMenuPanel.activeSelf);
 
     }
+
+    internal void LinkNetworkHandler(PlayerNetworkHandler networkHandler) { NetworkHandler = networkHandler; }
+
 
     public void ShowTaskPanel(bool show, IIssue.Type issueType = IIssue.Type.Dirty)
     {
@@ -91,6 +98,8 @@ public class InGameUI : MonoBehaviour
 
         _animator.SetBool("ShowHint", false);
     }
+
+    #region TASKS
 
     public void StartTaskProgress(float duration)
     {
@@ -129,6 +138,34 @@ public class InGameUI : MonoBehaviour
         StopTaskProgress(true);
     }
 
-    internal void LinkNetworkHandler(PlayerNetworkHandler networkHandler) { NetworkHandler = networkHandler; }
+    #endregion
 
+    #region GLOBAL
+
+    internal void UpdateCashUI(int targetCash)
+    {
+        if (_cashGrowCoroutine != null)
+        {
+            StopCoroutine(_cashGrowCoroutine);
+        }
+
+        _cashGrowCoroutine = StartCoroutine(GrowCashCoroutine(targetCash));
+    }
+
+    private IEnumerator GrowCashCoroutine(int targetCash)
+    {
+        WaitForSeconds interval = new WaitForSeconds(0.05f);
+
+        int currentCash = int.Parse(_cashText.text);
+
+        while (currentCash < targetCash)
+        {
+            currentCash++;
+            _cashText.text = currentCash.ToString();
+
+            yield return interval;
+        }
+    }
+
+    #endregion
 }

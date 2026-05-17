@@ -9,15 +9,21 @@ public class Trigger : MonoBehaviour, IInteractable
     [SerializeField] SphereCollider _sphereCollider;
     [SerializeField] private IInteractable.Type _interactionType = IInteractable.Type.Simple;
     [Tooltip("If true, the interaction can be shared among multiple players. If false, only one player can interact with it at a time.")]
-    [SerializeField] private bool _shared = false;
+    [SerializeField] private bool  _shared   = false;
     [SerializeField] private float _holdTime = 2f;
 
     private Action<PlayerController, Trigger> _onInteractionStarted;
     private Action<PlayerController, Trigger> _onInteracted;
     private Action<PlayerController, Trigger> _onInteractionCanceled;
+    private Action<Trigger> _onDestroy;
     public IInteractable.Type InteractionType => _interactionType;
     public float HoldTime => _holdTime;
     public bool Shared => _shared;
+
+    private void OnDestroy()
+    {
+        _onDestroy?.Invoke(this);
+    }
 
     /// <summary>
     /// Sets the trigger's properties. This is used to initialize the trigger after instantiating it, since we can't set these properties in the prefab.
@@ -32,11 +38,11 @@ public class Trigger : MonoBehaviour, IInteractable
         Action<PlayerController, Trigger> onInteracted, 
         IInteractable.Type interactionType = IInteractable.Type.Simple)
     {
-        _holdTime = holdTime;
-        _interactionType = interactionType;
+        _shared                = shared;
+        _holdTime              = holdTime;
+        _onInteracted          = onInteracted;
+        _interactionType       = interactionType;
         _sphereCollider.radius = radius;
-        _shared = shared;
-        _onInteracted = onInteracted;
 
         return this;
     }
@@ -46,11 +52,11 @@ public class Trigger : MonoBehaviour, IInteractable
         Action<PlayerController, Trigger> onInteractionCanceled, 
         IInteractable.Type interactionType = IInteractable.Type.Simple)
     {
-        _holdTime = holdTime;
-        _interactionType = interactionType;
+        _shared                = shared;
+        _holdTime              = holdTime;
+        _onInteracted          = onInteracted;
+        _interactionType       = interactionType;
         _sphereCollider.radius = radius;
-        _shared = shared;
-        _onInteracted = onInteracted;
         _onInteractionCanceled = onInteractionCanceled;
 
         return this;
@@ -62,29 +68,24 @@ public class Trigger : MonoBehaviour, IInteractable
         Action<PlayerController, Trigger> onInteractionCanceled, 
         IInteractable.Type interactionType = IInteractable.Type.Simple)
     {
-        _holdTime = holdTime;
-        _interactionType = interactionType;
+        _shared                = shared;
+        _holdTime              = holdTime;
+        _onInteracted          = onInteracted;
+        _interactionType       = interactionType;
         _sphereCollider.radius = radius;
-        _shared = shared;
-        _onInteractionStarted = onInteractionStarted;
-        _onInteracted = onInteracted;
+        _onInteractionStarted  = onInteractionStarted;
         _onInteractionCanceled = onInteractionCanceled;
 
         return this;
     }
-
-    public void Interact(PlayerController player)
+    public void OnDestroyTrigger(Action<Trigger> onDestroyTrigger)
     {
-        _onInteracted?.Invoke(player, this);
+        _onDestroy = onDestroyTrigger;
     }
 
-    public void CancelInteraction(PlayerController player)
-    {
-        _onInteractionCanceled?.Invoke(player, this);
-    }
+    public void Interact(PlayerController player) { _onInteracted?.Invoke(player, this); }
 
-    public void InteractionStarted(PlayerController player)
-    {
-        _onInteractionStarted?.Invoke(player, this);
-    }
+    public void CancelInteraction(PlayerController player) { _onInteractionCanceled?.Invoke(player, this); }
+
+    public void InteractionStarted(PlayerController player) { _onInteractionStarted?.Invoke(player, this); }
 }

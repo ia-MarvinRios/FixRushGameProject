@@ -295,9 +295,6 @@ public class VManager : MonoBehaviourPun
         // Destroy after getting index
         PhotonNetwork.Destroy(v.gameObject);
 
-        // Update UI
-        //UIManager.Instance.RemoveIssuesCard(UIManager.Instance.ActiveCards[index]);
-
         _readyToFix = false;
 
         if (_leader != null && _leader.isOnNavMesh)

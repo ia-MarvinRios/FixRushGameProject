@@ -86,28 +86,5 @@ public class PlayerSpawner : MonoBehaviourPun
 
         // Get player data
         Hashtable spawnData = ToHashtable(PhotonManager.Instance.GetThisPlayerData());
-
-        // Sync player spawn on server
-        photonView.RPC(
-            nameof(RPC_SyncPlayerSpawnOnServer),
-            RpcTarget.MasterClient,
-            playerPv.ViewID,
-            spawnData,
-            false
-        );
     }
-
-
-    #region RPCs
-
-    [PunRPC]
-    private void RPC_SyncPlayerSpawnOnServer(int playerViewID, Hashtable spawnData, bool left)
-    {
-        if (!PhotonNetwork.IsMasterClient) { return; }
-
-        if (left) { GameManager.Instance.UnregisterPlayer(playerViewID); }
-        else { GameManager.Instance.RegisterPlayer(playerViewID, spawnData); }
-    }
-
-    #endregion
 }

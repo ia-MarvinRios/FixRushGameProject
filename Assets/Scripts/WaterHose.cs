@@ -43,7 +43,7 @@ public class WaterHose : Interactable
             );
         }
 
-        _done = false;
+        _done          = false;
         _isInteracting = false;
 
         // UI and Audio
@@ -71,7 +71,7 @@ public class WaterHose : Interactable
             return;
         }
 
-        _done = true;
+        _done          = true;
         _isInteracting = true;
 
         photonView.RPC(
