@@ -33,8 +33,10 @@ public class PlayerController : MonoBehaviour
     private Vector3 _currentVelocity;
     private float   _acceleration = 10f;
     private float   _deceleration = 15f;
+    private bool    _canMove      = true;
 
     // Interactions
+    private bool _canFocus = true;
     private bool _isHolding = false;
     private float _remainingTime;
     private Coroutine _holdCoroutine;
@@ -45,6 +47,12 @@ public class PlayerController : MonoBehaviour
     internal Action<IInteractable, PlayerController> OnGrabbedObjInteraction;
     internal Action<IInteractable, PlayerController> OnGrabbedObjInteractionCanceled;
 
+    private void Awake()
+    {
+        if (!_networkHandler.PhotonViewIsMine) { return; }
+        _inputActions = new InputSystem_Actions();
+    }
+
     private void OnEnable()
     {
         if (!_networkHandler.PhotonViewIsMine)
@@ -52,10 +60,25 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        _inputActions = new InputSystem_Actions();
-        _camera       = Camera.main;
+        _camera = Camera.main;
 
         EnableAllInputs();
+    }
+
+    private void OnDisable()
+    {
+        if (!_networkHandler.PhotonViewIsMine) { return; }
+        if (_inputActions == null) return;
+
+        DisableAllInputs();
+    }
+
+    private void OnDestroy()
+    {
+        if (!_networkHandler.PhotonViewIsMine) { return; }
+        if (_inputActions == null) return;
+
+        DisableAllInputs();
     }
 
     private void FixedUpdate()
@@ -222,6 +245,8 @@ public class PlayerController : MonoBehaviour
         if (ctx.started)
         {
             _isHolding = true;
+            _canFocus = false;
+            _canMove = false;
 
             _holdCoroutine = StartCoroutine(HoldInteractionCoroutine(player, interactable));
 
@@ -231,6 +256,8 @@ public class PlayerController : MonoBehaviour
         if (ctx.canceled)
         {
             _isHolding = false;
+            _canFocus = true;
+            _canMove = true;
 
             if (_holdCoroutine != null)
                 StopCoroutine(_holdCoroutine);
@@ -271,6 +298,8 @@ public class PlayerController : MonoBehaviour
 
         FocusedObj     = null;
         _isHolding     = false;
+        _canFocus      = true;
+        _canMove       = true;
         _holdCoroutine = null;
     }
 
@@ -291,6 +320,8 @@ public class PlayerController : MonoBehaviour
     IEnumerator StillInteractionCoroutine(PlayerController player, IInteractable interactable)
     {
         interactable?.InteractionStarted(player);
+
+        _canFocus = false;
 
         float remainingTime = interactable.HoldTime;
 
@@ -327,6 +358,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Still completed");
         }
 
+        _canFocus       = true;
         _stillCoroutine = null;
     }
 
@@ -344,6 +376,8 @@ public class PlayerController : MonoBehaviour
 
     protected void UpdateFocused()
     {
+        if (!_canFocus) { return; }
+
         if (_characterController == null)
         {
             FocusedObj = null;
@@ -412,6 +446,8 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
+        if (!_canMove) { return; }
+
         // Process movement input
         _moveInput       = _moveAction.ReadValue<Vector2>();
         _moveDirection   = _camera.transform.forward.normalized * _moveInput.y +

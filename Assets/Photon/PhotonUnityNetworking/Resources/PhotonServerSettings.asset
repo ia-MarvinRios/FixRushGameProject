@@ -59,6 +59,9 @@ MonoBehaviour:
   - RPC_WashDirtIssue
   - RPC_SyncJackedState
   - RPC_DestroyChildren
+  - RPC_SyncSafeDestruction
+  - RPC_JackUnjackCar
+  - RPC_SafeDestruction
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

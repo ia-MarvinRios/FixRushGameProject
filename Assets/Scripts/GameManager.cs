@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviourPun
     {
         Instance = this;
 
+        if (!PhotonNetwork.IsMasterClient) { return; }
+
         foreach (Rigidbody rb in _roomPhysicObjects)
         {
             rb.isKinematic = false;

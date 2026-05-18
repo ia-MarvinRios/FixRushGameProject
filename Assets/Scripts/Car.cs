@@ -94,7 +94,7 @@ public class Car : Vehicle
             // Parenting
             jack.transform.SetParent(_jackRootRear);
 
-            NetworkHandler.SyncJacked(true);
+            IsJacked = true;
 
             mAnimator.SetTrigger("JackBack");
 
@@ -112,7 +112,7 @@ public class Car : Vehicle
         _jack.PickUp(player);
 
         _jack    = null;
-        NetworkHandler.SyncJacked(false);
+        IsJacked = false;
 
         mAnimator.SetTrigger("Base");
 

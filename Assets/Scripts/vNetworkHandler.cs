@@ -1,6 +1,6 @@
+using FixRush;
 using Photon.Pun;
 using UnityEngine;
-using FixRush;
 
 public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
@@ -40,6 +40,17 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
             nameof(RPC_SyncInitialization), 
             RpcTarget.Others,
             photonView.ViewID
+        );
+    }
+
+    internal void SyncJackUnjackCar(PlayerController player, bool jack)
+    {
+        photonView.RPC(
+            nameof(RPC_JackUnjackCar),
+            RpcTarget.Others,
+            photonView.ViewID,
+            player.GetComponent<PhotonView>().ViewID,
+            jack
         );
     }
 
@@ -137,13 +148,13 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         }
     }
 
-    internal void SyncJacked(bool jacked)
+    internal void SetSafeDestruction(bool safeDestruction)
     {
         photonView.RPC(
-            nameof(RPC_SyncJackedState),
+            nameof(RPC_SafeDestruction),
             RpcTarget.All,
             photonView.ViewID,
-            jacked
+            safeDestruction
         );
     }
 
@@ -161,11 +172,18 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         VManager.Instance.MoveToEndPoint(v);
     }
     [PunRPC]
-    private void RPC_SyncJackedState(int carViewID, bool jacked)
+    private void RPC_JackUnjackCar(int carViewID, int playerViewID, bool jack)
     {
         Car car = PhotonView.Find(carViewID).GetComponent<Car>();
+        PlayerController player = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
 
-        car.IsJacked = jacked;
+        if (jack)
+        {
+            car.JackCar(player);
+            return;
+        }
+
+        car.UnjackCar(player);
     }
     [PunRPC]
     void RPC_SyncInitialization(int vehicleViewID)
@@ -251,6 +269,15 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
                 return;
             }
         }
+    }
+    [PunRPC]
+    private void RPC_SafeDestruction(int vehicleViewID, bool safe)
+    {
+        Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
+
+        TireIssue issue = (TireIssue)vehicle.CurrentIssue;
+
+        issue.SafeDestruction = safe;
     }
     [PunRPC]
     void RPC_SetObjectActive(int objectViewID, bool active, string childrenName)

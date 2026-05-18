@@ -20,13 +20,21 @@ public class TireIssue : IIssue
 
     public IIssue.Type IssueType => IIssue.Type.Tires;
 
+    internal bool SafeDestruction = false;
     public bool IsFixed { get; private set; } = false;
     public int ReparationFee { get; private set; } = 160;
-
     private bool _passedCheck = false;
-
+    
     public void CleanUp()
     {
+        foreach (Trigger trigger in _triggers.Keys)
+        {
+            if (trigger != null)
+            {
+                GameObject.Destroy(trigger.gameObject);
+            }
+        }
+
         _triggers.Clear();
 
         // Hide UI Panel
@@ -79,8 +87,20 @@ public class TireIssue : IIssue
         }
     }
 
-    private void UpdateTriggerDictionary(Trigger trigger) 
+    private void TriggerDestructionHandler(Trigger trigger) 
     {
+        Debug.Log("Safe: " + SafeDestruction);
+        if (!SafeDestruction) { return; }
+
+        SafeDestruction = false;
+
+        // Create replace trigger if is the case
+        if (trigger.name.Contains("RemoveTireTrigger"))
+        {
+            CreateReplaceTireTrigger(_car.transform, _triggers[trigger].transform);
+        }
+
+        // --- Destroy and update dictionary ---
         _triggers.Remove(trigger);
 
         if (_triggers.Count <= 0)
@@ -109,7 +129,7 @@ public class TireIssue : IIssue
             IInteractable.Type.Hold
         );
 
-        _tempTrigger.OnDestroyTrigger(UpdateTriggerDictionary);
+        _tempTrigger.OnDestroyTrigger(TriggerDestructionHandler);
 
         _tempTrigger.transform.SetParent(parent);
         _tempTrigger.transform.localPosition = Vector3.zero;
@@ -135,7 +155,7 @@ public class TireIssue : IIssue
             IInteractable.Type.Hold
         );
 
-        _tempTrigger.OnDestroyTrigger(UpdateTriggerDictionary);
+        _tempTrigger.OnDestroyTrigger(TriggerDestructionHandler);
 
         _tempTrigger.transform.SetParent(parent);
         _tempTrigger.transform.position = tire.position;
@@ -222,6 +242,7 @@ public class TireIssue : IIssue
         if (_car.IsJacked)
         {
             _car.UnjackCar(player);
+            _car.NetworkHandler.SyncJackUnjackCar(player, false);
             SetActiveTireTriggers(false);
         }
 
@@ -229,6 +250,7 @@ public class TireIssue : IIssue
         else if (player.GrabbedObj.TryGetComponent(out Jack jack) && !_car.IsJacked)
         {
             int z = _car.JackCar(player);
+            _car.NetworkHandler.SyncJackUnjackCar(player, true);
 
             SetActiveTireTriggers(z, true);
 
@@ -283,10 +305,8 @@ public class TireIssue : IIssue
         }
 
         // Destroy it's trigger
+        _car.NetworkHandler.SetSafeDestruction(true);
         _car.NetworkHandler.DestroyChildren(tire, trigger.name);
-
-        // Create replace trigger
-        CreateReplaceTireTrigger(_car.transform, tire.transform);
 
         _passedCheck = false;
     }
@@ -322,6 +342,7 @@ public class TireIssue : IIssue
         }
 
         // Destroy it's trigger
+        _car.NetworkHandler.SetSafeDestruction(true);
         _car.NetworkHandler.DestroyChildren(_car.gameObject, trigger.name);
     }
 
