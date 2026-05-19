@@ -289,7 +289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7098bc52e2a262441b2f2386d8cacd7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Car
-  QueueIndex: -1
+  _queueIndex: -1
   NetworkHandler: {fileID: -560166049629438895}
   Agent: {fileID: -790701046224642771}
   mAnimator: {fileID: 2311776194917373681}
