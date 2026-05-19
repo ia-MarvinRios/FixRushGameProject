@@ -35,7 +35,12 @@ public class TireIssue : IIssue
             }
         }
 
+        GameObject.Destroy(_jackTrigger);
+        GameObject.Destroy(_tempTrigger);
+
         _triggers.Clear();
+        _tempTrigger = null;
+        _jackTrigger = null;
 
         // Hide UI Panel
         InGameUI.Instance.ShowTaskPanel(false, IIssue.Type.Tires);

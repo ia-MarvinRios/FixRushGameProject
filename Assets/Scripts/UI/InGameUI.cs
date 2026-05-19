@@ -26,7 +26,7 @@ public class InGameUI : MonoBehaviour
 
     // Tasks
     private float _currentProgress = 0f;
-    private float _modifier = 1f;
+    private float _modifier        = 1f;
     private Coroutine _taskProgressCoroutine;
 
     // Cash
@@ -45,30 +45,19 @@ public class InGameUI : MonoBehaviour
         AudioManager.Instance.PlayAllMusic(true);
     }
 
-    public void MainMenu()
-    {
-        PhotonManager.Instance.LeaveRoom();
-    }
-
-    public void QuitGame()
-    {
-        Application.Quit();
-    }
-
-    public void TogglePauseMenu()
-    {
-        _pauseMenuPanel.SetActive(!_pauseMenuPanel.activeSelf);
-
-    }
-
+    public void MainMenu() { PhotonManager.Instance.LeaveRoom(); }
+    public void QuitGame() { Application.Quit(); }
+    public void TogglePauseMenu() { _pauseMenuPanel.SetActive(!_pauseMenuPanel.activeSelf); }
     internal void LinkNetworkHandler(PlayerNetworkHandler networkHandler) { NetworkHandler = networkHandler; }
 
+    #region TASKS
 
     public void ShowTaskPanel(bool show, IIssue.Type issueType = IIssue.Type.Dirty)
     {
         _animator.SetBool("ShowTaskPanel", show);
 
-        string description = issueType switch {
+        string description = issueType switch
+        {
             IIssue.Type.Dirty => "Car is dirty",
             IIssue.Type.Tires => "Replace Tires",
             _ => "unknown"
@@ -83,23 +72,6 @@ public class InGameUI : MonoBehaviour
         }
 
     }
-
-    public void ShowHint(string hint, float duration = 2f)
-    {
-        _hintDescription.text = hint;
-
-        StartCoroutine(ShowHintCoroutine(duration));
-    }
-    private IEnumerator ShowHintCoroutine(float delay)
-    {
-        _animator.SetBool("ShowHint", true);
-
-        yield return new WaitForSeconds(delay);
-
-        _animator.SetBool("ShowHint", false);
-    }
-
-    #region TASKS
 
     public void StartTaskProgress(float duration)
     {
@@ -141,6 +113,22 @@ public class InGameUI : MonoBehaviour
     #endregion
 
     #region GLOBAL
+
+    // Los hints son los consejos de abajo a la derecha.
+    public void ShowHint(string hint, float duration = 2f)
+    {
+        _hintDescription.text = hint;
+
+        StartCoroutine(ShowHintCoroutine(duration));
+    }
+    private IEnumerator ShowHintCoroutine(float delay)
+    {
+        _animator.SetBool("ShowHint", true);
+
+        yield return new WaitForSeconds(delay);
+
+        _animator.SetBool("ShowHint", false);
+    }
 
     internal void UpdateCashUI(int targetCash)
     {

@@ -103,7 +103,12 @@ public class VManager : MonoBehaviourPun
                 // Recalc only from the new
                 if (_leader != null && _leader.isOnNavMesh)
                 {
-                    RecalculateQueueFrom(v.QueueIndex);
+                    AIExtension.RecalculateQueueFrom(
+                        v.QueueIndex, 
+                        _waitPointOffset, 
+                        _WaitPoint1,
+                        _leader,
+                        ObjectsToAgentsList(ActiveVehicles));
                 }
 
                 yield return _spawnIntervalWaitTime;
@@ -134,7 +139,7 @@ public class VManager : MonoBehaviourPun
 
     void MoveToTargetPos(NavMeshAgent agent)
     {
-        if (HasReachedDestination(agent) && !_readyToFix)
+        if (AIExtension.HasReachedDestination(agent) && !_readyToFix)
         {
             agent.SetDestination(_targets[0].position);
             StartCoroutine(SetUpForFixing(agent));
@@ -155,7 +160,7 @@ public class VManager : MonoBehaviourPun
             yield break;
         }
 
-        yield return new WaitUntil(() => HasReachedDestination(agent));
+        yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
 
         agent.isStopped = true;
         agent.transform.position = _targets[0].position;
@@ -173,112 +178,8 @@ public class VManager : MonoBehaviourPun
         agent.isStopped = false;
         agent.SetDestination(_endPoint);
         Debug.Log("Moving to endpoint...");
-        yield return new WaitUntil(() => HasReachedDestination(agent));
+        yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
         v.Fix();
-    }
-
-
-    /// <summary>
-    /// Recalculates the positions of vehicles in the queue starting from a specific index.
-    /// </summary>
-    /// <param name="startIndex">The index from which to start recalculating the queue.</param>
-    public void RecalculateQueueFrom(int startIndex)
-    {
-        NavMeshPath path = new NavMeshPath();
-
-        if (!_leader.CalculatePath(_WaitPoint1, path))
-            return;
-
-        float pathLength = GetPathLength(path);
-
-        for (int i = startIndex; i < ActiveVehicles.Count; i++)
-        {
-            Vehicle v = ActiveVehicles[i].GetComponent<Vehicle>();
-            v.QueueIndex = i;
-
-            float distance = GetQueueDistance(i);
-            distance = Mathf.Min(distance, pathLength - v.Size.z);
-
-            Vector3 point =
-                GetPointFromPathEnd(path, distance);
-
-            v.MoveTo(point);
-        }
-    }
-    /// <summary>
-    /// Gets the distance along the path for a vehicle based on its size and position in the queue.
-    /// </summary>
-    /// <param name="size">The size of the vehicle.</param>
-    /// <param name="index">The index of the vehicle in the queue.</param>
-    /// <returns>The distance along the path for the vehicle.</returns>
-    float GetQueueDistance(int index)
-    {
-        float distance = 0f;
-
-        for (int i = 0; i < index; i++)
-        {
-            Vehicle prev = ActiveVehicles[i].GetComponent<Vehicle>();
-            distance += prev.Size.z + _waitPointOffset + 0.2f;
-        }
-
-        return distance;
-    }
-    /// <summary>
-    /// Gets the total length of a NavMeshPath by summing the distances between its corners.
-    /// </summary>
-    /// <param name="path">The NavMeshPath to calculate the length of.</param>
-    /// <returns>The total length of the path.</returns>
-    float GetPathLength(NavMeshPath path)
-    {
-        float length = 0f;
-
-        for (int i = 1; i < path.corners.Length; i++)
-        {
-            length += Vector3.Distance(path.corners[i - 1], path.corners[i]);
-        }
-
-        return length;
-    }
-    /// <summary>
-    /// Gets a point along a NavMeshPath that is a certain distance from the end of the path.
-    /// </summary>
-    /// <param name="path">The NavMeshPath to calculate the point on.</param>
-    /// <param name="distanceFromEnd">The distance from the end of the path.</param>
-    /// <returns>The point along the path at the specified distance from the end.</returns>
-    Vector3 GetPointFromPathEnd(NavMeshPath path, float distanceFromEnd)
-    {
-        float remaining = distanceFromEnd;
-
-        for (int i = path.corners.Length - 1; i > 0; i--)
-        {
-            float segmentLength =
-                Vector3.Distance(path.corners[i], path.corners[i - 1]);
-
-            if (remaining <= segmentLength)
-            {
-                Vector3 dir =
-                    (path.corners[i - 1] - path.corners[i]).normalized;
-
-                return path.corners[i] + dir * remaining;
-            }
-
-            remaining -= segmentLength;
-        }
-
-        return path.corners[0];
-    }
-
-    bool HasReachedDestination(NavMeshAgent agent)
-    {
-        if (!agent || !agent.enabled || !agent.isOnNavMesh)
-            return false;
-
-        if (agent.pathPending ||
-            agent.remainingDistance > agent.stoppingDistance + 0.05f ||
-            agent.hasPath && agent.velocity.sqrMagnitude > 0.01f)
-            return false;
-
-        return true;
     }
 
     public void RemoveVehicle(Vehicle v)
@@ -299,7 +200,13 @@ public class VManager : MonoBehaviourPun
 
         if (_leader != null && _leader.isOnNavMesh)
         {
-            RecalculateQueueFrom(index);
+            AIExtension.RecalculateQueueFrom(
+                index,
+                _waitPointOffset,
+                _WaitPoint1,
+                _leader,
+                ObjectsToAgentsList(ActiveVehicles)
+            );
         }
     }
 
@@ -334,6 +241,16 @@ public class VManager : MonoBehaviourPun
             intArray[i] = (int)issues[i];
         }
         return intArray;
+    }
+    List<NavMeshAgent> ObjectsToAgentsList(List<GameObject> objects)
+    {
+        List<NavMeshAgent> agents = new List<NavMeshAgent>();
+        foreach (GameObject obj in objects)
+        {
+            agents.Add(obj.GetComponent<NavMeshAgent>());
+        }
+
+        return agents;
     }
 
     #endregion

@@ -5,10 +5,10 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(vNetworkHandler))]
-public abstract class Vehicle : MonoBehaviour
+public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
 {
     [Header("Vehicle Settings")]
-    [SerializeField] internal int QueueIndex = -1;
+    [SerializeField] private int _queueIndex = -1;
 
     [Header("Vechicle References")]
     [SerializeField] internal vNetworkHandler NetworkHandler;
@@ -23,7 +23,12 @@ public abstract class Vehicle : MonoBehaviour
 
     private bool _isInitialized = false;
 
-    internal Vector3 Size => _collider.size;
+    public int QueueIndex
+    {
+        get => _queueIndex; 
+        set => _queueIndex = value; 
+    }
+    public Vector3 Size => _collider.size;
     internal IIssue.Type[] IssueTypes
     { 
         get => _issueTypes; 
