@@ -15,6 +15,7 @@ public class PlayerSpawner : MonoBehaviourPun
     [Header("Player Spawning")]
     [SerializeField] private PlayerSettings _playerSettings;
     [SerializeField] private GameObject _playerPrefab;
+    [SerializeField] private bool _defaultSpawnOnStart = true;
 
     [Header("Level Data Reference")]
     [SerializeField] internal LevelData LevelData;
@@ -27,7 +28,7 @@ public class PlayerSpawner : MonoBehaviourPun
     }
     private void Start()
     {
-        SpawnPlayer();
+        if (_defaultSpawnOnStart) { SpawnPlayer(); }
     }
 
     /// <summary>
@@ -86,5 +87,19 @@ public class PlayerSpawner : MonoBehaviourPun
 
         // Get player data
         Hashtable spawnData = ToHashtable(PhotonManager.Instance.GetThisPlayerData());
+    }
+
+    public void SpawnPlayer(Transform spawnPosition)
+    {
+        // Do spawning
+        PlayerController playerController = PhotonNetwork.Instantiate(
+            _playerPrefab.name,
+            spawnPosition.position,
+            Quaternion.identity,
+            0,
+            new object[] { "C0A377" }
+        ).GetComponent<PlayerController>();
+
+        Controller = playerController;
     }
 }
