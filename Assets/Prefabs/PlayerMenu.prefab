@@ -40,17 +40,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6385811049665243957}
-  - component: {fileID: 3141403324767024230}
-  - component: {fileID: 807180346065615471}
-  - component: {fileID: 2170886952062733389}
+  - component: {fileID: 7948274858496994774}
   - component: {fileID: 2453003754471218011}
   - component: {fileID: -3920809063152099232}
-  - component: {fileID: 4329556820080241240}
-  - component: {fileID: 818489676637547624}
   - component: {fileID: -3542725918087135794}
   - component: {fileID: -99134527119038503}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerMenu
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74,7 +70,7 @@ Transform:
   - {fileID: 4948002578282382267}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3141403324767024230
+--- !u!114 &7948274858496994774
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -83,44 +79,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1549537976254818863}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d0f9774266e0394083c59dfc79004fa, type: 3}
+  m_Script: {fileID: 11500000, guid: e841cf4626dafd64ebd2180b45d5ac14, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OnlinePlayer
+  m_EditorClassIdentifier: Assembly-CSharp::OfflinePlayer
   Player: {fileID: 11400000, guid: 1b0cc9b4585edbd428823a59ca4dc910, type: 2}
   _characterController: {fileID: 2453003754471218011}
   Model1: {fileID: 3252203373830510300}
   Model2: {fileID: 7865679350224227619}
   ObjRoot: {fileID: 9191127004246503959}
-  _networkHandler: {fileID: 807180346065615471}
---- !u!114 &807180346065615471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549537976254818863}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04fa9f8827b7ef040a60b3f2dccfe0aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerControllerNetwork
-  PlayerSettings: {fileID: 11400000, guid: 1b0cc9b4585edbd428823a59ca4dc910, type: 2}
-  GameContent: {fileID: 11400000, guid: b0b1f3297d74f064c85ebcca653b63fe, type: 2}
---- !u!114 &2170886952062733389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549537976254818863}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4789e4cc596e6c74c8c88f1a83f085ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScriptsToIgnore
-  _scriptsToIgnore:
-  - {fileID: 807180346065615471}
-  - {fileID: 0}
+  _defaultHat: {fileID: 8297864872639466317, guid: b6c0b2fa496fe50428a36bb53b7b4cf0, type: 3}
+  _defaultBody: {fileID: 5066491826347664535, guid: 0b3c771af3090d84fb2de3cfd02f2bf5, type: 3}
 --- !u!143 &2453003754471218011
 CharacterController:
   m_ObjectHideFlags: 0
@@ -167,42 +135,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4329556820080241240
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549537976254818863}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 818489676637547624}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &818489676637547624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1549537976254818863}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35144820bcc25444bb8f0fd767d9423e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking.Utilities::Photon.Pun.UtilityScripts.SmoothSyncMovement
-  SmoothingDelay: 5
 --- !u!2083052967 &-3542725918087135794
 VisualEffect:
   m_ObjectHideFlags: 0

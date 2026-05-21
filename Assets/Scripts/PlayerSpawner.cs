@@ -92,12 +92,10 @@ public class PlayerSpawner : MonoBehaviourPun
     public void SpawnPlayer(Transform spawnPosition)
     {
         // Do spawning
-        PlayerController playerController = PhotonNetwork.Instantiate(
-            _playerPrefab.name,
+        PlayerController playerController = Instantiate(
+            _playerPrefab,
             spawnPosition.position,
-            Quaternion.identity,
-            0,
-            new object[] { "C0A377" }
+            Quaternion.identity
         ).GetComponent<PlayerController>();
 
         Controller = playerController;

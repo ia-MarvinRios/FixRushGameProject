@@ -15,15 +15,14 @@ public class PlayerController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private  CharacterController _characterController;
-    [SerializeField] private  PlayerNetworkHandler _networkHandler;
     [SerializeField] internal GameObject Model1;
     [SerializeField] internal GameObject Model2;
     [SerializeField] internal Transform ObjRoot;
 
-    private InputSystem_Actions _inputActions;
+    protected InputSystem_Actions _inputActions;
     private InputAction _moveAction;
 
-    private Camera _camera;
+    protected Camera _camera;
     private bool _paused = false;
 
     // Movement
@@ -41,84 +40,15 @@ public class PlayerController : MonoBehaviour
     private float _remainingTime;
     private Coroutine _holdCoroutine;
     private Coroutine _stillCoroutine;
-    private List<GameObject> _focusCandidates = new();
+    protected List<GameObject> _focusCandidates = new();
     internal GameObject FocusedObj = null;
     internal GameObject GrabbedObj = null;
     internal Action<IInteractable, PlayerController> OnGrabbedObjInteraction;
     internal Action<IInteractable, PlayerController> OnGrabbedObjInteractionCanceled;
 
-    private void Awake()
-    {
-        if (!_networkHandler.PhotonViewIsMine) { return; }
-        _inputActions = new InputSystem_Actions();
-    }
-
-    private void OnEnable()
-    {
-        if (!_networkHandler.PhotonViewIsMine)
-        {
-            return;
-        }
-
-        _camera = Camera.main;
-
-        EnableAllInputs();
-    }
-
-    private void OnDisable()
-    {
-        if (!_networkHandler.PhotonViewIsMine) { return; }
-        if (_inputActions == null) return;
-
-        DisableAllInputs();
-    }
-
-    private void OnDestroy()
-    {
-        if (!_networkHandler.PhotonViewIsMine) { return; }
-        if (_inputActions == null) return;
-
-        DisableAllInputs();
-    }
-
-    private void FixedUpdate()
-    {
-        if (!_networkHandler.PhotonViewIsMine) { return; }
-
-        ApplyGravity();
-        Move();
-        UpdateFocused();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!_networkHandler.PhotonViewIsMine) { return; }
-
-        // Items logic
-        if (other.TryGetComponent(out IInteractable interactable))
-        {
-            _focusCandidates.Add(
-                ((MonoBehaviour)interactable).gameObject
-            );
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (!_networkHandler.PhotonViewIsMine) { return; }
-
-        // Items logic
-        if (other.TryGetComponent(out IInteractable interactable))
-        {
-            _focusCandidates.Remove(
-                ((MonoBehaviour)interactable).gameObject
-            );
-        }
-    }
-
     #region INPUTS
 
-    private void EnableAllInputs()
+    internal virtual void EnableAllInputs()
     {
         _moveAction = _inputActions.Player.Move;
         _moveAction.Enable();
@@ -140,7 +70,7 @@ public class PlayerController : MonoBehaviour
         _inputActions.UI.Escape.performed += HandleEscapeInput;
         _inputActions.UI.Escape.Enable();
     }
-    internal void DisableAllInputs()
+    internal virtual void DisableAllInputs()
     {
         _moveAction.Disable();
 
@@ -362,17 +292,9 @@ public class PlayerController : MonoBehaviour
         _stillCoroutine = null;
     }
 
-    internal void PickUpObject(GameObject obj)
-    {
-        _focusCandidates.Remove(obj);
+    internal virtual void PickUpObject(GameObject obj) { }
 
-        _networkHandler.PickUpRequest(obj);
-    }
-
-    internal void DropObject(GameObject obj)
-    {
-        _networkHandler.DropRequest(obj);
-    }
+    internal virtual void DropObject(GameObject obj) { }
 
     protected void UpdateFocused()
     {
@@ -434,7 +356,7 @@ public class PlayerController : MonoBehaviour
 
     #region PHYSICS
 
-    private void ApplyGravity()
+    protected void ApplyGravity()
     {
         if (_characterController.isGrounded && _velocity.y < 0) { _velocity.y = -2f; }
 
@@ -444,7 +366,7 @@ public class PlayerController : MonoBehaviour
         _characterController.Move(_velocity * Time.fixedDeltaTime);
     }
 
-    private void Move()
+    protected void Move()
     {
         if (!_canMove) { return; }
 
@@ -497,10 +419,7 @@ public class PlayerController : MonoBehaviour
     /// Particulas que se activaran cuando se este trabajando en una reparación, Se espera un bool, true = play, false = stop
     /// </summary>
     /// <param name="status"></param>
-    public void ShowWorkParticle(bool show)
-    {
-        _networkHandler.SyncWorkParticles(show);
-    }
+    public virtual void ShowWorkParticle(bool show) { }
 
     #endregion
 
