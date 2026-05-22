@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using UnityEngine;
 using FixRush;
+using System;
 
 /// <summary>
 /// Handles the player spawning and the avatar loading for remote and local players.
@@ -21,6 +22,8 @@ public class PlayerSpawner : MonoBehaviourPun
     [SerializeField] internal LevelData LevelData;
 
     internal PlayerController Controller { get; private set; }
+
+    public static event Action<PlayerController> OnLocalPlayerSpawned;
 
     private void Awake()
     {
@@ -87,6 +90,8 @@ public class PlayerSpawner : MonoBehaviourPun
 
         // Get player data
         Hashtable spawnData = ToHashtable(PhotonManager.Instance.GetThisPlayerData());
+
+        OnLocalPlayerSpawned?.Invoke(Controller);
     }
 
     public void SpawnPlayer(Transform spawnPosition)
