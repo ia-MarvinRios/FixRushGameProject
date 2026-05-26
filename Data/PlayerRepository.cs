@@ -14,6 +14,7 @@ namespace FixRushGameAPI.Data
         Task<List<ItemDto>> ObtenerItems(int playerId);
         Task<bool> ActualizarDinero(int playerId, decimal dinero);
         Task ActualizarItem(int playerId, int itemId, bool tiene);
+        Task<bool> ActualizarNivel(int playerId, int nivel, int experiencia);
     }
 
     public class PlayerRepository : IPlayerRepository
@@ -148,10 +149,27 @@ namespace FixRushGameAPI.Data
                     Nombre = reader.GetString(1),
                     Tipo = reader.GetString(2),
                     Grupo = reader.IsDBNull(3) ? null : reader.GetString(3),
-                    Tiene = reader.GetBoolean(4)
+                    Tiene = reader.GetInt32(4) == 1 
                 });
             }
             return items;
+        }
+        public async Task<bool> ActualizarNivel(int playerId, int nivel, int experiencia)
+        {
+            const string sql = @"
+            UPDATE Players
+            SET nivel = @nivel, experiencia = @experiencia, actualizado_en = GETUTCDATE()
+            WHERE id = @playerId";
+
+            await using var conn = NuevaConexion();
+            await conn.OpenAsync();
+            await using var cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@nivel", nivel);
+            cmd.Parameters.AddWithValue("@experiencia", experiencia);
+            cmd.Parameters.AddWithValue("@playerId", playerId);
+
+            var rows = await cmd.ExecuteNonQueryAsync();
+            return rows > 0;
         }
 
         public async Task<bool> ActualizarDinero(int playerId, decimal dinero)

@@ -6,6 +6,7 @@ namespace FixRushGameAPI.Services
     {
         Task<(bool success, string message, decimal? dinero)> ActualizarDinero(int playerId, decimal dinero);
         Task<(bool success, string message)> ActualizarItem(int playerId, int itemId, bool tiene);
+        Task<(bool success, string message)> ActualizarNivel(int playerId, int nivel, int experiencia);
     }
 
     public class PlayerService : IPlayerService
@@ -32,6 +33,17 @@ namespace FixRushGameAPI.Services
 
             await _repo.ActualizarItem(playerId, itemId, tiene);
             return (true, "Item actualizado.");
+
+        }
+
+        public async Task<(bool success, string message)> ActualizarNivel(int playerId, int nivel, int experiencia)
+        {
+            var existe = await _repo.ObtenerPorId(playerId);
+            if (existe is null)
+                return (false, "Jugador no encontrado.");
+
+            await _repo.ActualizarNivel(playerId, nivel, experiencia);
+            return (true, "Nivel actualizado.");
         }
     }
 }

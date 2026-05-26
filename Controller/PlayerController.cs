@@ -43,5 +43,21 @@ namespace FixRushGameAPI.Controller
 
             return Ok(ApiResponse<object>.Ok(new { playerId, itemId, tiene = request.Tiene }, message));
         }
+
+        /// PUT /api/players/{playerId}/nivel
+        /// Body: { "nivel": 5, "experiencia": 1200 }
+        [HttpPut("{playerId}/nivel")]
+        public async Task<IActionResult> ActualizarNivel(int playerId, [FromBody] UpdateNivelRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse<object>.Fail("Valores de nivel invalidos."));
+
+            var (success, message) = await _playerService.ActualizarNivel(playerId, request.Nivel, request.Experiencia);
+
+            if (!success)
+                return NotFound(ApiResponse<object>.Fail(message));
+
+            return Ok(ApiResponse<object>.Ok(new { nivel = request.Nivel, experiencia = request.Experiencia }, message));
+        }
     }
 }
