@@ -1,0 +1,76 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# NuGet
+packages/
+*.nupkg
+
+# Entity Framework
+Migrations/
+
+# App settings sensibles
+appsettings.Development.json
+appsettings.Local.json
+
+# Secretos
+secrets.json
+
+# Publish
+publish/
+
+# IIS
+iisexpress/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# SQL Server local files
+*.mdf
+*.ldf
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Azure
+.publishsettings
+
+# Rider
+*.sln.iml
+
+# Certificados
+*.pfx
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# npm (si usas frontend)
+node_modules/
+
+# dotenv
+.env
+.env.*
