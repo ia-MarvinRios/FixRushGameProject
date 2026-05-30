@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
+    public float PatienceSliderStep;
+
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         // get th int issueIDs from the instantiation data int array
@@ -24,6 +26,20 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         Vehicle v = GetComponent<Vehicle>();
         v.IssueTypes = Issues;
         //v.IsFixed = (bool)data[1];
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // Enviar datos
+            stream.SendNext(PatienceSliderStep);
+        }
+        else
+        {
+            // Recibir datos
+            PatienceSliderStep = (float)stream.ReceiveNext();
+        }
     }
 
     public void MoveCarToEndPoint(Vehicle v)

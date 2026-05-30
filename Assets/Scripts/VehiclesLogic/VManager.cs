@@ -26,6 +26,11 @@ public class VManager : MonoBehaviourPun
     [SerializeField] float _waitPointOffset = 1f;
     [SerializeField, Range(0.1f, 5f)] float _spawnInterval = 0.5f;
     [SerializeField] Transform[] _targets;
+    [Space(10)]
+    [Header("Vehicle Lists")]
+    [SerializeField] List<GameObject> _queueMain;
+    [SerializeField] List<GameObject> _queueReparation;
+    [SerializeField] List<GameObject> _queueDestruction;
 
     [Header("Level Data Reference")]
     [SerializeField] private LevelData _levelData;
@@ -38,7 +43,9 @@ public class VManager : MonoBehaviourPun
     int _prefabIndex = -1;
     Vehicle _temp = null;
 
-    internal List<GameObject> ActiveVehicles { get; private set; }
+    internal List<GameObject> QueueVehicles { get => _queueMain; }
+    internal List<GameObject> DestructionQueueVehicles { get => _queueDestruction; }
+    internal List<GameObject> InReparationVehicles { get => _queueReparation; }
 
     private static IIssue.Type[] _selectableIssues = (IIssue.Type[])System.Enum.GetValues(typeof(IIssue.Type));
     private HashSet<IIssue.Type> _selected = new HashSet<IIssue.Type>();
@@ -53,7 +60,6 @@ public class VManager : MonoBehaviourPun
             return;
         }
 
-        ActiveVehicles = new List<GameObject>();
         _spawnIntervalWaitTime = new WaitForSeconds(_spawnInterval);
     }
 
@@ -69,7 +75,7 @@ public class VManager : MonoBehaviourPun
         while (true)
         {
             // --- Spawning flow ---
-            if (ActiveVehicles.Count < _maxInstances)
+            if (QueueVehicles.Count < _maxInstances)
             {
                 Debug.Log("[VManager] Spawning vehicle...");
 
@@ -94,28 +100,21 @@ public class VManager : MonoBehaviourPun
                 Vehicle v = obj.GetComponent<Vehicle>();
 
                 // Add first
-                ActiveVehicles.Add(obj);
-                v.QueueIndex = ActiveVehicles.Count - 1;
+                QueueVehicles.Add(obj);
+                v.QueueIndex = QueueVehicles.Count - 1;
 
                 // Update Leader
                 UpdateLeader();
 
-                // Recalc only from the new
-                if (_leader != null && _leader.isOnNavMesh)
-                {
-                    AIExtension.RecalculateQueueFrom(
-                        v.QueueIndex, 
-                        _waitPointOffset, 
-                        _WaitPoint1,
-                        _leader,
-                        ObjectsToAgentsList(ActiveVehicles));
-                }
+                UpdateQueueVehicles(v.QueueIndex);
 
                 yield return _spawnIntervalWaitTime;
             }
 
-            if (ActiveVehicles.Count > 0)
-                MoveToTargetPos(ActiveVehicles[0].GetComponent<NavMeshAgent>());
+            if (QueueVehicles.Count > 0 && InReparationVehicles.Count < _targets.Length)
+            {
+                MoveToTargetPos(QueueVehicles[0].GetComponent<Vehicle>().Agent);
+            }
 
             yield return new WaitForSeconds(1.5f);
         }
@@ -127,11 +126,11 @@ public class VManager : MonoBehaviourPun
     {
         _leader = null;
 
-        if (ActiveVehicles.Count == 0)
+        if (QueueVehicles.Count == 0)
             return;
 
         NavMeshAgent agent =
-            ActiveVehicles[^1].GetComponent<NavMeshAgent>();
+            QueueVehicles[^1].GetComponent<NavMeshAgent>();
 
         if (agent != null && agent.enabled && agent.isOnNavMesh)
             _leader = agent;
@@ -139,17 +138,11 @@ public class VManager : MonoBehaviourPun
 
     void MoveToTargetPos(NavMeshAgent agent)
     {
-        if (AIExtension.HasReachedDestination(agent) && !_readyToFix)
+        if (AIExtension.HasReachedDestination(agent))
         {
             agent.SetDestination(_targets[0].position);
             StartCoroutine(SetUpForFixing(agent));
         }
-    }
-
-    public Coroutine MoveToEndPoint(Vehicle v)
-    {
-        NavMeshAgent agent = v.Agent;
-        return StartCoroutine(MoveToEndPointCoroutine(agent, v));
     }
 
     IEnumerator SetUpForFixing(NavMeshAgent agent)
@@ -167,29 +160,72 @@ public class VManager : MonoBehaviourPun
         agent.transform.rotation = _targets[0].rotation;
         _readyToFix = true;
 
+        // Move to reparation list
+        InReparationVehicles.Add(agent.gameObject);
+        QueueVehicles.Remove(agent.gameObject);
+
+        UpdateLeader();
 
         if (agent.TryGetComponent(out Vehicle v))
             v.InitializeVehicle();
 
+        // Update queue
+        UpdateQueueVehicles(v.QueueIndex);
     }
+
+    public Coroutine MoveToEndPoint(Vehicle v) { return StartCoroutine(MoveToEndPointCoroutine(v.Agent, v)); }
 
     public IEnumerator MoveToEndPointCoroutine(NavMeshAgent agent, Vehicle v)
     {
+        // Move to destruction list
+        DestructionQueueVehicles.Add(agent.gameObject);
+        InReparationVehicles.Remove(agent.gameObject);
+        QueueVehicles.Remove(agent.gameObject);
+
+        UpdateLeader();
+
+        // Move
+        Debug.Log("[VManager] Moving to endpoint...");
         agent.isStopped = false;
         agent.SetDestination(_endPoint);
-        Debug.Log("Moving to endpoint...");
+
+        yield return _spawnIntervalWaitTime;
+
+        UpdateQueueVehicles(v.QueueIndex);
+
         yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
-        v.Fix();
+
+        // Remove and destroy vehicle
+        DestructionQueueVehicles.Remove(agent.gameObject);
+        PhotonNetwork.Destroy(v.gameObject);
+    }
+
+    public void UpdateQueueVehicles(int index)
+    {
+        // Recalc only from the new
+        if (_leader != null && _leader.isOnNavMesh)
+        {
+            AIExtension.RecalculateQueueFrom(
+                index,
+                _waitPointOffset,
+                _WaitPoint1,
+                _leader,
+                ObjectsToAgentsList(QueueVehicles));
+        }
     }
 
     public void RemoveVehicle(Vehicle v)
     {
-        int index = ActiveVehicles.IndexOf(v.gameObject);
+        int index = QueueVehicles.IndexOf(v.gameObject);
 
-        if (index < 0)
-            return;
-
-        ActiveVehicles.RemoveAt(index);
+        if (index >= 0)
+        {
+            QueueVehicles.RemoveAt(index);
+        }
+        else
+        {
+            index = 0;
+        }
 
         UpdateLeader();
 
@@ -198,16 +234,7 @@ public class VManager : MonoBehaviourPun
 
         _readyToFix = false;
 
-        if (_leader != null && _leader.isOnNavMesh)
-        {
-            AIExtension.RecalculateQueueFrom(
-                index,
-                _waitPointOffset,
-                _WaitPoint1,
-                _leader,
-                ObjectsToAgentsList(ActiveVehicles)
-            );
-        }
+        UpdateQueueVehicles(index);
     }
 
     IIssue.Type[] AssignIssues(Vehicle v)

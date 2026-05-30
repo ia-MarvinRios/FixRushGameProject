@@ -120,7 +120,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScriptsToIgnore
   _scriptsToIgnore:
   - {fileID: 807180346065615471}
-  - {fileID: 0}
 --- !u!143 &2453003754471218011
 CharacterController:
   m_ObjectHideFlags: 0

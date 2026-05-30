@@ -1,7 +1,9 @@
 using FixRush;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 using UnityEngine.VFX;
 
 [RequireComponent(typeof(vNetworkHandler))]
@@ -9,6 +11,7 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
 {
     [Header("Vehicle Settings")]
     [SerializeField] private int _queueIndex = -1;
+    [SerializeField] private Gradient _gradient;
 
     [Header("Vechicle References")]
     [SerializeField] internal vNetworkHandler NetworkHandler;
@@ -18,10 +21,13 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
     [SerializeField] private DecalProjector _dirtDecal;
     [SerializeField] private Material _dirtMaterial;
     [SerializeField] private VisualEffect _sudsParticles;
+    [SerializeField] private Transform _sliderRoot;
     [SerializeField] internal GameObject TriggerPrefab;
     [SerializeField] private IIssue.Type[] _issueTypes;
 
     private bool _isInitialized = false;
+    private Slider _patienceSlider;
+    private Image _sliderFillImage;
 
     public int QueueIndex
     {
@@ -51,9 +57,18 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
             return;
         }
     }
+    private void OnEnable()
+    {
+        // Set references to impatience slider UI
+        _patienceSlider = InWorldCanvas.Instance.CreatePatienceSlider(_sliderRoot);
+        _sliderFillImage = _patienceSlider.fillRect.GetComponent<Image>();
+    }
     private void Start()
     {
         SetupDirt();
+
+        if (!PhotonManager.Instance.IsMasterClient) { return; }
+        TimeOutCountdown();
     }
 
     public virtual void InitializeVehicle()
@@ -61,6 +76,7 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
         if (PhotonManager.Instance.IsMasterClient && !_isInitialized)
         {
             _isInitialized = true;
+            StopAllCoroutines();
             NetworkHandler.SyncInitialization();
         }
     }
@@ -71,7 +87,6 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
 
         // Set fixed and destroy.
         IsFixed = true;
-        VManager.Instance.RemoveVehicle(this);
 
         // Audio
         AudioManager.Instance.PlaySoundByName("CarDone");
@@ -106,12 +121,48 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
         }
     }
 
-    internal void ShowSuds(float duration)
+    internal void ShowSuds(float duration) { _sudsParticles.Play(); }
+    internal void HideSuds() { _sudsParticles.Stop(); }
+
+    internal void TimeOutCountdown()
     {
-        _sudsParticles.Play();
+        int   totalSeconds       = QueueIndex * 60 + IssueTypes.Length * 60;
+        float difficultyModifier = GameManager.Instance.LevelData.LevelDifficulty * 2f * 0.01f;
+
+        float countdownSecs = totalSeconds - totalSeconds * difficultyModifier;
+
+        StartCoroutine(CountdownCoroutine(countdownSecs));
     }
-    internal void HideSuds()
+
+    private IEnumerator CountdownCoroutine(float startSeconds)
     {
-        _sudsParticles.Stop();
+        float seconds = startSeconds;
+
+        while (seconds > 0)
+        {
+            // Pause countdown on moving
+            if (!AIExtension.HasReachedDestination(Agent))
+            {
+                yield return null;
+                continue;
+            }
+
+            seconds -= Time.deltaTime;
+            NetworkHandler.PatienceSliderStep = seconds / startSeconds;
+
+            // Esto será sincronizado por el observador
+            _patienceSlider.value = seconds / startSeconds;
+            _sliderFillImage.color = _gradient.Evaluate(seconds / startSeconds);
+
+            yield return null;
+        }
+
+        TimeOut();
+    }
+
+    private void TimeOut()
+    {
+        VManager.Instance.MoveToEndPoint(this);
+        AudioManager.Instance.PlaySoundByName("Error");
     }
 }

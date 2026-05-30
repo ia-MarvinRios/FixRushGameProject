@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InWorldCanvas : MonoBehaviour
 {
@@ -7,6 +9,12 @@ public class InWorldCanvas : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameObject _objectSelectorPrefab;
     [SerializeField] private Camera _mainCamera;
+
+    [Header("UI Prefabs")]
+    [SerializeField] private Slider _patienceSliderPrefab;
+
+    private Dictionary<GameObject, Transform> _dynamicElements = new Dictionary<GameObject, Transform>();
+    private List<GameObject> _toRemove                         = new List<GameObject>();
 
     internal GameObject Selector { get; private set; }
 
@@ -24,6 +32,29 @@ public class InWorldCanvas : MonoBehaviour
         {
             Selector.transform.LookAt(_mainCamera.transform);
         }
+
+        UpdateDynamicElements();
+    }
+
+    private void UpdateDynamicElements()
+    {
+        foreach (KeyValuePair<GameObject, Transform> element in _dynamicElements)
+        {
+            if (element.Key == null || element.Value == null)
+            {
+                _toRemove.Add(element.Key);
+                continue;
+            }
+
+            element.Key.transform.position = element.Value.position;
+            element.Key.transform.LookAt(_mainCamera.transform);
+        }
+
+        foreach (GameObject key in _toRemove)
+        {
+            Destroy(key);
+            _dynamicElements.Remove(key);
+        }
     }
 
     public void ShowSelector(bool show)
@@ -36,4 +67,20 @@ public class InWorldCanvas : MonoBehaviour
 
         Selector.transform.position = position;
     }
+
+    public Slider CreatePatienceSlider(Transform target)
+    {
+        Slider slider = Instantiate(
+            _patienceSliderPrefab, 
+            transform
+        );
+
+        _dynamicElements.Add(
+            slider.gameObject, 
+            target
+        );
+
+        return slider;
+    }
+    public void RemovePatienceSlider(Slider slider) { _dynamicElements.Remove(slider.gameObject); }
 }

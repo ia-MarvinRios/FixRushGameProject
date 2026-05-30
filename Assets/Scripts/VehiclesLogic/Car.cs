@@ -47,9 +47,9 @@ public class Car : Vehicle
         }
 
         CurrentIssue = null;
+        Fix();
 
         MoveCarToEndPoint(this);
-        yield return new WaitUntil(() => IsFixed);
     }
 
     private void MoveCarToEndPoint(Vehicle vehicle)
