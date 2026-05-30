@@ -4368,7 +4368,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: FixRush!
+  m_text: 'FixRush</color> '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 671eac5746d889e48a012c78ee9aae44, type: 2}
   m_sharedMaterial: {fileID: -5153896548051510894, guid: 671eac5746d889e48a012c78ee9aae44, type: 2}
