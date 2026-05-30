@@ -38,7 +38,6 @@ public class VManager : MonoBehaviourPun
     NavMeshAgent _leader;
     Coroutine _spawnCoroutine;
     WaitForSeconds _spawnIntervalWaitTime;
-    bool _readyToFix = false;
 
     int _prefabIndex = -1;
     Vehicle _temp = null;
@@ -158,7 +157,6 @@ public class VManager : MonoBehaviourPun
         agent.isStopped = true;
         agent.transform.position = _targets[0].position;
         agent.transform.rotation = _targets[0].rotation;
-        _readyToFix = true;
 
         // Move to reparation list
         InReparationVehicles.Add(agent.gameObject);
@@ -231,8 +229,6 @@ public class VManager : MonoBehaviourPun
 
         // Destroy after getting index
         PhotonNetwork.Destroy(v.gameObject);
-
-        _readyToFix = false;
 
         UpdateQueueVehicles(index);
     }

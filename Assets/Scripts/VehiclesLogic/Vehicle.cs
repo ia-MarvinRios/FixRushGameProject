@@ -77,6 +77,7 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
         {
             _isInitialized = true;
             StopAllCoroutines();
+            Destroy(PatienceSlider.gameObject);
             NetworkHandler.SyncInitialization();
         }
     }

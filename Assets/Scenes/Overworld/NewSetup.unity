@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: c051fe5a20f72814f9643eb10ebbd2fc, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 904974077}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5050,6 +5050,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1397584048}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1397584051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8672,6 +8684,7 @@ GameObject:
   - component: {fileID: 795590983684513273}
   - component: {fileID: 1185749128182163805}
   - component: {fileID: 7905433411632308407}
+  - component: {fileID: 7905433411632308408}
   m_Layer: 0
   m_Name: pasted__carpa1
   m_TagString: Untagged
@@ -11499,6 +11512,7 @@ GameObject:
   - component: {fileID: 7746116982208275432}
   - component: {fileID: 4850278263873324262}
   - component: {fileID: 7925001787809899526}
+  - component: {fileID: 7925001787809899527}
   m_Layer: 0
   m_Name: carpa
   m_TagString: Untagged
@@ -11574,6 +11588,7 @@ GameObject:
   - component: {fileID: 744566115643291307}
   - component: {fileID: 4815299352631632154}
   - component: {fileID: 2748829721070061027}
+  - component: {fileID: 7818819354395273977}
   m_Layer: 0
   m_Name: pasted__carpa
   m_TagString: Untagged
@@ -11581,6 +11596,27 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!65 &7818819354395273977
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7818819354395273976}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.8896255, y: 5.359999, z: 11.55497}
+  m_Center: {x: -5.8255363, y: 2.3896778, z: -3.6751928}
 --- !u!4 &7837053959973310088
 Transform:
   m_ObjectHideFlags: 0
@@ -11665,6 +11701,27 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7905433411632308408
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2432468025539289328}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.8896255, y: 5.2260723, z: 10.492641}
+  m_Center: {x: -5.8255363, y: 2.4566412, z: -3.3759174}
 --- !u!23 &7925001787809899526
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -11714,6 +11771,27 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7925001787809899527
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7796232078628183529}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.8896255, y: 5.1834955, z: 10.492641}
+  m_Center: {x: -5.8255363, y: 2.4779296, z: -3.3759174}
 --- !u!114 &7943000138986478661
 MonoBehaviour:
   m_ObjectHideFlags: 0

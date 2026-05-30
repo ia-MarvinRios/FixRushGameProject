@@ -1,6 +1,6 @@
-using ExitGames.Client.Photon;
 using Photon.Pun;
-using System.Collections.Generic;
+using System;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviourPun
 
     private int _globalCash;
 
+    public static event Action OnLevelTimeOut;
+
     private void Awake()
     {
         Instance = this;
@@ -32,6 +34,18 @@ public class GameManager : MonoBehaviourPun
         {
             rb.isKinematic = false;
         }
+    }
+
+    private void Start()
+    {
+        if (!PhotonNetwork.IsMasterClient) { return; }
+
+        LevelTimeCountdownStart();
+    }
+
+    private void LevelTimeCountdownStart()
+    {
+        StartCoroutine(LevelTimeCountdownCoroutine());
     }
 
     internal void AddCashMaster(int cash)
@@ -47,6 +61,19 @@ public class GameManager : MonoBehaviourPun
             RpcTarget.All,
             _globalCash
         );
+    }
+
+    private IEnumerator LevelTimeCountdownCoroutine()
+    {
+        float currentTime = LevelData.TimeLimitSeconds;
+
+        while (currentTime > 0)
+        {
+            currentTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        OnLevelTimeOut?.Invoke();
     }
 
     private void OnDrawGizmos()
