@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: c051fe5a20f72814f9643eb10ebbd2fc, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 383428331}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11666,6 +11666,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InWorldCanvas
   _objectSelectorPrefab: {fileID: 7521977892973467331, guid: 15e59642d1417034d893568b1b3aa0ba, type: 3}
   _mainCamera: {fileID: 7012972333695681860}
+  _scenarioAnimator: {fileID: 0}
+  _gate: {fileID: 0}
   _patienceSliderPrefab: {fileID: 0}
 --- !u!224 &1847808001
 RectTransform:
@@ -14357,7 +14359,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -17506,7 +17508,7 @@ Camera:
   m_GameObject: {fileID: 7116060043956982807}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.4481132, g: 0.7876603, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
