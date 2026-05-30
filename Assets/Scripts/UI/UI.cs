@@ -124,6 +124,13 @@ public class UI : MonoBehaviour
         _mainMenuPanel.SetActive(false);
     }
 
+    public void EnterLobby()
+    {
+        if (!CheckNickname()) { return; }
+
+        _mainMenuPanel.SetActive(false);
+    }
+
     public void CreateRoom()
     {
         _lobbyTitle.text = 
