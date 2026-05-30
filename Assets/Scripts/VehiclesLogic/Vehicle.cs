@@ -11,7 +11,7 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
 {
     [Header("Vehicle Settings")]
     [SerializeField] private int _queueIndex = -1;
-    [SerializeField] private Gradient _gradient;
+    [SerializeField] internal Gradient PatienceGradient;
 
     [Header("Vechicle References")]
     [SerializeField] internal vNetworkHandler NetworkHandler;
@@ -26,8 +26,8 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
     [SerializeField] private IIssue.Type[] _issueTypes;
 
     private bool _isInitialized = false;
-    private Slider _patienceSlider;
-    private Image _sliderFillImage;
+    internal Slider PatienceSlider;
+    internal Image SliderFillImage;
 
     public int QueueIndex
     {
@@ -60,8 +60,8 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
     private void OnEnable()
     {
         // Set references to impatience slider UI
-        _patienceSlider = InWorldCanvas.Instance.CreatePatienceSlider(_sliderRoot);
-        _sliderFillImage = _patienceSlider.fillRect.GetComponent<Image>();
+        PatienceSlider = InWorldCanvas.Instance.CreatePatienceSlider(_sliderRoot);
+        SliderFillImage = PatienceSlider.fillRect.GetComponent<Image>();
     }
     private void Start()
     {
@@ -148,21 +148,20 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
             }
 
             seconds -= Time.deltaTime;
-            NetworkHandler.PatienceSliderStep = seconds / startSeconds;
-
-            // Esto será sincronizado por el observador
-            _patienceSlider.value = seconds / startSeconds;
-            _sliderFillImage.color = _gradient.Evaluate(seconds / startSeconds);
+            PatienceSlider.value = seconds / startSeconds;
+            SliderFillImage.color = PatienceGradient.Evaluate(seconds / startSeconds);
 
             yield return null;
         }
 
-        TimeOut();
+        NetworkHandler.TimeOut();
     }
 
-    private void TimeOut()
+    internal void TimeOut()
     {
-        VManager.Instance.MoveToEndPoint(this);
         AudioManager.Instance.PlaySoundByName("Error");
+
+        if (!PhotonManager.Instance.IsMasterClient) { return; }
+        VManager.Instance.MoveToEndPoint(this);
     }
 }

@@ -1,10 +1,15 @@
 using FixRush;
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
-public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
+public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, IPunObservable
 {
-    public float PatienceSliderStep;
+    [Header("Stream Sync")]
+    [SerializeField] private Vehicle _vehicle;
+
+    private string _color;
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
@@ -23,8 +28,8 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
             Issues[i] = (IIssue.Type)issueIds[i];
         }
 
-        Vehicle v = GetComponent<Vehicle>();
-        v.IssueTypes = Issues;
+        _vehicle = GetComponent<Vehicle>();
+        _vehicle.IssueTypes = Issues;
         //v.IsFixed = (bool)data[1];
     }
 
@@ -33,12 +38,19 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         if (stream.IsWriting)
         {
             // Enviar datos
-            stream.SendNext(PatienceSliderStep);
+            stream.SendNext(_vehicle.PatienceSlider.value);
         }
         else
         {
             // Recibir datos
-            PatienceSliderStep = (float)stream.ReceiveNext();
+            float value = (float)stream.ReceiveNext();
+
+            if (Mathf.Abs(value - _vehicle.PatienceSlider.value) > 0.001f)
+            {
+                _vehicle.PatienceSlider.value = value;
+            }
+
+            _vehicle.SliderFillImage.color = _vehicle.PatienceGradient.Evaluate(value);
         }
     }
 
@@ -55,6 +67,15 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
         photonView.RPC(
             nameof(RPC_SyncInitialization), 
             RpcTarget.Others,
+            photonView.ViewID
+        );
+    }
+
+    internal void TimeOut()
+    {
+        photonView.RPC(
+            nameof(RPC_VehicleTimeOut),
+            RpcTarget.All,
             photonView.ViewID
         );
     }
@@ -186,6 +207,13 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback
 
         // Move it to the end point
         VManager.Instance.MoveToEndPoint(v);
+    }
+    [PunRPC]
+    private void RPC_VehicleTimeOut(int vehicleViewID)
+    {
+        Vehicle vehicle = PhotonView.Find(vehicleViewID).GetComponent<Vehicle>();
+
+        vehicle.TimeOut();
     }
     [PunRPC]
     private void RPC_JackUnjackCar(int carViewID, int playerViewID, bool jack)

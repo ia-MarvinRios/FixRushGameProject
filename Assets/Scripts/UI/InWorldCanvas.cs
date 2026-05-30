@@ -9,6 +9,8 @@ public class InWorldCanvas : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameObject _objectSelectorPrefab;
     [SerializeField] private Camera _mainCamera;
+    [SerializeField] private Animator _scenarioAnimator;
+    [SerializeField] private Transform _gate;
 
     [Header("UI Prefabs")]
     [SerializeField] private Slider _patienceSliderPrefab;
@@ -83,4 +85,10 @@ public class InWorldCanvas : MonoBehaviour
         return slider;
     }
     public void RemovePatienceSlider(Slider slider) { _dynamicElements.Remove(slider.gameObject); }
+
+    public void RequestUnlockGate()
+    {
+        AudioManager.Instance.PlayOnTarget("GateOpening", _gate);
+        _scenarioAnimator.SetTrigger("OpenGate");
+    }
 }
