@@ -88,7 +88,7 @@ public class WaterHose : Interactable
 
     private void GetReleaseBucket(bool get, PlayerController player)
     {
-        if (get)
+        if (get && player.GrabbedObj != null)
         {
             player.GrabbedObj.transform.parent = _bucketRoot;
             player.GrabbedObj.transform.position = _bucketRoot.position;
