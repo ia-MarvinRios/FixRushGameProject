@@ -361,7 +361,7 @@ MonoBehaviour:
   _sudsParticles: {fileID: 2285997258325488651}
   _sliderRoot: {fileID: 742550662972315600}
   TriggerPrefab: {fileID: 7018675178099524341, guid: 647d3c08175fa484c9f11faf5ffae2d1, type: 3}
-  _issueTypes: 0000000001000000
+  _issueTypes: 01000000
   _jackRootFront: {fileID: 7351842593075112819}
   TiresFront:
   - {fileID: 8894471337947044396}
