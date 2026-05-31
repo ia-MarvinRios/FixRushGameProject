@@ -4,18 +4,7 @@ using Microsoft.Data.SqlClient;
 
 namespace FixRushGameAPI.Data
 {
-    public interface IPlayerRepository
-    {
-        Task<bool> ExisteCorreo(string correo);
-        Task<bool> ExisteNickname(string nickname);
-        Task<Player> Crear(Player player);
-        Task<Player?> ObtenerPorCorreo(string correo);
-        Task<Player?> ObtenerPorId(int id);
-        Task<List<ItemDto>> ObtenerItems(int playerId);
-        Task<bool> ActualizarDinero(int playerId, decimal dinero);
-        Task ActualizarItem(int playerId, int itemId, bool tiene);
-        Task<bool> ActualizarNivel(int playerId, int nivel, int experiencia);
-    }
+    
 
     public class PlayerRepository : IPlayerRepository
     {
@@ -85,7 +74,7 @@ namespace FixRushGameAPI.Data
         {
             const string sql = @"
             SELECT id, nombre, nickname, correo, password_hash,
-                   fecha_nacimiento, dinero, nivel, experiencia,
+                   fecha_nacimiento, dinero, nivel, experiencia,cosmetico_cuerpo_id, cosmetico_gorro_id,
                    creado_en, actualizado_en
             FROM Players WHERE correo = @correo";
 
@@ -103,7 +92,7 @@ namespace FixRushGameAPI.Data
         {
             const string sql = @"
             SELECT id, nombre, nickname, correo, password_hash,
-                   fecha_nacimiento, dinero, nivel, experiencia,
+                   fecha_nacimiento, dinero, nivel, experiencia, cosmetico_cuerpo_id, cosmetico_gorro_id,
                    creado_en, actualizado_en
             FROM Players WHERE id = @id";
 
@@ -212,6 +201,31 @@ namespace FixRushGameAPI.Data
             await cmd.ExecuteNonQueryAsync();
         }
 
+        public async Task<bool> ActualizarEquip(int playerId, int? cuerpoId, int? gorroId)
+        {
+            // Solo actualiza los campos que llegaron, ignora los que sean null
+            const string sql = @"
+            UPDATE Players
+            SET
+                cosmetico_cuerpo_id = CASE WHEN @actualizarCuerpo = 1 THEN @cuerpoId ELSE cosmetico_cuerpo_id END,
+                cosmetico_gorro_id  = CASE WHEN @actualizarGorro  = 1 THEN @gorroId  ELSE cosmetico_gorro_id  END,
+                actualizado_en      = GETUTCDATE()
+            WHERE id = @playerId";
+
+            await using var conn = NuevaConexion();
+            await conn.OpenAsync();
+            await using var cmd = new SqlCommand(sql, conn);
+
+            cmd.Parameters.AddWithValue("@playerId", playerId);
+            cmd.Parameters.AddWithValue("@actualizarCuerpo", cuerpoId.HasValue ? 1 : 0);
+            cmd.Parameters.AddWithValue("@actualizarGorro", gorroId.HasValue ? 1 : 0);
+            cmd.Parameters.AddWithValue("@cuerpoId", (object?)cuerpoId ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@gorroId", (object?)gorroId ?? DBNull.Value);
+
+            var rows = await cmd.ExecuteNonQueryAsync();
+            return rows > 0;
+        }
+
         // ── Mapper privado ───────────────────────────────────────────
         private static Player MapPlayer(SqlDataReader r) => new()
         {
@@ -224,8 +238,10 @@ namespace FixRushGameAPI.Data
             Dinero = r.GetDecimal(6),
             Nivel = r.GetInt32(7),
             Experiencia = r.GetInt32(8),
-            CreadoEn = r.GetDateTime(9),
-            ActualizadoEn = r.GetDateTime(10)
+            CosmeticoCuerpoId = r.IsDBNull(9) ? null : r.GetInt32(9),
+            CosmeticoGorroId = r.IsDBNull(10) ? null : r.GetInt32(10),
+            CreadoEn = r.GetDateTime(11),
+            ActualizadoEn = r.GetDateTime(12)
         };
     }
 }

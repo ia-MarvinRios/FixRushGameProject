@@ -6,8 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-    c.SwaggerDoc("v1", new() { Title = "CarGame API", Version = "v1" }));
+//builder.Services.AddSwaggerGen(c =>
+//    c.SwaggerDoc("v1", new() { Title = "CarGame API", Version = "v1" }));
+
+
 
 // Inyeccion de dependencias
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
@@ -20,11 +22,12 @@ builder.Services.AddCors(o => o.AddPolicy("Unity",
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//    app.UseSwaggerGen();
+//}
 
 app.UseCors("Unity");
 app.UseAuthorization();

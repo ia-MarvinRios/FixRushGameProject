@@ -13,5 +13,7 @@
         public int Experiencia { get; set; } = 0;
         public DateTime CreadoEn { get; set; }
         public DateTime ActualizadoEn { get; set; }
+        public int? CosmeticoCuerpoId { get; set; }
+        public int? CosmeticoGorroId { get; set; }
     }
 }

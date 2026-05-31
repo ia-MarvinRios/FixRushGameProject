@@ -59,5 +59,27 @@ namespace FixRushGameAPI.Controller
 
             return Ok(ApiResponse<object>.Ok(new { nivel = request.Nivel, experiencia = request.Experiencia }, message));
         }
+
+        /// PUT /api/players/{playerId}/equip
+        /// Body: { "cosmeticoCuerpoId": 3 }          solo cuerpo
+        /// Body: { "cosmeticoGorroId": 7 }           solo gorro
+        /// Body: { "cosmeticoCuerpoId": 3, "cosmeticoGorroId": 7 }  ambos
+        [HttpPut("{playerId}/equip")]
+        public async Task<IActionResult> ActualizarEquip(int playerId, [FromBody] UpdateEquipRequest request)
+        {
+            var (success, message) = await _playerService.ActualizarEquip(
+                playerId,
+                request.CosmeticoCuerpoId,
+                request.CosmeticoGorroId);
+
+            if (!success) { }
+                return BadRequest(ApiResponse<object>.Fail(message));
+
+            return Ok(ApiResponse<object>.Ok(new
+            {
+                cosmeticoCuerpoId = request.CosmeticoCuerpoId,
+                cosmeticoGorroId = request.CosmeticoGorroId
+            }, message));
+        }
     }
 }

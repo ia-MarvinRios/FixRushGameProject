@@ -8,6 +8,8 @@
         public decimal Dinero { get; set; }
         public int Nivel { get; set; }
         public int Experiencia { get; set; }
+        public int? CosmeticoCuerpoId { get; set; }
+        public int? CosmeticoGorroId { get; set; }
         public List<ItemDto> Items { get; set; } = new();
     }
 }

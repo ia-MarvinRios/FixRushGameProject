@@ -7,6 +7,8 @@ namespace FixRushGameAPI.Services
         Task<(bool success, string message, decimal? dinero)> ActualizarDinero(int playerId, decimal dinero);
         Task<(bool success, string message)> ActualizarItem(int playerId, int itemId, bool tiene);
         Task<(bool success, string message)> ActualizarNivel(int playerId, int nivel, int experiencia);
+        
+        Task<(bool success, string message)> ActualizarEquip(int playerId, int? cuerpoId, int? gorroId);
     }
 
     public class PlayerService : IPlayerService
@@ -44,6 +46,19 @@ namespace FixRushGameAPI.Services
 
             await _repo.ActualizarNivel(playerId, nivel, experiencia);
             return (true, "Nivel actualizado.");
+        }
+
+        public async Task<(bool success, string message)> ActualizarEquip(int playerId, int? cuerpoId, int? gorroId)
+        {
+            if (!cuerpoId.HasValue && !gorroId.HasValue)
+                return (false, "Debes enviar al menos un cosmetico para equipar.");
+
+            var existe = await _repo.ObtenerPorId(playerId);
+            if (existe is null)
+                return (false, "Jugador no encontrado.");
+
+            await _repo.ActualizarEquip(playerId, cuerpoId, gorroId);
+            return (true, "Cosmeticos equipados correctamente.");
         }
     }
 }

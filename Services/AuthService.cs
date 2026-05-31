@@ -62,7 +62,10 @@ namespace FixRushGameAPI.Services
                 Dinero = player.Dinero,
                 Nivel = player.Nivel,
                 Experiencia = player.Experiencia,
+                CosmeticoCuerpoId = player.CosmeticoCuerpoId,  
+                CosmeticoGorroId = player.CosmeticoGorroId,  
                 Items = items
+                
             });
         }
 
