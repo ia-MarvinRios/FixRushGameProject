@@ -62,9 +62,9 @@ public class GameManager : MonoBehaviourPun
         _globalCash += cash;
         Debug.Log($"{LOG_FORMAT} Current Cash: {_globalCash}");
 
-        // Update Everyone's UI
+        // Update Everyone's Cash
         photonView.RPC(
-            nameof(RPC_SyncCashUI),
+            nameof(RPC_SyncCash),
             RpcTarget.All,
             _globalCash
         );
@@ -96,7 +96,11 @@ public class GameManager : MonoBehaviourPun
         _directionalLight.color = _skyColorGradient.Evaluate(1f);
         _directionalLight.transform.eulerAngles = rotation;
 
-        OnLevelTimeOut?.Invoke();
+        // Sync Game Over Event on Clients
+        photonView.RPC(
+            nameof(RPC_SyncGameOverEvent),
+            RpcTarget.All
+        );
     }
 
     private string GetTime(float step)
@@ -132,9 +136,17 @@ public class GameManager : MonoBehaviourPun
     #region RPCs
 
     [PunRPC]
-    private void RPC_SyncCashUI(int cash)
+    private void RPC_SyncCash(int cash)
     {
+        _globalCash = cash;
+
+        // UI
         _ui.UpdateCashUI(cash);
+    }
+    [PunRPC]
+    private void RPC_SyncGameOverEvent()
+    {
+        OnLevelTimeOut?.Invoke();
     }
 
     #endregion
