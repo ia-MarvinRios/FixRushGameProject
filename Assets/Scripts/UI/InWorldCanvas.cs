@@ -90,27 +90,29 @@ public class InWorldCanvas : MonoBehaviourPun
 
     public void RequestUnlockGate()
     {
-        photonView.RPC(
-            nameof(RPC_UnlockGate),
-            RpcTarget.All
-        );
+        if (GameManager.Instance.GetCurrentCash() < GameManager.Instance.LevelData.Level2Price)
+        {
+            Debug.Log("[InWorlCanvas] Not enough money!!");
+            InGameUI.Instance.ShowHint("Not enough money to unlock.");
+        }
+        else
+        {
+            photonView.RPC(
+                nameof(RPC_UnlockGate),
+                RpcTarget.All
+            );
+        }
+        
     }
 
     private void UnlockGate()
     {
-        if (GameManager.Instance.GetCurrentCash() < GameManager.Instance.LevelData.Level2Price)
-        {
-            Debug.Log("[InWorlCanvas] Not enough money!!");
-        }
-        else
-        {
-            GameManager.Instance.AddCashMaster(-GameManager.Instance.LevelData.Level2Price);
+        GameManager.Instance.AddCashMaster(-GameManager.Instance.LevelData.Level2Price);
 
-            Destroy(_openGateButon.gameObject);
+        Destroy(_openGateButon.gameObject);
 
-            AudioManager.Instance.PlayOnTarget("GateOpening", _gate);
-            _scenarioAnimator.SetTrigger("OpenGate");
-        }
+        AudioManager.Instance.PlayOnTarget("GateOpening", _gate);
+        _scenarioAnimator.SetTrigger("OpenGate");
     }
 
     #region RPCs

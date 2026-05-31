@@ -14,6 +14,7 @@ public class InGameUI : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private GameObject _pauseMenuPanel;
+    [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private TMP_Text _hintDescription;
     [SerializeField] private TMP_Text _taskPanelText;
     [SerializeField] private GameObject _taskProgressPanel;
@@ -38,6 +39,16 @@ public class InGameUI : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+    }
+
+    private void OnEnable()
+    {
+        GameManager.OnLevelTimeOut += HandleGameOver;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnLevelTimeOut -= HandleGameOver;
     }
 
     private void Start()
@@ -154,6 +165,11 @@ public class InGameUI : MonoBehaviour
 
             yield return interval;
         }
+    }
+
+    private void HandleGameOver()
+    {
+        _gameOverPanel.SetActive(true);
     }
 
     #endregion

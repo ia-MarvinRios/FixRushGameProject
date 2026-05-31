@@ -176,20 +176,17 @@ public class VManager : MonoBehaviourPun
     public IEnumerator MoveToEndPointCoroutine(NavMeshAgent agent, Vehicle v)
     {
         // Move to destruction list
-        DestructionQueueVehicles.Add(agent.gameObject);
-        InReparationVehicles.Remove(agent.gameObject);
         QueueVehicles.Remove(agent.gameObject);
+        InReparationVehicles.Remove(agent.gameObject);
+        DestructionQueueVehicles.Add(agent.gameObject);
 
-        UpdateLeader();
+        // Para evitar que se peleen por llegar al final
+        agent.stoppingDistance = 1.5f;
 
         // Move
         Debug.Log("[VManager] Moving to endpoint...");
         agent.isStopped = false;
         agent.SetDestination(_endPoint);
-
-        yield return _spawnIntervalWaitTime;
-
-        UpdateQueueVehicles(v.QueueIndex);
 
         yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
 

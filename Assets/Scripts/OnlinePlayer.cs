@@ -23,6 +23,9 @@ public class OnlinePlayer : PlayerController
         _camera = Camera.main;
 
         EnableAllInputs();
+
+        // Events
+        GameManager.OnLevelTimeOut += DisableAllInputs;
     }
 
     private void OnDisable()
@@ -31,6 +34,9 @@ public class OnlinePlayer : PlayerController
         if (_inputActions == null) return;
 
         DisableAllInputs();
+
+        // Events
+        GameManager.OnLevelTimeOut -= DisableAllInputs;
     }
 
     private void OnDestroy()
