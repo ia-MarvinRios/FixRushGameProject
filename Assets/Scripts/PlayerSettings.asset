@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSettings
   Nickname: 
   MoveSpeed: 5
+  Money: 210
   Hat: 0
-  Body: 0
-  SkinColor: {r: 0.7529412, g: 0.6392157, b: 0.46666667, a: 0}
+  Body: 2
+  SkinColor: {r: 0.48235294, g: 0.32156864, b: 0.13725491, a: 1}

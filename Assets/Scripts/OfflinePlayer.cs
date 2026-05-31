@@ -5,8 +5,7 @@ using UnityEngine.VFX;
 public class OfflinePlayer : PlayerController
 {
     [Header("Offline Player Settings")]
-    [SerializeField] private GameObject _defaultHat;
-    [SerializeField] private GameObject _defaultBody;
+    [SerializeField] private GameContent _gameContent;
 
     private void Awake()
     {
@@ -89,12 +88,12 @@ public class OfflinePlayer : PlayerController
     private void CreateAvatar()
     {
         GameObject body = Instantiate(
-            _defaultBody,
+            _gameContent.Bodies[Player.Body].Prefab,
             Model1.transform
         );
 
         GameObject hat = Instantiate(
-            _defaultHat,
+            _gameContent.Hats[Player.Hat].Prefab,
             Model1.transform
         );
 
@@ -102,6 +101,8 @@ public class OfflinePlayer : PlayerController
         body.transform.localRotation = Quaternion.identity;
         hat.transform.localPosition = Vector3.zero;
         hat.transform.localRotation = Quaternion.identity;
+
+        body.GetComponent<MeshRenderer>().material.color = Player.SkinColor;
     }
 
     /// <summary>

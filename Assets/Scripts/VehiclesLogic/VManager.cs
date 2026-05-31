@@ -105,7 +105,7 @@ public class VManager : MonoBehaviourPun
                 // Update Leader
                 UpdateLeader();
 
-                UpdateQueueVehicles(v.QueueIndex);
+                UpdateQueueVehicles(0);
 
                 yield return _spawnIntervalWaitTime;
             }

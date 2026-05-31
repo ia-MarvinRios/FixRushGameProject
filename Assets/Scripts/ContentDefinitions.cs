@@ -37,10 +37,12 @@ namespace FixRush
     }
 
     [System.Serializable]
-    public struct Cosmetic
+    public class Cosmetic
     {
         public string Name;
         public bool Unlocked;
+        public int BuyPrice;
+        public Sprite Sprite;
         public GameObject Prefab;
     }
 

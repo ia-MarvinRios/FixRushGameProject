@@ -87,8 +87,7 @@ MonoBehaviour:
   Model1: {fileID: 3252203373830510300}
   Model2: {fileID: 7865679350224227619}
   ObjRoot: {fileID: 9191127004246503959}
-  _defaultHat: {fileID: 8297864872639466317, guid: b6c0b2fa496fe50428a36bb53b7b4cf0, type: 3}
-  _defaultBody: {fileID: 5066491826347664535, guid: 0b3c771af3090d84fb2de3cfd02f2bf5, type: 3}
+  _gameContent: {fileID: 11400000, guid: b0b1f3297d74f064c85ebcca653b63fe, type: 2}
 --- !u!143 &2453003754471218011
 CharacterController:
   m_ObjectHideFlags: 0

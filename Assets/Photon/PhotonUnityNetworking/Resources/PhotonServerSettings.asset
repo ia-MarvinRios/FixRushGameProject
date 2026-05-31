@@ -64,6 +64,8 @@ MonoBehaviour:
   - RPC_SafeDestruction
   - RPC_VehicleTimeOut
   - RPC_UnlockGate
+  - RPC_SyncCash
+  - RPC_SyncGameOverEvent
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
