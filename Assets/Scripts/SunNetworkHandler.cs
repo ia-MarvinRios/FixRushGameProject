@@ -13,14 +13,12 @@ public class SunNetworkHandler : MonoBehaviourPun, IPunObservable
         {
             // Enviar datos
             stream.SendNext(_sun.color);
-            stream.SendNext(_sun.transform.rotation);
             stream.SendNext(_time.text);
         }
         else
         {
             // Recibir datos
             _sun.color = (Color)stream.ReceiveNext();
-            _sun.transform.rotation = (Quaternion)stream.ReceiveNext();
             _time.text = (string)stream.ReceiveNext();
         }
     }
