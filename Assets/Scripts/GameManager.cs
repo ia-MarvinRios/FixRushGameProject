@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviourPun
 
     private int _globalCash;
 
+    public float LevelCoutdownStep;
     public static event Action OnLevelTimeOut;
 
     private void Awake()
@@ -72,22 +73,21 @@ public class GameManager : MonoBehaviourPun
     private IEnumerator LevelTimeCountdownCoroutine()
     {
         float currentTime = LevelData.TimeLimitSeconds;
-        float step;
         float xRotation;
         Vector3 rotation = Vector3.zero;
 
         while (currentTime > 0)
         {
             currentTime -= Time.deltaTime;
-            step = currentTime / LevelData.TimeLimitSeconds;
+            LevelCoutdownStep = currentTime / LevelData.TimeLimitSeconds;
 
-            _directionalLight.color = _skyColorGradient.Evaluate(step);
+            _directionalLight.color = _skyColorGradient.Evaluate(LevelCoutdownStep);
 
-            xRotation = (1f - step) * 180f;
+            xRotation = (1f - LevelCoutdownStep) * 180f;
             rotation.x = xRotation;
             _directionalLight.transform.eulerAngles = rotation;
 
-            InGameUI.Instance.TimeText.text = GetTime(step);
+            InGameUI.Instance.TimeText.text = GetTime(LevelCoutdownStep);
 
             yield return null;
         }

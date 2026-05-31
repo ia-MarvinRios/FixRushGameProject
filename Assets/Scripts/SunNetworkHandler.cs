@@ -12,13 +12,15 @@ public class SunNetworkHandler : MonoBehaviourPun, IPunObservable
         if (stream.IsWriting)
         {
             // Enviar datos
-            stream.SendNext(_sun.color);
+            stream.SendNext(GameManager.Instance.LevelCoutdownStep);
             stream.SendNext(_time.text);
         }
         else
         {
             // Recibir datos
-            _sun.color = (Color)stream.ReceiveNext();
+            float value = (float)stream.ReceiveNext();
+
+            _sun.color = GameManager.Instance._skyColorGradient.Evaluate(value);
             _time.text = (string)stream.ReceiveNext();
         }
     }
