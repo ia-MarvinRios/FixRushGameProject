@@ -158,9 +158,10 @@ public class InGameUI : MonoBehaviour
 
         int currentCash = int.Parse(_cashText.text);
 
-        while (currentCash < targetCash)
+        while (currentCash != targetCash)
         {
-            currentCash++;
+            currentCash += System.Math.Sign(targetCash - currentCash);
+
             _cashText.text = currentCash.ToString();
 
             yield return interval;
