@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
-public class InWorldCanvas : MonoBehaviour
+public class InWorldCanvas : MonoBehaviourPun
 {
     public static InWorldCanvas Instance { get; private set; }
 
@@ -10,6 +11,7 @@ public class InWorldCanvas : MonoBehaviour
     [SerializeField] private GameObject _objectSelectorPrefab;
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private Animator _scenarioAnimator;
+    [SerializeField] private Button _openGateButon;
     [SerializeField] private Transform _gate;
 
     [Header("UI Prefabs")]
@@ -88,7 +90,36 @@ public class InWorldCanvas : MonoBehaviour
 
     public void RequestUnlockGate()
     {
-        AudioManager.Instance.PlayOnTarget("GateOpening", _gate);
-        _scenarioAnimator.SetTrigger("OpenGate");
+        photonView.RPC(
+            nameof(RPC_UnlockGate),
+            RpcTarget.All
+        );
     }
+
+    private void UnlockGate()
+    {
+        if (GameManager.Instance.GetCurrentCash() < GameManager.Instance.LevelData.Level2Price)
+        {
+            Debug.Log("[InWorlCanvas] Not enough money!!");
+        }
+        else
+        {
+            GameManager.Instance.AddCashMaster(-GameManager.Instance.LevelData.Level2Price);
+
+            Destroy(_openGateButon.gameObject);
+
+            AudioManager.Instance.PlayOnTarget("GateOpening", _gate);
+            _scenarioAnimator.SetTrigger("OpenGate");
+        }
+    }
+
+    #region RPCs
+
+    [PunRPC]
+    private void RPC_UnlockGate()
+    {
+        UnlockGate();
+    }
+
+    #endregion
 }

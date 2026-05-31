@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviourPun
     [Header("Level Data Reference")]
     [SerializeField] internal LevelData LevelData;
 
+    [Header("Day Night Cycle")]
+    [SerializeField] internal Gradient _skyColorGradient;
+    [SerializeField] internal Light _directionalLight;
+
     [Header("UI Reference")]
     [SerializeField] InGameUI _ui;
 
@@ -48,6 +52,8 @@ public class GameManager : MonoBehaviourPun
         StartCoroutine(LevelTimeCountdownCoroutine());
     }
 
+    internal float GetCurrentCash() { return _globalCash; }
+
     internal void AddCashMaster(int cash)
     {
         if (!PhotonNetwork.IsMasterClient) { return; }
@@ -66,14 +72,49 @@ public class GameManager : MonoBehaviourPun
     private IEnumerator LevelTimeCountdownCoroutine()
     {
         float currentTime = LevelData.TimeLimitSeconds;
+        float step;
+        float xRotation;
+        Vector3 rotation = Vector3.zero;
 
         while (currentTime > 0)
         {
             currentTime -= Time.deltaTime;
+            step = currentTime / LevelData.TimeLimitSeconds;
+
+            _directionalLight.color = _skyColorGradient.Evaluate(step);
+
+            xRotation = (1f - step) * 180f;
+            rotation.x = xRotation;
+            _directionalLight.transform.eulerAngles = rotation;
+
+            InGameUI.Instance.TimeText.text = GetTime(step);
+
             yield return null;
         }
 
+        rotation = Vector3.zero;
+        _directionalLight.color = _skyColorGradient.Evaluate(1f);
+        _directionalLight.transform.eulerAngles = rotation;
+
         OnLevelTimeOut?.Invoke();
+    }
+
+    private string GetTime(float step)
+    {
+        float normalizedTime = 1f - step;
+
+        float totalHours = 6f + normalizedTime * 12f;
+
+        int hours = Mathf.FloorToInt(totalHours);
+        int minutes = Mathf.FloorToInt((totalHours - hours) * 60f);
+
+        string period = hours >= 12 ? "PM" : "AM";
+
+        int displayHour = hours % 12;
+        if (displayHour == 0)
+            displayHour = 12;
+
+        return $"{displayHour}:{minutes:00} {period}";
     }
 
     private void OnDrawGizmos()

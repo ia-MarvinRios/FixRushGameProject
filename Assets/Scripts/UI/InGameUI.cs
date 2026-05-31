@@ -19,6 +19,7 @@ public class InGameUI : MonoBehaviour
     [SerializeField] private GameObject _taskProgressPanel;
     [SerializeField] private Slider _taskProgressSlider;
     [SerializeField] private TMP_Text _cashText;
+    [SerializeField] internal TMP_Text TimeText;
     [SerializeField] internal GameObject Manual;
 
     [Header("Animations")]

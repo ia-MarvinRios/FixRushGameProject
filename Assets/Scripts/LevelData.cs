@@ -7,6 +7,7 @@ public class LevelData : ScriptableObject
     [SerializeField, Range(MIN_DIFFICULTY, MAX_DIFFICULTY)] internal int LevelDifficulty;
     [SerializeField] internal float TargetCash;
     [SerializeField] internal float TimeLimitSeconds;
+    [SerializeField] internal int Level2Price;
     [SerializeField] internal Vector3[] Spawnpoints;
 
     internal const int MIN_DIFFICULTY = 1;

@@ -63,6 +63,7 @@ MonoBehaviour:
   - RPC_JackUnjackCar
   - RPC_SafeDestruction
   - RPC_VehicleTimeOut
+  - RPC_UnlockGate
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

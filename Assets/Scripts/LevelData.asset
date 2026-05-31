@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: LevelData
   m_EditorClassIdentifier: Assembly-CSharp::LevelData
   LevelDifficulty: 20
+  TargetCash: 1000
+  TimeLimitSeconds: 120
+  Level2Price: 500
   Spawnpoints:
   - {x: 0.99, y: 1, z: 25.9}
   - {x: -3.49, y: 1, z: 25.9}
