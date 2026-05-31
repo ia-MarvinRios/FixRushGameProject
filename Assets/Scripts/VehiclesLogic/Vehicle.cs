@@ -80,7 +80,7 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
         }
 
         StopAllCoroutines();
-        Destroy(PatienceSlider.gameObject);
+        if (PatienceSlider.gameObject != null) { Destroy(PatienceSlider.gameObject); }
     }
 
     public void Fix()
