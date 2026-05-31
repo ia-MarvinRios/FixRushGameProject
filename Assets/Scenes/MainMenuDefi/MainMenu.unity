@@ -9256,6 +9256,7 @@ MonoBehaviour:
   _objectSelectorPrefab: {fileID: 7521977892973467331, guid: 15e59642d1417034d893568b1b3aa0ba, type: 3}
   _mainCamera: {fileID: 7012972333695681860}
   _scenarioAnimator: {fileID: 0}
+  _openGateButon: {fileID: 0}
   _gate: {fileID: 0}
   _patienceSliderPrefab: {fileID: 0}
 --- !u!224 &1847808001
