@@ -76,10 +76,11 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
         if (PhotonManager.Instance.IsMasterClient && !_isInitialized)
         {
             _isInitialized = true;
-            StopAllCoroutines();
-            Destroy(PatienceSlider.gameObject);
             NetworkHandler.SyncInitialization();
         }
+
+        StopAllCoroutines();
+        Destroy(PatienceSlider.gameObject);
     }
 
     public void Fix()
