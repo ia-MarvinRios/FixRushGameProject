@@ -4,14 +4,21 @@ public class CameraController : MonoBehaviour
 {
     [Header("Camera Controller Settings")]
     [SerializeField] private Camera _mainCamera;
+    [SerializeField] private HoverDetector _hoverDetector;
 
     [SerializeField] private Vector2 _maxMinZ;
     [SerializeField] private float _cameraSliderLenght;
     [SerializeField] private float _zOffset;
+    [SerializeField] private float _xOffset;
+    [SerializeField] private float _hoverSmoothTime = 1f;
 
     float _playerZ;
     float _leftBound;
     float _rightBound;
+    private float _startX;
+    private float _currentX;
+    private float _targetX;
+    private float _xVelocity;
     private float _halfLength;
     private float _cameraSliderPositionZ;
     private Vector3 _targetPosition;
@@ -31,12 +38,17 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        _targetPosition = new Vector3(-10, 0, _cameraSliderPositionZ);
+        _targetPosition = _mainCamera.transform.position;
+        _startX         = _mainCamera.transform.position.x;
+        _currentX       = _startX;
     }
 
     private void Update()
     {
+        CheckHover();
         FollowPlayerZ();
+
+        _mainCamera.transform.position = _targetPosition;
     }
 
     #endregion
@@ -50,7 +62,7 @@ public class CameraController : MonoBehaviour
         _playerZ = _targetPlayer.position.z;
 
         // Current camera position
-        _targetPosition = _mainCamera.transform.position;
+        _targetPosition.z = _mainCamera.transform.position.z;
 
         // Dead zone limits
         _halfLength = _cameraSliderLenght / 2f;
@@ -76,8 +88,23 @@ public class CameraController : MonoBehaviour
             _maxMinZ.y + _halfLength,
             _maxMinZ.x - _halfLength
         );
+    }
 
-        _mainCamera.transform.position = _targetPosition;
+    private void CheckHover()
+    {
+        _targetX =
+            _hoverDetector.IsHovered
+            ? _startX + _xOffset
+            : _startX;
+
+        _currentX = Mathf.SmoothDamp(
+            _currentX,
+            _targetX,
+            ref _xVelocity,
+            _hoverSmoothTime
+        );
+
+        _targetPosition.x = _currentX;
     }
 
     [ContextMenu("Adjust With Area Length")]
