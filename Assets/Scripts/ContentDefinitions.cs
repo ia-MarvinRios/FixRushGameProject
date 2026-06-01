@@ -39,6 +39,7 @@ namespace FixRush
     [System.Serializable]
     public class Cosmetic
     {
+        public int id;
         public string Name;
         public bool Unlocked;
         public int BuyPrice;
