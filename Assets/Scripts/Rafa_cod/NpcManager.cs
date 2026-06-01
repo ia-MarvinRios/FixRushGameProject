@@ -1,30 +1,15 @@
 ﻿using FixRush;
-using NUnit.Framework.Interfaces;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>
-/// Manages the NPC queue in the shop level.
-/// NPCs arrive, line up, request a spare part (ItemData), wait for the player
-/// to deliver it, then leave. Mirrors VManager's queue logic using AIExtension.
-/// Only runs on the MasterClient (same as VManager).
-/// </summary>
 public class NpcManager : MonoBehaviourPun
 {
     public static NpcManager Instance { get; private set; }
 
-    [System.Serializable]
-    public class ItemSpawnData
-    {
-        public ItemData item;
-        public Transform spawnPoint;
-    }
-
     [Header("NPC Spawner")]
-    [Space(10)]
     [SerializeField, Range(1, 10)] int _maxInstances = 5;
     [SerializeField] GameObject[] _npcPrefabs;
     [SerializeField] Vector3 _spawnPoint;
@@ -34,20 +19,19 @@ public class NpcManager : MonoBehaviourPun
     [SerializeField, Range(0.1f, 5f)] float _spawnInterval = 2f;
     [SerializeField] Transform _counterPoint;
 
-    [Header("Item Spawning")]
-    [SerializeField] ItemSpawnData[] _availableItems;
+    [Header("NPC Requests")]
+    [SerializeField] ItemData[] _availableItems;
 
-    // --- Estado interno ---
     NavMeshAgent _leader;
-    Coroutine _spawnCoroutine;
     WaitForSeconds _spawnIntervalWaitTime;
 
     bool _waitingForItem = false;
     NpcShop _currentNpcAtCounter;
+
     internal List<GameObject> ActiveNpcs { get; private set; }
 
     // -----------------------------------------------------------------------
-    #region UNITY CALLBACKS
+    #region UNITY
 
     private void Awake()
     {
@@ -66,106 +50,21 @@ public class NpcManager : MonoBehaviourPun
     private void Start()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-
-        // Spawnear todos los items al inicio
-        SpawnAllItems();
-
-        _spawnCoroutine = StartCoroutine(SpawnNpcs());
+        StartCoroutine(SpawnNpcs());
     }
 
     #endregion
 
     // -----------------------------------------------------------------------
-    #region ITEM SPAWNING INICIAL
-
-    /// <summary>
-    /// Al iniciar la escena, spawnea un item por cada ItemSpawnData configurado.
-    /// </summary>
-    void SpawnAllItems()
-    {
-        foreach (ItemSpawnData data in _availableItems)
-        {
-            if (data.item == null || data.item.Prefab == null || data.spawnPoint == null)
-            {
-                Debug.LogWarning("[NpcManager] ItemSpawnData incompleto, se omite.");
-                continue;
-            }
-
-            SpawnItem(data.item, data.spawnPoint);
-        }
-    }
-
-    /// <summary>
-    /// Spawnea el prefab del item y lo registra en su ItemData.
-    /// </summary>
-    void SpawnItem(ItemData item, Transform spawnPoint)
-    {
-        if (item.IsAvailable)
-        {
-            Debug.Log($"[NpcManager] {item.ItemName} ya tiene una instancia activa, no se spawnea otro.");
-            return;
-        }
-
-        GameObject instance = PhotonNetwork.InstantiateRoomObject(
-            item.Prefab.name,
-            spawnPoint.position,
-            spawnPoint.rotation
-        );
-
-        if (instance != null)
-        {
-            item.RegisterInstance(instance);
-            Debug.Log($"[NpcManager] Item spawneado: {item.ItemName}");
-        }
-    }
-
-    /// <summary>
-    /// Llamar cuando el jugador recoge un item del mundo.
-    /// Limpia la instancia del ItemData y spawnea una nueva automaticamente.
-    /// </summary>
-    public void OnItemPickedUp(ItemData item)
-    {
-        if (item == null) return;
-
-        // Limpiar referencia (el jugador ya lo tiene)
-        item.UnregisterInstance();
-
-        // Buscar el spawn point de este item y spawnear uno nuevo
-        ItemSpawnData spawnData = GetSpawnDataForItem(item);
-
-        if (spawnData != null)
-            SpawnItem(item, spawnData.spawnPoint);
-    }
-
-    ItemSpawnData GetSpawnDataForItem(ItemData item)
-    {
-        foreach (ItemSpawnData data in _availableItems)
-        {
-            if (data.item == item)
-                return data;
-        }
-        return null;
-    }
-
-    Transform GetSpawnPointForItem(ItemData item)
-    {
-        ItemSpawnData data = GetSpawnDataForItem(item);
-        return data?.spawnPoint;
-    }
-
-    #endregion
-
-    // -----------------------------------------------------------------------
-    #region SPAWN & QUEUE LOOP
+    #region SPAWN & QUEUE
 
     private IEnumerator SpawnNpcs()
     {
         while (true)
         {
+            // --- Spawnear nuevo NPC si hay espacio ---
             if (ActiveNpcs.Count < _maxInstances)
             {
-                Debug.Log("[NpcManager] Spawning NPC...");
-
                 int prefabIndex = Random.Range(0, _npcPrefabs.Length);
 
                 GameObject obj = PhotonNetwork.InstantiateRoomObject(
@@ -174,121 +73,116 @@ public class NpcManager : MonoBehaviourPun
                     Quaternion.identity
                 );
 
-                if (obj == null)
+                if (obj != null)
                 {
-                    yield return _spawnIntervalWaitTime;
-                    continue;
-                }
+                    NpcShop npc = obj.GetComponent<NpcShop>();
 
-                NpcShop npc = obj.GetComponent<NpcShop>();
-
-                if (npc != null)
-                {
-                    if (_availableItems != null && _availableItems.Length > 0)
+                    if (npc == null)
                     {
-                        ItemSpawnData randomItemData = _availableItems[Random.Range(0, _availableItems.Length)];
-
-                        if (randomItemData != null && randomItemData.item != null)
-                            npc.AssignRequest(randomItemData.item);
-                        else
-                        {
-                            npc.AssignRequest(null);
-                            Debug.LogWarning("[NpcManager] ItemSpawnData sin item asignado.");
-                        }
+                        Debug.LogWarning("[NpcManager] El prefab no tiene NpcShop.");
+                        PhotonNetwork.Destroy(obj);
                     }
                     else
                     {
-                        npc.AssignRequest(null);
-                        Debug.LogWarning("[NpcManager] No hay items configurados.");
+                        AssignRandomRequest(npc);
+                        ActiveNpcs.Add(obj);
+                        npc.QueueIndex = ActiveNpcs.Count - 1;
+                        UpdateLeader();
+
+                        if (_leader != null && _leader.isOnNavMesh)
+                        {
+                            AIExtension.RecalculateQueueFrom(
+                                npc.QueueIndex,
+                                _waitPointOffset,
+                                _waitPoint,
+                                _leader,
+                                ObjectsToAgentsList(ActiveNpcs)
+                            );
+                        }
                     }
-                }
-
-                ActiveNpcs.Add(obj);
-                npc.QueueIndex = ActiveNpcs.Count - 1;
-
-                UpdateLeader();
-
-                if (_leader != null && _leader.isOnNavMesh)
-                {
-                    AIExtension.RecalculateQueueFrom(
-                        npc.QueueIndex,
-                        _waitPointOffset,
-                        _waitPoint,
-                        _leader,
-                        ObjectsToAgentsList(ActiveNpcs)
-                    );
                 }
 
                 yield return _spawnIntervalWaitTime;
             }
 
+            // --- Mover primer NPC al counter si está libre ---
             if (ActiveNpcs.Count > 0 && !_waitingForItem)
             {
-                MoveFirstNpcToCounter(ActiveNpcs[0].GetComponent<NavMeshAgent>());
+                NavMeshAgent firstAgent = ActiveNpcs[0].GetComponent<NavMeshAgent>();
+                TryMoveToCounter(firstAgent);
             }
 
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1f);
         }
     }
 
-    void MoveFirstNpcToCounter(NavMeshAgent agent)
+    private void AssignRandomRequest(NpcShop npc)
     {
-        if (AIExtension.HasReachedDestination(agent) && !_waitingForItem)
+        if (_availableItems != null && _availableItems.Length > 0)
+            npc.AssignRequest(_availableItems[Random.Range(0, _availableItems.Length)]);
+        else
         {
+            npc.AssignRequest(null);
+            Debug.LogWarning("[NpcManager] No hay items configurados en _availableItems.");
+        }
+    }
+
+    /// <summary>
+    /// Intenta mandar al primer NPC al counter.
+    /// Usa distancia en lugar de HasReachedDestination para mayor fiabilidad.
+    /// </summary>
+    private void TryMoveToCounter(NavMeshAgent agent)
+    {
+        if (agent == null || _counterPoint == null || _waitingForItem) return;
+
+        float distToWait = Vector3.Distance(agent.transform.position, _waitPoint);
+
+        // ✅ Si está cerca del waitPoint (o sin destino activo), mandarlo al counter
+        bool nearWaitPoint = distToWait < 2f;
+        bool notMoving = !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f;
+
+        if (nearWaitPoint || notMoving)
+        {
+            _waitingForItem = true;
             agent.SetDestination(_counterPoint.position);
+            Debug.Log("[NpcManager] Mandando NPC al counter...");
             StartCoroutine(SetUpForServing(agent));
         }
     }
 
-    IEnumerator SetUpForServing(NavMeshAgent agent)
+    private IEnumerator SetUpForServing(NavMeshAgent agent)
     {
-        if (agent == null)
-        {
-            Debug.LogWarning("[NpcManager] Agent es null.");
-            yield break;
-        }
+        if (agent == null) { _waitingForItem = false; yield break; }
 
-        yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
+        // ✅ Esperar que el path esté listo primero
+        yield return new WaitUntil(() => !agent.pathPending);
+
+        // ✅ Luego esperar que llegue
+        yield return new WaitUntil(() =>
+            agent.remainingDistance <= agent.stoppingDistance + 0.5f
+        );
 
         agent.isStopped = true;
         agent.transform.position = _counterPoint.position;
         agent.transform.rotation = _counterPoint.rotation;
 
-        if (!agent.TryGetComponent(out NpcShop npc)) yield break;
+        if (!agent.TryGetComponent(out NpcShop npc))
+        {
+            _waitingForItem = false;
+            yield break;
+        }
 
         _currentNpcAtCounter = npc;
 
-        // Verificar si el item pedido está disponible en el mundo
-        if (npc.RequestedItem == null || !npc.RequestedItem.IsAvailable)
+        if (npc.RequestedItem == null)
         {
-            Debug.Log("[NpcManager] Item no disponible en el mundo. NPC se va en 2 segundos.");
             yield return new WaitForSeconds(2f);
             MoveNpcToEndPoint(npc);
             yield break;
         }
 
-        // El item existe en el mundo, esperar que el jugador lo entregue
-        _waitingForItem = true;
-        Debug.Log($"[NpcManager] NPC esperando: {npc.RequestedItem.ItemName}");
-    }
-
-    #endregion
-
-    // -----------------------------------------------------------------------
-    #region ITEM DELIVERY
-
-    /// <summary>
-    /// Llamar cuando el jugador le entrega el item al NPC.
-    /// </summary>
-    public void OnItemDelivered()
-    {
-        if (_currentNpcAtCounter == null) return;
-
-        // El item ya fue entregado, limpiar referencia si aun existiera
-        if (_currentNpcAtCounter.RequestedItem != null)
-            _currentNpcAtCounter.RequestedItem.UnregisterInstance();
-
-        MoveNpcToEndPoint(_currentNpcAtCounter);
+        npc.SetAtCounter(true);
+        Debug.Log($"[NpcManager] NPC en counter esperando: {npc.RequestedItem.ItemName}");
     }
 
     #endregion
@@ -298,16 +192,20 @@ public class NpcManager : MonoBehaviourPun
 
     public void MoveNpcToEndPoint(NpcShop npc)
     {
+        if (npc == null) return;
         StartCoroutine(MoveToEndPointCoroutine(npc));
     }
 
-    IEnumerator MoveToEndPointCoroutine(NpcShop npc)
+    private IEnumerator MoveToEndPointCoroutine(NpcShop npc)
     {
         NavMeshAgent agent = npc.Agent;
         agent.isStopped = false;
         agent.SetDestination(_endPoint);
 
-        yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
+        yield return new WaitUntil(() =>
+            !agent.pathPending &&
+            agent.remainingDistance <= agent.stoppingDistance + 0.1f
+        );
 
         RemoveNpc(npc);
     }
@@ -315,13 +213,10 @@ public class NpcManager : MonoBehaviourPun
     public void RemoveNpc(NpcShop npc)
     {
         int index = ActiveNpcs.IndexOf(npc.gameObject);
-
         if (index < 0) return;
 
         ActiveNpcs.RemoveAt(index);
-
         UpdateLeader();
-
         PhotonNetwork.Destroy(npc.gameObject);
 
         _waitingForItem = false;
@@ -347,18 +242,16 @@ public class NpcManager : MonoBehaviourPun
     public void UpdateLeader()
     {
         _leader = null;
-
         if (ActiveNpcs.Count == 0) return;
 
         NavMeshAgent agent = ActiveNpcs[^1].GetComponent<NavMeshAgent>();
-
         if (agent != null && agent.enabled && agent.isOnNavMesh)
             _leader = agent;
     }
 
-    List<NavMeshAgent> ObjectsToAgentsList(List<GameObject> objects)
+    private List<NavMeshAgent> ObjectsToAgentsList(List<GameObject> objects)
     {
-        List<NavMeshAgent> agents = new List<NavMeshAgent>();
+        List<NavMeshAgent> agents = new();
         foreach (GameObject obj in objects)
             agents.Add(obj.GetComponent<NavMeshAgent>());
         return agents;

@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleInteractionInput(InputAction.CallbackContext context)
     {
+
         if (FocusedObj == null)
         {
             // Drop the currently grabbed object if there's no focused object and the player is trying to interact

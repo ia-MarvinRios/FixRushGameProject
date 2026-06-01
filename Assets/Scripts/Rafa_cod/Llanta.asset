@@ -10,9 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2bbd43bff05181049a796ece16cf39bb, type: 3}
-  m_Name: llamata
+  m_Name: Llanta
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  ItemName: llanta
-  Icon: {fileID: 0}
-  Prefab: {fileID: 3796587596136481013, guid: ba55d0f86a6fb1c499a4bc6479abbbb7, type: 3}
-  SpawnedInstance: {fileID: 0}
+  ItemName: LLanta
+  Icon: {fileID: 21300000, guid: 1e7151342e980464a88db1ae971d80f7, type: 3}
+  Prefab: {fileID: 3412789608464742709, guid: 9b22d155ac0370a46b8355673b6c0869, type: 3}
