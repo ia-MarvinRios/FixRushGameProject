@@ -24,7 +24,6 @@ public class GarbajeCollector : MonoBehaviourPun
 
     private void Awake()
     {
-        if (!PhotonNetwork.IsMasterClient) { enabled = false;  return; }
         Instance = this;
     }
 

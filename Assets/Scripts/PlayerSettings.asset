@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a12de0c98757c946aa7781028e469be, type: 3}
   m_Name: PlayerSettings
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSettings
-  Nickname: Raydell
+  Nickname: 
   MoveSpeed: 5
   Money: 210
   Hat: 0
