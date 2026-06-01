@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a12de0c98757c946aa7781028e469be, type: 3}
   m_Name: PlayerSettings
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSettings
-  Nickname: 
+  Nickname: Raydell
   MoveSpeed: 5
   Money: 210
   Hat: 0
-  Body: 2
-  SkinColor: {r: 0.48235294, g: 0.32156864, b: 0.13725491, a: 1}
+  Body: 0
+  SkinColor: {r: 0.9019608, g: 0.81960785, b: 0.69411767, a: 1}

@@ -104,7 +104,7 @@ MonoBehaviour:
   _sudsParticles: {fileID: 6830723250297209350}
   _sliderRoot: {fileID: 3511343809527596351}
   TriggerPrefab: {fileID: 7018675178099524341, guid: 647d3c08175fa484c9f11faf5ffae2d1, type: 3}
-  _issueTypes: 01000000
+  _issueTypes: 0000000001000000
   _jackRootFront: {fileID: 1600934890019726593}
   TiresFront:
   - {fileID: 5294424614357234976}

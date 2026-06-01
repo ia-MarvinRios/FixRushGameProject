@@ -1,4 +1,5 @@
 using FixRush;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,8 +36,8 @@ public class TireIssue : IIssue
             }
         }
 
-        GameObject.Destroy(_jackTrigger);
-        GameObject.Destroy(_tempTrigger);
+        if (_jackTrigger != null) GameObject.Destroy(_jackTrigger.gameObject);
+        if (_tempTrigger != null) GameObject.Destroy(_tempTrigger.gameObject);
 
         _triggers.Clear();
         _tempTrigger = null;
@@ -66,7 +67,7 @@ public class TireIssue : IIssue
     {
         // --- Create jack trigger ---
         _jackTrigger = GameObject.Instantiate(_car.TriggerPrefab).GetComponent<Trigger>().Set(
-            _car.Size.z,
+            _car.Size.z * 0.7f,
             5f,
             true,
             JackInteractionStarted,
@@ -152,12 +153,12 @@ public class TireIssue : IIssue
         // Create trigger
         _tempTrigger = GameObject.Instantiate(_car.TriggerPrefab).GetComponent<Trigger>().Set(
             1f,
-            5f,
+            0f,
             true,
             HandleReplaceTireInteractionStarted,
             HandleReplaceTireInteraction,
             HandleReplaceTireInteractionCanceled,
-            IInteractable.Type.Hold
+            IInteractable.Type.Simple
         );
 
         _tempTrigger.OnDestroyTrigger(TriggerDestructionHandler);
@@ -329,16 +330,32 @@ public class TireIssue : IIssue
 
     #region REPLACE_TIRES
 
-    private void HandleReplaceTireInteractionStarted(PlayerController controller, Trigger trigger)
+    private void HandleReplaceTireInteractionStarted(PlayerController player, Trigger trigger)
     {
+        if (player.GrabbedObj == null)
+        {
+            InGameUI.Instance.ShowHint("You need to grab a new wheel first", 2f);
+            return;
+        }
+
+        if (player.GrabbedObj.tag != "NewWheel")
+        {
+            InGameUI.Instance.ShowHint("This is not a NEW wheel", 2f);
+            return;
+        }
+
+        _passedCheck = true;
+
         // Audio and UI
         AudioManager.Instance.PlaySoundByName("Jack");
         InGameUI.Instance.StartTaskProgress(trigger.HoldTime);
 
     }
 
-    private void HandleReplaceTireInteraction(PlayerController controller, Trigger trigger)
+    private void HandleReplaceTireInteraction(PlayerController player, Trigger trigger)
     {
+        if (!_passedCheck) { return; }
+
         // Activate tire
         _triggers.TryGetValue(trigger, out GameObject tire);
         if (tire != null)
@@ -349,10 +366,17 @@ public class TireIssue : IIssue
         // Destroy it's trigger
         _car.NetworkHandler.SetSafeDestruction(true);
         _car.NetworkHandler.DestroyChildren(_car.gameObject, trigger.name);
+
+        // Drop and destroy new wheel on player's hand
+        GameObject obj = player.GrabbedObj;
+        player.DropObject(obj);
+        _car.NetworkHandler.DestroyNetworkObjMaster(obj);
     }
 
-    private void HandleReplaceTireInteractionCanceled(PlayerController controller, Trigger trigger)
+    private void HandleReplaceTireInteractionCanceled(PlayerController player, Trigger trigger)
     {
+        _passedCheck = false;
+
         // Audio and UI
         AudioManager.Instance.StopAllFX();
         InGameUI.Instance.StopTaskProgress(false);

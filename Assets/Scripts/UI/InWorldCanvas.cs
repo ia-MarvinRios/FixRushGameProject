@@ -107,9 +107,10 @@ public class InWorldCanvas : MonoBehaviourPun
 
     private void UnlockGate()
     {
-        GameManager.Instance.AddCashMaster(-GameManager.Instance.LevelData.Level2Price);
-
         Destroy(_openGateButon.gameObject);
+
+        GameManager.Instance.AddCashMaster(-GameManager.Instance.LevelData.Level2Price);
+        VManager.Instance.EnableAllPlatforms();
 
         AudioManager.Instance.PlayOnTarget("GateOpening", _gate);
         _scenarioAnimator.SetTrigger("OpenGate");

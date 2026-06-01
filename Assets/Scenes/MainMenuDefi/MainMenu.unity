@@ -8676,7 +8676,9 @@ MonoBehaviour:
   _waitPointOffset: 1
   _spawnInterval: 0.5
   _targets:
-  - {fileID: 809555746}
+  - Unlocked: 0
+    Taken: 0
+    Target: {fileID: 0}
   _queueMain: []
   _queueReparation: []
   _queueDestruction: []
@@ -13558,7 +13560,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.33333334
+  m_VoxelSize: 0.41666666
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: e05c83f60eb16b64b8d5b9e8d7a2ced6, type: 2}
   m_BuildHeightMesh: 0

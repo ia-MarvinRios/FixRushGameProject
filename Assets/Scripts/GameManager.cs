@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviourPun
     [Header("Level Data Reference")]
     [SerializeField] internal LevelData LevelData;
 
+    [Header("Player Settings Reference")]
+    [SerializeField] internal PlayerSettings _playerSettings;
+
     [Header("Day Night Cycle")]
     [SerializeField] internal Gradient _skyColorGradient;
     [SerializeField] internal Light _directionalLight;
@@ -26,6 +29,8 @@ public class GameManager : MonoBehaviourPun
 
     private int _globalCash;
 
+    public int LostCars = 0;
+    public int RepairedCars = 0;
     public float LevelCoutdownStep;
     public static event Action OnLevelTimeOut;
 
@@ -96,6 +101,8 @@ public class GameManager : MonoBehaviourPun
         _directionalLight.color = _skyColorGradient.Evaluate(1f);
         _directionalLight.transform.eulerAngles = rotation;
 
+        DistributeMoney();
+
         // Sync Game Over Event on Clients
         photonView.RPC(
             nameof(RPC_SyncGameOverEvent),
@@ -120,6 +127,21 @@ public class GameManager : MonoBehaviourPun
 
         return $"{displayHour}:{minutes:00} {period}";
     }
+
+    private void DistributeMoney()
+    {
+        // Divide total cash by the online players count to get the amount each player should receive
+        int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+        int cashPerPlayer = playerCount > 0 ? Mathf.FloorToInt(_globalCash / playerCount) : 0;
+
+        photonView.RPC(
+            nameof(RPC_GetDayPayment),
+            RpcTarget.All,
+            cashPerPlayer
+        );
+    }
+
+    private void GetDayPayment(int cash) { _playerSettings.Money += cash; }
 
     private void OnDrawGizmos()
     {
@@ -147,6 +169,11 @@ public class GameManager : MonoBehaviourPun
     private void RPC_SyncGameOverEvent()
     {
         OnLevelTimeOut?.Invoke();
+    }
+    [PunRPC]
+    private void RPC_GetDayPayment(int cash)
+    {
+        GetDayPayment(cash);
     }
 
     #endregion

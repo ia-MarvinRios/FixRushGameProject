@@ -9,6 +9,7 @@ TagManager:
   - WaterRefill
   - Jack
   - CrossWrench
+  - NewWheel
   layers:
   - Default
   - TransparentFX

@@ -62,10 +62,24 @@ public static class AIExtension
     {
         float distance = 0f;
 
-        for (int i = 0; i < index; i++)
+        for (int i = 1; i <= index; i++)
         {
-            IQueueAgent queueObject = agents[i].GetComponent<IQueueAgent>();
-            distance += queueObject.Size.z + offset + 0.2f;
+            IQueueAgent front =
+                agents[i - 1].GetComponent<IQueueAgent>();
+
+            IQueueAgent back =
+                agents[i].GetComponent<IQueueAgent>();
+
+            float frontHalf =
+                front.Size.z * 0.5f;
+
+            float backHalf =
+                back.Size.z * 0.5f;
+
+            distance += frontHalf;
+            distance += backHalf;
+            distance += offset;
+            distance += 0.2f;
         }
 
         return distance;
