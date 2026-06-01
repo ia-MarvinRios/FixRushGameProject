@@ -97,6 +97,7 @@ public class UI : MonoBehaviour
         {
             // Set the player's nickname in Photon
             PhotonManager.Instance.SetNickname(_nicknameField.text);
+            _playerSettings.Nickname = _nicknameField.text;
 
             return true;
         }
