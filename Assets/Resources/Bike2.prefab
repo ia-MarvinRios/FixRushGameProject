@@ -366,14 +366,14 @@ MonoBehaviour:
   m_FadeScale: 0.9
   m_StartAngleFade: 180
   m_EndAngleFade: 180
-  m_UVScale: {x: 1, y: 1}
-  m_UVBias: {x: 0, y: 0}
+  m_UVScale: {x: 0.48546505, y: 0.61908305}
+  m_UVBias: {x: 0.25311804, y: 0.18881178}
   m_RenderingLayerMask:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: 0, y: 0, z: 0.89}
-  m_Size: {x: 2, y: 3.78, z: 1.78}
+  m_Offset: {x: -0.008298874, y: -0.0062236786, z: 0.89}
+  m_Size: {x: 0.9709301, y: 2.340135, z: 1.78}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1

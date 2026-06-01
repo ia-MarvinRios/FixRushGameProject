@@ -347,7 +347,7 @@ public class TireIssue : IIssue
         _passedCheck = true;
 
         // Audio and UI
-        AudioManager.Instance.PlaySoundByName("Jack");
+        AudioManager.Instance.PlaySoundByName("PlaceObject");
         InGameUI.Instance.StartTaskProgress(trigger.HoldTime);
 
     }
@@ -376,10 +376,6 @@ public class TireIssue : IIssue
     private void HandleReplaceTireInteractionCanceled(PlayerController player, Trigger trigger)
     {
         _passedCheck = false;
-
-        // Audio and UI
-        AudioManager.Instance.StopAllFX();
-        InGameUI.Instance.StopTaskProgress(false);
     }
 
     #endregion

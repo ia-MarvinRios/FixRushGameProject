@@ -23,6 +23,7 @@ public class VManager : MonoBehaviourPun
     [SerializeField] Vector3 _spawnPoint;
     [SerializeField] Vector3 _WaitPoint1;
     [SerializeField] Vector3 _endPoint;
+    [SerializeField] Vector3 _endPointAlternative;
     [SerializeField] float _waitPointOffset = 1f;
     [SerializeField, Range(0.1f, 5f)] float _spawnInterval = 0.5f;
     [SerializeField] ReparationPlatform[] _targets;
@@ -200,9 +201,20 @@ public class VManager : MonoBehaviourPun
         agent.stoppingDistance = 1.5f;
 
         // Move
-        Debug.Log("[VManager] Moving to endpoint...");
         agent.isStopped = false;
-        agent.SetDestination(_endPoint);
+        if (v.QueueIndex != 0)
+        {
+            agent.SetDestination(new Vector3(_endPointAlternative.x, v.transform.position.y, v.transform.position.z));
+            yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
+
+            Debug.Log("[VManager] Moving to endpoint...");
+            agent.SetDestination(_endPointAlternative);
+        }
+        else
+        {
+            Debug.Log("[VManager] Moving to endpoint...");
+            agent.SetDestination(_endPoint);
+        }
 
         yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
 
@@ -319,6 +331,7 @@ public class VManager : MonoBehaviourPun
         Gizmos.DrawWireCube(_spawnPoint, Vector3.one);
         Gizmos.DrawWireCube(_WaitPoint1, Vector3.one);
         Gizmos.DrawWireCube(_endPoint, Vector3.one);
+        Gizmos.DrawWireCube(_endPointAlternative, Vector3.one);
 
         Gizmos.color = Color.green;
         foreach (var target in _targets)
