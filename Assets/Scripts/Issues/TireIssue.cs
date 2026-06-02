@@ -247,8 +247,8 @@ public class TireIssue : IIssue
         // --- If it's jacked ---
         if (_car.IsJacked)
         {
+            _car.NetworkHandler.SyncJackUnjackCar(player, _car.mJack, false);
             _car.UnjackCar(player);
-            _car.NetworkHandler.SyncJackUnjackCar(player, null, false);
             SetActiveTireTriggers(false);
         }
 
