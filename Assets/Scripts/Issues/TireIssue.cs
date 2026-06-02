@@ -247,8 +247,8 @@ public class TireIssue : IIssue
         // --- If it's jacked ---
         if (_car.IsJacked)
         {
-            _car.NetworkHandler.SyncJackUnjackCar(player, _car.mJack, false);
             _car.UnjackCar(player);
+            _car.NetworkHandler.SyncJackUnjackCar(player, false);
             SetActiveTireTriggers(false);
         }
 
@@ -260,7 +260,7 @@ public class TireIssue : IIssue
         else if (player.GrabbedObj.TryGetComponent(out Jack jack) && !_car.IsJacked)
         {
             int z = _car.JackCar(player);
-            _car.NetworkHandler.SyncJackUnjackCar(player, _car.mJack, true);
+            _car.NetworkHandler.SyncJackUnjackCar(player, true);
 
             SetActiveTireTriggers(z, true);
 

@@ -90,15 +90,14 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         );
     }
 
-    internal void SyncJackUnjackCar(PlayerController player, Jack jack, bool jacked)
+    internal void SyncJackUnjackCar(PlayerController player, bool jack)
     {
         photonView.RPC(
             nameof(RPC_JackUnjackCar),
-            RpcTarget.All,
+            RpcTarget.Others,
             photonView.ViewID,
             player.GetComponent<PhotonView>().ViewID,
-            jack.GetComponent<PhotonView>().ViewID,
-            jacked
+            jack
         );
     }
 
@@ -215,16 +214,6 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         );
     }
 
-    internal void RequestPickUpObject(PlayerController player, GameObject obj)
-    {
-        photonView.RPC(
-            nameof(RPC_GetObject),
-            RpcTarget.All,
-            player.GetComponent<PhotonView>().ViewID,
-            obj.GetComponent<PhotonView>().ViewID
-        );
-    }
-
     #region RPCs
 
     [PunRPC]
@@ -252,36 +241,19 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         vehicle.TimeOut();
     }
     [PunRPC]
-    private void RPC_JackUnjackCar(int carViewID, int playerViewID, int jackViewID, bool jacked)
+    private void RPC_JackUnjackCar(int carViewID, int playerViewID, bool jack)
     {
         Car car = PhotonView.Find(carViewID).GetComponent<Car>();
         PlayerController player = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
-        Jack jack = PhotonView.Find(jackViewID).GetComponent<Jack>();
 
-        if (jack != null && jacked)
+        if (jack && !car.IsJacked)
         {
             car.JackCar(player);
-            car.mJack = jack;
-            car.IsJacked = true;
             return;
         }
-
-        car.UnjackCar(player);
-        car.mJack = null;
-        car.IsJacked = false;
-    }
-    [PunRPC]
-    private void RPC_GetObject(int playerViewID, int objectViewID)
-    {
-        PhotonView playerView = PhotonView.Find(playerViewID);
-        if (!playerView.IsMine) { return; }
-
-        PlayerController player = playerView.GetComponent<PlayerController>();
-        GameObject obj = PhotonView.Find(objectViewID).gameObject;
-
-        if (player != null && obj != null)
+        if (!jack && car.IsJacked)
         {
-            player.PickUpObject(obj);
+            car.UnjackCar(player);
         }
     }
     [PunRPC]

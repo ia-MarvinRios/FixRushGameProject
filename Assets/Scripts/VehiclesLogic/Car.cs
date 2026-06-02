@@ -107,11 +107,17 @@ public class Car : Vehicle
     {
         if (mJack == null) { return 0; }
 
-        Vector3 dirToReference = (player.transform.position - transform.position).normalized;
-        float dot              = Vector3.Dot(transform.forward, dirToReference);
+        float dot = 0f;
 
         mJack.EnablePicking();
-        NetworkHandler.RequestPickUpObject(player, mJack.gameObject);
+
+        if (player != null)
+        {
+            Vector3 dirToReference = (player.transform.position - transform.position).normalized;
+            dot = Vector3.Dot(transform.forward, dirToReference);
+
+            player.PickUpObject(mJack.gameObject);
+        }
 
         mJack    = null;
         IsJacked = false;
