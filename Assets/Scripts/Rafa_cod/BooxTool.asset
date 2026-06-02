@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2bbd43bff05181049a796ece16cf39bb, type: 3}
-  m_Name: Llanta
+  m_Name: BooxTool
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  ItemName: LLanta
-  Icon: {fileID: 21300000, guid: 1e7151342e980464a88db1ae971d80f7, type: 3}
-  Prefab: {fileID: 3412789608464742709, guid: 9b22d155ac0370a46b8355673b6c0869, type: 3}
+  ItemName: CajaHerramientas
+  Icon: {fileID: 21300000, guid: c97d3427f7454814fab9d1937ac3d9db, type: 3}
+  Prefab: {fileID: 4903471267635469117, guid: 47c8309d726ce8b44bbe0ee926fb1d0a, type: 3}
