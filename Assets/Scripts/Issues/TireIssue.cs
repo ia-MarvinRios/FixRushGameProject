@@ -243,24 +243,26 @@ public class TireIssue : IIssue
     private void JackInteraction(PlayerController player, Trigger trigger)
     {
         if (!_passedCheck) { return; }
+        if (player.GrabbedObj == null)
+        {
+            InGameUI.Instance.ShowHint("You need to grab a Jack tool first", 2f);
+            return;
+        }
+        if (!player.GrabbedObj.TryGetComponent(out Jack jack)) { return; }
+
 
         // --- If it's jacked ---
         if (_car.IsJacked)
         {
-            _car.UnjackCar(player);
-            _car.NetworkHandler.SyncJackUnjackCar(player, false);
+            _car.NetworkHandler.RequestJackUnjackCar(player, jack, false);
             SetActiveTireTriggers(false);
         }
 
         // --- If it's not jacked ---
-        if (player.GrabbedObj == null)
+        else if (jack != null && !_car.IsJacked)
         {
-            InGameUI.Instance.ShowHint("You need to grab a Jack tool first", 2f);
-        }
-        else if (player.GrabbedObj.TryGetComponent(out Jack jack) && !_car.IsJacked)
-        {
-            int z = _car.JackCar(player);
-            _car.NetworkHandler.SyncJackUnjackCar(player, true);
+            int z = _car.GetPlayerReferencePos(player);
+            _car.NetworkHandler.RequestJackUnjackCar(player, jack, true);
 
             SetActiveTireTriggers(z, true);
 

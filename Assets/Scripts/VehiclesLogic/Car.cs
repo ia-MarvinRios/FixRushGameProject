@@ -11,7 +11,7 @@ public class Car : Vehicle
     [SerializeField] private Transform _jackRootRear;
     [SerializeField] internal GameObject[] TiresRear;
 
-    internal Jack mJack;
+    private Jack _jack;
 
     internal bool IsJacked = false;
 
@@ -71,7 +71,7 @@ public class Car : Vehicle
         float dot              = Vector3.Dot(transform.forward, dirToReference);
 
         jack.DisablePicking();
-        mJack = jack;
+        _jack = jack;
 
         if (dot >= 0)
         {
@@ -105,25 +105,34 @@ public class Car : Vehicle
 
     internal int UnjackCar(PlayerController player)
     {
-        if (mJack == null) { return 0; }
+        if (_jack == null) { return 0; }
 
-        float dot = 0f;
+        Vector3 dirToReference = (player.transform.position - transform.position).normalized;
+        float dot              = Vector3.Dot(transform.forward, dirToReference);
 
-        mJack.EnablePicking();
+        _jack.EnablePicking();
+        player.PickUpObject(_jack.gameObject);
 
-        if (player != null)
-        {
-            Vector3 dirToReference = (player.transform.position - transform.position).normalized;
-            dot = Vector3.Dot(transform.forward, dirToReference);
-
-            player.PickUpObject(mJack.gameObject);
-        }
-
-        mJack    = null;
+        _jack    = null;
         IsJacked = false;
 
         mAnimator.SetTrigger("Base");
 
         return dot >= 0 ? 1 : -1;
+    }
+
+    internal int GetPlayerReferencePos(PlayerController player)
+    {
+        Vector3 dirToReference = (player.transform.position - transform.position).normalized;
+        float dot = Vector3.Dot(transform.forward, dirToReference);
+
+        if (dot >= 0)
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
     }
 }
