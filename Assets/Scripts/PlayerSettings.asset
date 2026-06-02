@@ -16,5 +16,5 @@ MonoBehaviour:
   MoveSpeed: 5
   Money: 210
   Hat: 0
-  Body: 2
-  SkinColor: {r: 0.48235294, g: 0.32156864, b: 0.13725491, a: 1}
+  Body: 0
+  SkinColor: {r: 0.9019608, g: 0.81960785, b: 0.69411767, a: 1}

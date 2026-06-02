@@ -26,8 +26,10 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
     [SerializeField] private IIssue.Type[] _issueTypes;
 
     private bool _isInitialized = false;
+    internal int PreviousIssueCount = 0;
     internal Slider PatienceSlider;
     internal Image SliderFillImage;
+    internal ReparationPlatform Platform;
 
     public int QueueIndex
     {
@@ -87,8 +89,15 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
     {
         if (!PhotonManager.Instance.IsMasterClient) { return; }
 
-        // Set fixed and destroy.
+        // Set fixed and release platform.
         IsFixed = true;
+        if (Platform != null)
+        {
+            Platform.Taken = false;
+            Platform = null;
+        }
+
+        NetworkHandler.SyncCarsProgressCounters(1, 0);
 
         // Audio
         AudioManager.Instance.PlaySoundByName("CarDone");
@@ -128,8 +137,8 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
 
     internal void TimeOutCountdown()
     {
-        int   totalSeconds       = QueueIndex * 60 + IssueTypes.Length * 60;
-        float difficultyModifier = GameManager.Instance.LevelData.LevelDifficulty * 2f * 0.01f;
+        int   totalSeconds       = QueueIndex * 60 + PreviousIssueCount * 60 + 15;
+        float difficultyModifier = GameManager.Instance.LevelData.LevelDifficulty * 3f * 0.01f;
 
         float countdownSecs = totalSeconds - totalSeconds * difficultyModifier;
 
@@ -164,6 +173,7 @@ public abstract class Vehicle : MonoBehaviour, AIExtension.IQueueAgent
         AudioManager.Instance.PlaySoundByName("Error");
 
         if (!PhotonManager.Instance.IsMasterClient) { return; }
+        NetworkHandler.SyncCarsProgressCounters(0, 1);
         VManager.Instance.MoveToEndPoint(this);
     }
 }

@@ -70,7 +70,7 @@ public class InGameUI : MonoBehaviour
 
         string description = issueType switch
         {
-            IIssue.Type.Dirty => "Car is dirty",
+            IIssue.Type.Dirty => "Vehicle is dirty",
             IIssue.Type.Tires => "Replace Tires",
             _ => "unknown"
         };

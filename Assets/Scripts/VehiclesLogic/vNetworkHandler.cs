@@ -9,8 +9,6 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
     [Header("Stream Sync")]
     [SerializeField] private Vehicle _vehicle;
 
-    private string _color;
-
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         // get th int issueIDs from the instantiation data int array
@@ -30,7 +28,7 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
 
         _vehicle = GetComponent<Vehicle>();
         _vehicle.IssueTypes = Issues;
-        //v.IsFixed = (bool)data[1];
+        _vehicle.PreviousIssueCount = (int)data[1];
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -52,6 +50,16 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
 
             _vehicle.SliderFillImage.color = _vehicle.PatienceGradient.Evaluate(value);
         }
+    }
+
+    public void SyncCarsProgressCounters(int repaired, int lost)
+    {
+        photonView.RPC(
+            nameof(RPC_UpdateCarProgress),
+            RpcTarget.All,
+            repaired,
+            lost
+        );
     }
 
     public void MoveCarToEndPoint(Vehicle v)
@@ -172,6 +180,15 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         }
     }
 
+    internal void DestroyNetworkObjMaster(GameObject obj)
+    {
+        photonView.RPC(
+            nameof(RPC_DestroyNetworkObject),
+            RpcTarget.MasterClient,
+            obj.GetComponent<PhotonView>().ViewID
+        );
+    }
+
     internal void DestroyChildren(GameObject parent, string childrenName)
     {
         if (parent.TryGetComponent(out PhotonView objPhotonView))
@@ -197,6 +214,12 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
 
     #region RPCs
 
+    [PunRPC]
+    void RPC_UpdateCarProgress(int repaired, int lost)
+    {
+        GameManager.Instance.RepairedCars += repaired;
+        GameManager.Instance.LostCars += lost;
+    }
     [PunRPC]
     void RPC_MoveCarToEndPoint(int vehicleViewID)
     {
@@ -276,6 +299,12 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         DirtIssue i = v.CurrentIssue as DirtIssue;
         if (i == null) return;
         i.ResolveDirtIssue();
+    }
+    [PunRPC]
+    private void RPC_DestroyNetworkObject(int objViewID)
+    {
+        GameObject obj = PhotonView.Find(objViewID).gameObject;
+        PhotonNetwork.Destroy(obj);
     }
     [PunRPC]
     private void RPC_DestroyChildren(int parentViewID, string childrenName)

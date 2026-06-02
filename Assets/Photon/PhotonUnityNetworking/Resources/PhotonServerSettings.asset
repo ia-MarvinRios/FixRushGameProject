@@ -66,6 +66,10 @@ MonoBehaviour:
   - RPC_UnlockGate
   - RPC_SyncCash
   - RPC_SyncGameOverEvent
+  - RPC_UpdateCarProgress
+  - RPC_QueueDestruction
+  - RPC_DestroyNetworkObject
+  - RPC_GetDayPayment
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

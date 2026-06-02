@@ -23,9 +23,10 @@ public class VManager : MonoBehaviourPun
     [SerializeField] Vector3 _spawnPoint;
     [SerializeField] Vector3 _WaitPoint1;
     [SerializeField] Vector3 _endPoint;
+    [SerializeField] Vector3 _endPointAlternative;
     [SerializeField] float _waitPointOffset = 1f;
     [SerializeField, Range(0.1f, 5f)] float _spawnInterval = 0.5f;
-    [SerializeField] Transform[] _targets;
+    [SerializeField] ReparationPlatform[] _targets;
     [Space(10)]
     [Header("Vehicle Lists")]
     [SerializeField] List<GameObject> _queueMain;
@@ -38,10 +39,12 @@ public class VManager : MonoBehaviourPun
     NavMeshAgent _leader;
     Coroutine _spawnCoroutine;
     WaitForSeconds _spawnIntervalWaitTime;
-
-    int _prefabIndex = -1;
     Vehicle _temp = null;
 
+    int _prefabIndex = -1;
+    int _previousIssueCount = 0;
+
+    // ---------Internal Access------------
     internal List<GameObject> QueueVehicles { get => _queueMain; }
     internal List<GameObject> DestructionQueueVehicles { get => _queueDestruction; }
     internal List<GameObject> InReparationVehicles { get => _queueReparation; }
@@ -90,7 +93,7 @@ public class VManager : MonoBehaviourPun
                     _spawnPoint,
                     Quaternion.identity,
                     0,
-                    new object[] { IssuesToIntArray(AssignIssues(_temp)) }
+                    new object[] { IssuesToIntArray(AssignIssues(_temp)), _previousIssueCount }
                 );
 
                 if (obj == null) { continue; }
@@ -102,15 +105,19 @@ public class VManager : MonoBehaviourPun
                 QueueVehicles.Add(obj);
                 v.QueueIndex = QueueVehicles.Count - 1;
 
+                // Update previous
+                _previousIssueCount += v.IssueTypes.Length;
+
                 // Update Leader
                 UpdateLeader();
 
+                // Recalc queue
                 UpdateQueueVehicles(0);
 
                 yield return _spawnIntervalWaitTime;
             }
 
-            if (QueueVehicles.Count > 0 && InReparationVehicles.Count < _targets.Length)
+            if (QueueVehicles.Count > 0 && GetFirstAvailablePlatform() != null)
             {
                 MoveToTargetPos(QueueVehicles[0].GetComponent<Vehicle>().Agent);
             }
@@ -139,7 +146,6 @@ public class VManager : MonoBehaviourPun
     {
         if (AIExtension.HasReachedDestination(agent))
         {
-            agent.SetDestination(_targets[0].position);
             StartCoroutine(SetUpForFixing(agent));
         }
     }
@@ -151,30 +157,41 @@ public class VManager : MonoBehaviourPun
             Debug.LogWarning("Trying to set up vehicle but it's reference is null.");
             yield break;
         }
+        if (!agent.TryGetComponent(out Vehicle v)) { yield break; }
 
-        yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
-
-        agent.isStopped = true;
-        agent.transform.position = _targets[0].position;
-        agent.transform.rotation = _targets[0].rotation;
+        // Previous adjustments
+        ReparationPlatform platform = GetFirstAvailablePlatform();
+        platform.Taken = true;
+        _previousIssueCount -= v.IssueTypes.Length;
 
         // Move to reparation list
-        InReparationVehicles.Add(agent.gameObject);
         QueueVehicles.Remove(agent.gameObject);
+        InReparationVehicles.Add(agent.gameObject);
 
-        UpdateLeader();
+        // Move vehicle agent
+        Debug.Log("[VManager] Moving to target...");
+        agent.isStopped = false;
+        agent.SetDestination(platform.Target.position);
 
-        if (agent.TryGetComponent(out Vehicle v))
-            v.InitializeVehicle();
+        yield return null;
+        yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
 
-        // Update queue
-        UpdateQueueVehicles(v.QueueIndex);
+        // Snap car to position
+        agent.isStopped = true;
+        agent.transform.position = platform.Target.position;
+        agent.transform.rotation = platform.Target.rotation;
+
+        // Init vehicle
+        v.Platform = platform;
+        v.InitializeVehicle();
     }
 
     public Coroutine MoveToEndPoint(Vehicle v) { return StartCoroutine(MoveToEndPointCoroutine(v.Agent, v)); }
 
     public IEnumerator MoveToEndPointCoroutine(NavMeshAgent agent, Vehicle v)
     {
+        _previousIssueCount -= v.IssueTypes.Length;
+
         // Move to destruction list
         QueueVehicles.Remove(agent.gameObject);
         InReparationVehicles.Remove(agent.gameObject);
@@ -184,9 +201,20 @@ public class VManager : MonoBehaviourPun
         agent.stoppingDistance = 1.5f;
 
         // Move
-        Debug.Log("[VManager] Moving to endpoint...");
         agent.isStopped = false;
-        agent.SetDestination(_endPoint);
+        if (v.QueueIndex != 0)
+        {
+            agent.SetDestination(new Vector3(_endPointAlternative.x, v.transform.position.y, v.transform.position.z));
+            yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
+
+            Debug.Log("[VManager] Moving to endpoint...");
+            agent.SetDestination(_endPointAlternative);
+        }
+        else
+        {
+            Debug.Log("[VManager] Moving to endpoint...");
+            agent.SetDestination(_endPoint);
+        }
 
         yield return new WaitUntil(() => AIExtension.HasReachedDestination(agent));
 
@@ -197,6 +225,8 @@ public class VManager : MonoBehaviourPun
 
     public void UpdateQueueVehicles(int index)
     {
+        Debug.Log($"[VManager] UpdatingQueue from index: {index} | leader: {_leader.name}...");
+
         // Recalc only from the new
         if (_leader != null && _leader.isOnNavMesh)
         {
@@ -212,6 +242,7 @@ public class VManager : MonoBehaviourPun
     public void RemoveVehicle(Vehicle v)
     {
         int index = QueueVehicles.IndexOf(v.gameObject);
+        _previousIssueCount -= v.IssueTypes.Length;
 
         if (index >= 0)
         {
@@ -228,6 +259,14 @@ public class VManager : MonoBehaviourPun
         PhotonNetwork.Destroy(v.gameObject);
 
         UpdateQueueVehicles(index);
+    }
+
+    public void EnableAllPlatforms()
+    {
+        foreach (ReparationPlatform p in _targets)
+        {
+            p.Unlocked = true;
+        }
     }
 
     IIssue.Type[] AssignIssues(Vehicle v)
@@ -272,6 +311,17 @@ public class VManager : MonoBehaviourPun
 
         return agents;
     }
+    ReparationPlatform GetFirstAvailablePlatform()
+    {
+        foreach (ReparationPlatform p in _targets)
+        {
+            if (!p.Unlocked) { continue; }
+            if (p.Taken) continue;
+            return p;
+        }
+
+        return null;
+    }
 
     #endregion
 
@@ -281,11 +331,15 @@ public class VManager : MonoBehaviourPun
         Gizmos.DrawWireCube(_spawnPoint, Vector3.one);
         Gizmos.DrawWireCube(_WaitPoint1, Vector3.one);
         Gizmos.DrawWireCube(_endPoint, Vector3.one);
+        Gizmos.DrawWireCube(_endPointAlternative, Vector3.one);
 
-        Gizmos.color = Color.gold;
+        Gizmos.color = Color.green;
         foreach (var target in _targets)
         {
-            Gizmos.DrawSphere(target.position, 0.5f);
+            if (target.Taken) { Gizmos.color = Color.gold; }
+            if (!target.Unlocked) { Gizmos.color = Color.darkRed; }
+
+            Gizmos.DrawSphere(target.Target.position, 0.5f);
         }
     }
 }

@@ -143,7 +143,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 2011436924100264858}
   m_Enabled: 1
   m_AgentTypeID: -334000983
-  m_Radius: 1
+  m_Radius: 1.25
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -197,8 +197,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1.612406, z: 2.38}
-  m_Center: {x: 0, y: 0.816203, z: 0}
+  m_Size: {x: 1, y: 1.6080399, z: 2.5}
+  m_Center: {x: 0, y: 0.8183861, z: 0}
 --- !u!1 &2384245907643496834
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,14 +672,14 @@ MonoBehaviour:
   m_FadeScale: 0.9
   m_StartAngleFade: 180
   m_EndAngleFade: 180
-  m_UVScale: {x: 1, y: 1}
-  m_UVBias: {x: 0, y: 0}
+  m_UVScale: {x: 0.48470497, y: 0.6210438}
+  m_UVBias: {x: 0.2592678, y: 0.1920502}
   m_RenderingLayerMask:
     serializedVersion: 0
     m_Bits: 1
   m_ScaleMode: 0
-  m_Offset: {x: 0, y: 0, z: 0.89}
-  m_Size: {x: 2, y: 3.78, z: 1.78}
+  m_Offset: {x: 0.0032405853, y: 0.00972259, z: 0.9645394}
+  m_Size: {x: 0.96940994, y: 2.3475454, z: 1.9290788}
   m_FadeFactor: 1
   version: 1
   m_DecalLayerMask: 1

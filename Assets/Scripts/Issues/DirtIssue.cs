@@ -39,7 +39,7 @@ public class DirtIssue : IIssue
     {
         // Create trigger
         _trigger = GameObject.Instantiate(_vehicle.TriggerPrefab).GetComponent<Trigger>().Set(
-            _vehicle.Size.z,
+            _vehicle.Size.z * 0.7f,
             2f,
             true,
             HandleInteractionStarted,

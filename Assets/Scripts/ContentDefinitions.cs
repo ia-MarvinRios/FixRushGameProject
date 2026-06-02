@@ -107,4 +107,12 @@ namespace FixRush
         /// </summary>
         IEnumerator FixingCoroutine();
     }
+
+    [System.Serializable]
+    public class ReparationPlatform
+    {
+        public bool Unlocked;
+        public bool Taken;
+        public Transform Target;
+    }
 }
