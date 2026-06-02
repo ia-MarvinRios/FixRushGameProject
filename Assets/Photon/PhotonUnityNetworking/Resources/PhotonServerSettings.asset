@@ -61,6 +61,12 @@ MonoBehaviour:
   - RPC_UpdateCarProgress
   - RPC_VehicleTimeOut
   - RPC_WashDirtIssue
+  - RPC_OnDropped
+  - RPC_OnPickedUp
+  - RPC_OnServed
+  - RPC_SetAtCounter
+  - RPC_AssignRequest
+  - RPC_TryReceiveItem
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

@@ -1295,53 +1295,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!1 &206713155
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 206713157}
-  - component: {fileID: 206713156}
-  m_Layer: 0
-  m_Name: Obj
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &206713156
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 206713155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2211cc8f9c8ab8043ac02a106a2c01a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
-  _item: {fileID: 11400000, guid: 4b6c2c5f8c548704d9c46eb1a4dad686, type: 2}
-  _spawnPoint: {fileID: 206713157}
-  _respawnDelay: 3
---- !u!4 &206713157
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 206713155}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
-  m_LocalPosition: {x: 13.17, y: 0.030329704, z: 22.220001}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3164830806087775686}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &220224662
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1886,6 +1839,7 @@ MonoBehaviour:
   _holdTime: 2
   _rigidbody: {fileID: 262113939}
   _collider: {fileID: 262113940}
+  CanBePickedUp: 1
 --- !u!114 &262113942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4001,6 +3955,7 @@ MonoBehaviour:
   _holdTime: 2
   _rigidbody: {fileID: 568969995}
   _collider: {fileID: 568969996}
+  CanBePickedUp: 1
   _isFull: 0
 --- !u!114 &568969998
 MonoBehaviour:
@@ -8464,6 +8419,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1397584048}
   m_CullTransparentMesh: 1
+--- !u!1 &1402840040
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1402840042}
+  - component: {fileID: 1402840041}
+  m_Layer: 0
+  m_Name: NoToques Raydel estoy probando coas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1402840041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402840040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2211cc8f9c8ab8043ac02a106a2c01a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
+  _item: {fileID: 11400000, guid: 4b6c2c5f8c548704d9c46eb1a4dad686, type: 2}
+  _spawnPoint: {fileID: 1402840042}
+  _respawnDelay: 3
+--- !u!4 &1402840042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402840040}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -15.8, y: -0.05, z: -3.02}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1426549110
 GameObject:
   m_ObjectHideFlags: 0
@@ -9914,6 +9916,7 @@ MonoBehaviour:
   _holdTime: 2
   _rigidbody: {fileID: 1768221133}
   _collider: {fileID: 1768221134}
+  CanBePickedUp: 1
 --- !u!114 &1768221136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12470,6 +12473,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gate
       objectReference: {fileID: 0}
+    - target: {fileID: 5641957530692917565, guid: 9ac5bd116d011c540a4cf5ddf7610c7a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5767255602533502534, guid: 9ac5bd116d011c540a4cf5ddf7610c7a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -13030,6 +13037,7 @@ GameObject:
   - component: {fileID: 359922871}
   - component: {fileID: 359922870}
   - component: {fileID: 359922869}
+  - component: {fileID: 8178036327630182263}
   m_Layer: 0
   m_Name: WallL
   m_TagString: Untagged
@@ -14995,7 +15003,6 @@ Transform:
   - {fileID: 8178036327630182262}
   - {fileID: 1693503936616884810}
   - {fileID: 609186572}
-  - {fileID: 206713157}
   m_Father: {fileID: 6632237746298333976}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &3186264146150792736
@@ -15093,6 +15100,7 @@ MonoBehaviour:
   _holdTime: 2
   _rigidbody: {fileID: 384855996}
   _collider: {fileID: 384855997}
+  CanBePickedUp: 1
   _isFull: 0
 --- !u!33 &3477607066289081216
 MeshFilter:
@@ -17654,6 +17662,7 @@ MonoBehaviour:
   _holdTime: 2
   _rigidbody: {fileID: 5903538639710443135}
   _collider: {fileID: 3430849979867196762}
+  CanBePickedUp: 1
 --- !u!23 &8172233691893257975
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -17720,6 +17729,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3164830806087775686}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8178036327630182263
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759380705359349602}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 20.207323, y: 0.12297249, z: 31.659134}
+  m_Center: {x: 5.1036615, y: 4.9385147, z: 7.194065}
 --- !u!1 &8257167909017638700
 GameObject:
   m_ObjectHideFlags: 0
@@ -17778,6 +17808,7 @@ MonoBehaviour:
   _holdTime: 2
   _rigidbody: {fileID: 758055650478375831}
   _collider: {fileID: 1860877550250582627}
+  CanBePickedUp: 1
 --- !u!33 &8519717184074819381
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -18204,3 +18235,4 @@ SceneRoots:
   - {fileID: 962181684}
   - {fileID: 6632237746298333976}
   - {fileID: 1649274976}
+  - {fileID: 1402840042}

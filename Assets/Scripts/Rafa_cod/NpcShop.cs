@@ -4,11 +4,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-/// <summary>
-/// NPC de la tienda.
-/// - Muestra panel UI solo cuando está en el counter
-/// - Implementa IInteractable para recibir el item del jugador
-/// </summary>
 public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
 {
     [Header("Componentes")]
@@ -18,6 +13,9 @@ public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
     [Header("Request UI")]
     [SerializeField] private GameObject _requestPanel;
     [SerializeField] private Image _requestIcon;
+
+    [Header("Reward")]
+    [SerializeField] private int _deliveryFee = 50;
 
     // --- IQueueAgent ---
     public int QueueIndex { get; set; }
@@ -46,24 +44,34 @@ public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
     #endregion
 
     // -----------------------------------------------------------------------
-    #region SETUP
+    #region REQUEST SETUP
 
-    public void AssignRequest(ItemData item)
+    public void AssignRequest(ItemData item, int itemIndex)
     {
-        RequestedItem = item;
-        HideRequest(); // ✅ Oculto hasta llegar al counter
-        Debug.Log($"[NpcShop] NPC solicitando: {item?.ItemName}");
+        photonView.RPC("RPC_AssignRequest", RpcTarget.AllBuffered, itemIndex);
     }
 
-    /// <summary>
-    /// NpcManager llama esto cuando el NPC llega al counter.
-    /// </summary>
+    [PunRPC]
+    private void RPC_AssignRequest(int itemIndex)
+    {
+        RequestedItem = NpcManager.Instance.GetItemByIndex(itemIndex);
+
+        HideRequest();
+
+        Debug.Log($"[NpcShop] NPC solicitando: {RequestedItem?.ItemName}");
+    }
+
     public void SetAtCounter(bool value)
+    {
+        photonView.RPC("RPC_SetAtCounter", RpcTarget.AllBuffered, value);
+    }
+
+    [PunRPC]
+    private void RPC_SetAtCounter(bool value)
     {
         _isAtCounter = value;
 
-        // ✅ Panel solo visible cuando está en el counter
-        if (value && RequestedItem != null)
+        if (_isAtCounter && RequestedItem != null)
             ShowRequest(RequestedItem);
         else
             HideRequest();
@@ -76,17 +84,11 @@ public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
 
     public void InteractionStarted(PlayerController player) { }
 
-    /// <summary>
-    /// El jugador interactúa con el NPC mientras lleva el item.
-    /// </summary>
     public void Interact(PlayerController player)
     {
-        Debug.Log($"[NpcShop] Interact llamado! isAtCounter: {_isAtCounter}, GrabbedObj: {player.GrabbedObj?.name}");
-        if (!_isAtCounter) return;
-
         if (!_isAtCounter)
         {
-            Debug.Log("[NpcShop] NPC no está en el counter todavía.");
+            Debug.Log("[NpcShop] NPC no esta en el counter todavia.");
             return;
         }
 
@@ -102,10 +104,21 @@ public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
             return;
         }
 
-        bool accepted = TryReceiveItem(player, heldItem);
+        PhotonView playerView = player.GetComponent<PhotonView>();
+        PhotonView itemView = heldItem.GetComponent<PhotonView>();
 
-        if (accepted)
-            NpcManager.Instance.MoveNpcToEndPoint(this);
+        if (playerView == null || itemView == null)
+        {
+            Debug.LogWarning("[NpcShop] Falta PhotonView en player o item.");
+            return;
+        }
+
+        photonView.RPC(
+            "RPC_TryReceiveItem",
+            RpcTarget.MasterClient,
+            playerView.ViewID,
+            itemView.ViewID
+        );
     }
 
     public void CancelInteraction(PlayerController player) { }
@@ -115,6 +128,32 @@ public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
     // -----------------------------------------------------------------------
     #region ITEM DELIVERY
 
+    [PunRPC]
+    private void RPC_TryReceiveItem(int playerViewID, int itemViewID)
+    {
+        PhotonView playerView = PhotonView.Find(playerViewID);
+        PhotonView itemView = PhotonView.Find(itemViewID);
+
+        if (playerView == null || itemView == null)
+            return;
+
+        PlayerController player = playerView.GetComponent<PlayerController>();
+        PickableItem item = itemView.GetComponent<PickableItem>();
+
+        if (player == null || item == null)
+            return;
+
+        bool accepted = TryReceiveItem(player, item);
+
+        if (!accepted)
+            return;
+
+        if (PhotonNetwork.IsMasterClient)
+            GameManager.Instance.AddCashMaster(_deliveryFee);
+
+        NpcManager.Instance.MoveNpcToEndPoint(this);
+    }
+
     public bool TryReceiveItem(PlayerController player, PickableItem item)
     {
         if (item == null || item.ItemData == null) return false;
@@ -122,22 +161,28 @@ public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
 
         if (item.ItemData != RequestedItem)
         {
-            Debug.Log($"[NpcShop] Incorrecto. Pedía '{RequestedItem.ItemName}', recibió '{item.ItemData.ItemName}'.");
+            Debug.Log($"[NpcShop] Incorrecto. Pedia '{RequestedItem.ItemName}', recibio '{item.ItemData.ItemName}'.");
             return false;
         }
 
-        // ✅ Soltar del jugador primero, luego consumir
         player.DropObject(player.GrabbedObj);
         item.Consume();
-
         OnServed();
+
         return true;
     }
 
     public void OnServed()
     {
+        photonView.RPC("RPC_OnServed", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    private void RPC_OnServed()
+    {
+        _isAtCounter = false;
         HideRequest();
-        SetAtCounter(false);
+
         Debug.Log("[NpcShop] NPC atendido!");
     }
 
@@ -148,13 +193,17 @@ public class NpcShop : MonoBehaviourPun, AIExtension.IQueueAgent, IInteractable
 
     private void ShowRequest(ItemData item)
     {
-        if (_requestPanel != null) _requestPanel.SetActive(true);
-        if (_requestIcon != null && item.Icon != null) _requestIcon.sprite = item.Icon;
+        if (_requestPanel != null)
+            _requestPanel.SetActive(true);
+
+        if (_requestIcon != null && item != null)
+            _requestIcon.sprite = item.Icon;
     }
 
     private void HideRequest()
     {
-        if (_requestPanel != null) _requestPanel.SetActive(false);
+        if (_requestPanel != null)
+            _requestPanel.SetActive(false);
     }
 
     #endregion

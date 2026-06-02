@@ -50,7 +50,37 @@ public class NpcManager : MonoBehaviourPun
     private void Start()
     {
         if (!PhotonNetwork.IsMasterClient) return;
+
         StartCoroutine(SpawnNpcs());
+    }
+
+    #endregion
+
+    // -----------------------------------------------------------------------
+    #region REQUEST DATA
+
+    public ItemData GetItemByIndex(int index)
+    {
+        if (_availableItems == null) return null;
+        if (index < 0 || index >= _availableItems.Length) return null;
+
+        return _availableItems[index];
+    }
+
+    private void AssignRandomRequest(NpcShop npc)
+    {
+        if (_availableItems != null && _availableItems.Length > 0)
+        {
+            int itemIndex = Random.Range(0, _availableItems.Length);
+            ItemData item = _availableItems[itemIndex];
+
+            npc.AssignRequest(item, itemIndex);
+        }
+        else
+        {
+            npc.AssignRequest(null, -1);
+            Debug.LogWarning("[NpcManager] No hay items configurados en _availableItems.");
+        }
     }
 
     #endregion
@@ -62,7 +92,6 @@ public class NpcManager : MonoBehaviourPun
     {
         while (true)
         {
-            // --- Spawnear nuevo NPC si hay espacio ---
             if (ActiveNpcs.Count < _maxInstances)
             {
                 int prefabIndex = Random.Range(0, _npcPrefabs.Length);
@@ -74,38 +103,11 @@ public class NpcManager : MonoBehaviourPun
                 );
 
                 if (obj != null)
-                {
-                    NpcShop npc = obj.GetComponent<NpcShop>();
-
-                    if (npc == null)
-                    {
-                        Debug.LogWarning("[NpcManager] El prefab no tiene NpcShop.");
-                        PhotonNetwork.Destroy(obj);
-                    }
-                    else
-                    {
-                        AssignRandomRequest(npc);
-                        ActiveNpcs.Add(obj);
-                        npc.QueueIndex = ActiveNpcs.Count - 1;
-                        UpdateLeader();
-
-                        if (_leader != null && _leader.isOnNavMesh)
-                        {
-                            AIExtension.RecalculateQueueFrom(
-                                npc.QueueIndex,
-                                _waitPointOffset,
-                                _waitPoint,
-                                _leader,
-                                ObjectsToAgentsList(ActiveNpcs)
-                            );
-                        }
-                    }
-                }
+                    SetupSpawnedNpc(obj);
 
                 yield return _spawnIntervalWaitTime;
             }
 
-            // --- Mover primer NPC al counter si está libre ---
             if (ActiveNpcs.Count > 0 && !_waitingForItem)
             {
                 NavMeshAgent firstAgent = ActiveNpcs[0].GetComponent<NavMeshAgent>();
@@ -116,48 +118,67 @@ public class NpcManager : MonoBehaviourPun
         }
     }
 
-    private void AssignRandomRequest(NpcShop npc)
+    private void SetupSpawnedNpc(GameObject obj)
     {
-        if (_availableItems != null && _availableItems.Length > 0)
-            npc.AssignRequest(_availableItems[Random.Range(0, _availableItems.Length)]);
-        else
+        NpcShop npc = obj.GetComponent<NpcShop>();
+
+        if (npc == null)
         {
-            npc.AssignRequest(null);
-            Debug.LogWarning("[NpcManager] No hay items configurados en _availableItems.");
+            Debug.LogWarning("[NpcManager] El prefab no tiene NpcShop.");
+            PhotonNetwork.Destroy(obj);
+            return;
+        }
+
+        AssignRandomRequest(npc);
+
+        ActiveNpcs.Add(obj);
+        npc.QueueIndex = ActiveNpcs.Count - 1;
+
+        UpdateLeader();
+
+        if (_leader != null && _leader.isOnNavMesh)
+        {
+            AIExtension.RecalculateQueueFrom(
+                npc.QueueIndex,
+                _waitPointOffset,
+                _waitPoint,
+                _leader,
+                ObjectsToAgentsList(ActiveNpcs)
+            );
         }
     }
 
-    /// <summary>
-    /// Intenta mandar al primer NPC al counter.
-    /// Usa distancia en lugar de HasReachedDestination para mayor fiabilidad.
-    /// </summary>
     private void TryMoveToCounter(NavMeshAgent agent)
     {
         if (agent == null || _counterPoint == null || _waitingForItem) return;
 
         float distToWait = Vector3.Distance(agent.transform.position, _waitPoint);
 
-        // ✅ Si está cerca del waitPoint (o sin destino activo), mandarlo al counter
         bool nearWaitPoint = distToWait < 2f;
-        bool notMoving = !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f;
+        bool notMoving = !agent.pathPending &&
+                         agent.remainingDistance <= agent.stoppingDistance + 0.1f;
 
         if (nearWaitPoint || notMoving)
         {
             _waitingForItem = true;
             agent.SetDestination(_counterPoint.position);
+
             Debug.Log("[NpcManager] Mandando NPC al counter...");
+
             StartCoroutine(SetUpForServing(agent));
         }
     }
 
     private IEnumerator SetUpForServing(NavMeshAgent agent)
     {
-        if (agent == null) { _waitingForItem = false; yield break; }
+        if (agent == null)
+        {
+            _waitingForItem = false;
+            yield break;
+        }
 
-        // ✅ Esperar que el path esté listo primero
         yield return new WaitUntil(() => !agent.pathPending);
 
-        // ✅ Luego esperar que llegue
         yield return new WaitUntil(() =>
             agent.remainingDistance <= agent.stoppingDistance + 0.5f
         );
@@ -182,6 +203,7 @@ public class NpcManager : MonoBehaviourPun
         }
 
         npc.SetAtCounter(true);
+
         Debug.Log($"[NpcManager] NPC en counter esperando: {npc.RequestedItem.ItemName}");
     }
 
@@ -193,12 +215,14 @@ public class NpcManager : MonoBehaviourPun
     public void MoveNpcToEndPoint(NpcShop npc)
     {
         if (npc == null) return;
+
         StartCoroutine(MoveToEndPointCoroutine(npc));
     }
 
     private IEnumerator MoveToEndPointCoroutine(NpcShop npc)
     {
         NavMeshAgent agent = npc.Agent;
+
         agent.isStopped = false;
         agent.SetDestination(_endPoint);
 
@@ -213,10 +237,12 @@ public class NpcManager : MonoBehaviourPun
     public void RemoveNpc(NpcShop npc)
     {
         int index = ActiveNpcs.IndexOf(npc.gameObject);
+
         if (index < 0) return;
 
         ActiveNpcs.RemoveAt(index);
         UpdateLeader();
+
         PhotonNetwork.Destroy(npc.gameObject);
 
         _waitingForItem = false;
@@ -242,9 +268,11 @@ public class NpcManager : MonoBehaviourPun
     public void UpdateLeader()
     {
         _leader = null;
+
         if (ActiveNpcs.Count == 0) return;
 
         NavMeshAgent agent = ActiveNpcs[^1].GetComponent<NavMeshAgent>();
+
         if (agent != null && agent.enabled && agent.isOnNavMesh)
             _leader = agent;
     }
@@ -252,8 +280,10 @@ public class NpcManager : MonoBehaviourPun
     private List<NavMeshAgent> ObjectsToAgentsList(List<GameObject> objects)
     {
         List<NavMeshAgent> agents = new();
+
         foreach (GameObject obj in objects)
             agents.Add(obj.GetComponent<NavMeshAgent>());
+
         return agents;
     }
 
