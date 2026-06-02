@@ -262,10 +262,13 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         {
             car.JackCar(player);
             car.mJack = jack;
+            car.IsJacked = true;
             return;
         }
 
         car.UnjackCar(player);
+        car.mJack = null;
+        car.IsJacked = false;
     }
     [PunRPC]
     private void RPC_GetObject(int playerViewID, int objectViewID)
