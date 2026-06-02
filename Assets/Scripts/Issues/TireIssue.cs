@@ -243,10 +243,23 @@ public class TireIssue : IIssue
     private void JackInteraction(PlayerController player, Trigger trigger)
     {
         if (!_passedCheck) { return; }
+        if (player.GrabbedObj != null)
+        {
+            if (player.GrabbedObj.GetComponent<Jack>() && _car.mJack != null)
+            {
+                InGameUI.Instance.ShowHint("The car is already jacked!", 2f);
+                return;
+            }
+        }
 
         // --- If it's jacked ---
         if (_car.IsJacked)
         {
+            if (_car.mJack == null)
+            {
+                InGameUI.Instance.ShowHint("The car is unjacked already!", 2f);
+                return;
+            }
             _car.NetworkHandler.RequestJackUnjackCar(player, _car.mJack, false);
             SetActiveTireTriggers(false);
         }
