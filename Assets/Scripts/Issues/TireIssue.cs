@@ -253,6 +253,10 @@ public class TireIssue : IIssue
         }
 
         // --- If it's not jacked ---
+        if (player.GrabbedObj == null)
+        {
+            InGameUI.Instance.ShowHint("You need to grab a Jack tool first", 2f);
+        }
         else if (player.GrabbedObj.TryGetComponent(out Jack jack) && !_car.IsJacked)
         {
             int z = _car.JackCar(player);
