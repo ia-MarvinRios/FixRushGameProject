@@ -243,11 +243,6 @@ public class TireIssue : IIssue
     private void JackInteraction(PlayerController player, Trigger trigger)
     {
         if (!_passedCheck) { return; }
-        if (player.GrabbedObj == null)
-        {
-            InGameUI.Instance.ShowHint("You need to grab a Jack tool first", 2f);
-            return;
-        }
         if (!player.GrabbedObj.TryGetComponent(out Jack jack)) { return; }
 
 
