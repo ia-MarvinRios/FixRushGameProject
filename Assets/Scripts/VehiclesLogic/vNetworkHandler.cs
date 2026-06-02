@@ -90,14 +90,15 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         );
     }
 
-    internal void SyncJackUnjackCar(PlayerController player, bool jack)
+    internal void SyncJackUnjackCar(PlayerController player, Jack jack, bool jacked)
     {
         photonView.RPC(
             nameof(RPC_JackUnjackCar),
-            RpcTarget.Others,
+            RpcTarget.All,
             photonView.ViewID,
             player.GetComponent<PhotonView>().ViewID,
-            jack
+            jack.GetComponent<PhotonView>().ViewID,
+            jacked
         );
     }
 
@@ -251,14 +252,16 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         vehicle.TimeOut();
     }
     [PunRPC]
-    private void RPC_JackUnjackCar(int carViewID, int playerViewID, bool jack)
+    private void RPC_JackUnjackCar(int carViewID, int playerViewID, int jackViewID, bool jacked)
     {
         Car car = PhotonView.Find(carViewID).GetComponent<Car>();
         PlayerController player = PhotonView.Find(playerViewID).GetComponent<PlayerController>();
+        Jack jack = PhotonView.Find(jackViewID).GetComponent<Jack>();
 
-        if (jack)
+        if (jack != null && jacked)
         {
             car.JackCar(player);
+            car.mJack = jack;
             return;
         }
 

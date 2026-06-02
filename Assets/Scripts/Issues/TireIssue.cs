@@ -248,15 +248,19 @@ public class TireIssue : IIssue
         if (_car.IsJacked)
         {
             _car.UnjackCar(player);
-            _car.NetworkHandler.SyncJackUnjackCar(player, false);
+            _car.NetworkHandler.SyncJackUnjackCar(player, null, false);
             SetActiveTireTriggers(false);
         }
 
         // --- If it's not jacked ---
+        if (player.GrabbedObj == null)
+        {
+            InGameUI.Instance.ShowHint("You need to grab a Jack tool first", 2f);
+        }
         else if (player.GrabbedObj.TryGetComponent(out Jack jack) && !_car.IsJacked)
         {
             int z = _car.JackCar(player);
-            _car.NetworkHandler.SyncJackUnjackCar(player, true);
+            _car.NetworkHandler.SyncJackUnjackCar(player, _car.mJack, true);
 
             SetActiveTireTriggers(z, true);
 
