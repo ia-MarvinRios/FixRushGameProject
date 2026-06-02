@@ -234,6 +234,15 @@ public class TireIssue : IIssue
             return;
         }
 
+        if (player.GrabbedObj != null)
+        {
+            if (player.GrabbedObj.tag == "Jack" && _car.mJack != null)
+            {
+                InGameUI.Instance.ShowHint("The car is already jacked!", 2f);
+                return;
+            }
+        }
+
         _passedCheck = true;
 
         // Audio and UI
@@ -243,14 +252,6 @@ public class TireIssue : IIssue
     private void JackInteraction(PlayerController player, Trigger trigger)
     {
         if (!_passedCheck) { return; }
-        if (player.GrabbedObj != null)
-        {
-            if (player.GrabbedObj.GetComponent<Jack>() && _car.mJack != null)
-            {
-                InGameUI.Instance.ShowHint("The car is already jacked!", 2f);
-                return;
-            }
-        }
 
         // --- If it's jacked ---
         if (_car.IsJacked)
@@ -265,8 +266,10 @@ public class TireIssue : IIssue
         }
 
         // --- If it's not jacked ---
-        else if (player.GrabbedObj.TryGetComponent(out Jack jack) && !_car.IsJacked)
+        else if (player.GrabbedObj != null && !_car.IsJacked)
         {
+            if (!player.GrabbedObj.TryGetComponent(out Jack jack)) { return; }
+
             int z = _car.GetPlayerReferencePos(player);
             _car.NetworkHandler.RequestJackUnjackCar(player, jack, true);
 
