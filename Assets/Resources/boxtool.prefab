@@ -223,5 +223,5 @@ MonoBehaviour:
   _rigidbody: {fileID: 2024982302784987654}
   _collider: {fileID: 8670003059652999612}
   CanBePickedUp: 1
-  _itemData: {fileID: 0}
+  _itemData: {fileID: 11400000, guid: e464960e31213e24cb481df8dcbaab64, type: 2}
   _triggerCollider: {fileID: 1227375879333077102}
