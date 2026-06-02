@@ -43,6 +43,8 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
             // Recibir datos
             float value = (float)stream.ReceiveNext();
 
+            if (_vehicle.SliderFillImage == null || _vehicle.PatienceSlider == null) return;
+
             if (Mathf.Abs(value - _vehicle.PatienceSlider.value) > 0.001f)
             {
                 _vehicle.PatienceSlider.value = value;
@@ -212,6 +214,16 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         );
     }
 
+    internal void RequestPickUpObject(PlayerController player, GameObject obj)
+    {
+        photonView.RPC(
+            nameof(RPC_GetObject),
+            RpcTarget.All,
+            player.GetComponent<PhotonView>().ViewID,
+            obj.GetComponent<PhotonView>().ViewID
+        );
+    }
+
     #region RPCs
 
     [PunRPC]
@@ -251,6 +263,20 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
         }
 
         car.UnjackCar(player);
+    }
+    [PunRPC]
+    private void RPC_GetObject(int playerViewID, int objectViewID)
+    {
+        PhotonView playerView = PhotonView.Find(playerViewID);
+        if (!playerView.IsMine) { return; }
+
+        PlayerController player = playerView.GetComponent<PlayerController>();
+        GameObject obj = PhotonView.Find(objectViewID).gameObject;
+
+        if (player != null && obj != null)
+        {
+            player.PickUpObject(obj);
+        }
     }
     [PunRPC]
     void RPC_SyncInitialization(int vehicleViewID)

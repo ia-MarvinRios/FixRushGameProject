@@ -1,12 +1,13 @@
 using FixRush;
 using UnityEngine;
+using Photon.Pun;
 
 /// <summary>
 /// A class representing a pickable object in the game.
 /// Inherits from MonoBehaviour and implements IInteractable and IPickupable interfaces to allow interaction and pickup functionality.
 /// </summary>
 [RequireComponent(typeof(Collider))]
-public class Pickable : MonoBehaviour, IInteractable, IPickupable
+public class Pickable : MonoBehaviourPun, IInteractable, IPickupable
 {
     [Header("Interaction Settings")]
     [SerializeField] private IInteractable.Type _interactionType = IInteractable.Type.Simple;
@@ -17,9 +18,16 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
     [SerializeField] private Rigidbody _rigidbody;
     [SerializeField] private Collider _collider;
 
+    public bool CanBePickedUp = true;
     public IInteractable.Type InteractionType => _interactionType;
     public bool Shared => _shared;
     public float HoldTime => _holdTime;
+    
+
+    private void Awake()
+    {
+        if (PhotonNetwork.IsMasterClient) { _rigidbody.isKinematic = false; }
+    }
 
     /// <summary>
     /// Interaction method that allows the specified player to pick up this object. This method is called when the player interacts
@@ -56,6 +64,7 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
     /// <param name="player">The player who will pick up the object. Cannot be null and must have a valid grab point.</param>
     public virtual void PickUp(PlayerController player)
     {
+        if (!CanBePickedUp) { return; }
         if (player.GrabbedObj != null)
         {
             player.DropObject(player.GrabbedObj);
@@ -78,6 +87,8 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
 
         // --- Set reference in player ---
         player.GrabbedObj = gameObject;
+
+        CanBePickedUp = false;
     }
 
     /// <summary>
@@ -102,10 +113,13 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
 
         // --- Clear reference in player ---
         player.GrabbedObj = null;
+
+        CanBePickedUp = true;
     }
 
     internal void DisablePicking()
     {
+        CanBePickedUp = false;
         // --- Disable some components ---
         // Collider
         _collider.enabled = false;
@@ -117,8 +131,9 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
         }
     }
 
-    internal void EnablePicking()
+    internal void EnablePicking(bool enablePhysics = false)
     {
+        CanBePickedUp = true;
         // --- Re-enable components ---
         // Collider
         _collider.enabled = true;
@@ -126,7 +141,7 @@ public class Pickable : MonoBehaviour, IInteractable, IPickupable
         // Rigidbody (only on master client to avoid conflicts)
         if (PhotonManager.Instance.IsMasterClient && _rigidbody != null)
         {
-            _rigidbody.isKinematic = false;
+            _rigidbody.isKinematic = !enablePhysics;
             _rigidbody.linearVelocity = Vector3.zero;
         }
     }

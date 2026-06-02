@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7454038929801137591}
   - component: {fileID: 3025935470921431188}
   - component: {fileID: 3315808301746075927}
+  - component: {fileID: -6207864877547903006}
   m_Layer: 0
   m_Name: Bike2
   m_TagString: Untagged
@@ -63,6 +64,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 1112331163812521345}
+  - {fileID: -6207864877547903006}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -199,6 +201,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.630188, z: 2.5}
   m_Center: {x: 0, y: 0.82753754, z: 0}
+--- !u!114 &-6207864877547903006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231817527869927787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35144820bcc25444bb8f0fd767d9423e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking.Utilities::Photon.Pun.UtilityScripts.SmoothSyncMovement
+  SmoothingDelay: 5
 --- !u!1 &2315347418993416719
 GameObject:
   m_ObjectHideFlags: 0

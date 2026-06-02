@@ -36,40 +36,31 @@ MonoBehaviour:
   RpcList:
   - ClickRpc
   - DestroyRpc
-  - RPC_SyncPlayerSpawnOnServer
-  - RPC_SyncSpawnOnClients
-  - RPC_SetCosmeticParent
-  - PickUpJack
-  - RPC_PickUpObj
-  - RPC_DropObj
-  - RPC_MoveCarToEndPoint
-  - RPC_SyncDirt
-  - RPC_SyncDirtAlpha
-  - RPC_SyncSkinColor
-  - RPC_SyncTaskPanel
-  - RPC_SyncWorkParticles
-  - RPC_SyncInitialization
-  - RPC_RepairDirtIssue
-  - RPC_SyncSuds
-  - RPC_GetReleaseBucket
-  - RPC_SyncWashCounterDirtIssue
-  - RPC_SetObjectActive
-  - RPC_SyncCashUI
-  - RPC_RequestPaymentToMaster
-  - RPC_WashDirtIssue
-  - RPC_SyncJackedState
   - RPC_DestroyChildren
-  - RPC_SyncSafeDestruction
-  - RPC_JackUnjackCar
-  - RPC_SafeDestruction
-  - RPC_VehicleTimeOut
-  - RPC_UnlockGate
-  - RPC_SyncCash
-  - RPC_SyncGameOverEvent
-  - RPC_UpdateCarProgress
-  - RPC_QueueDestruction
   - RPC_DestroyNetworkObject
+  - RPC_DropObj
   - RPC_GetDayPayment
+  - RPC_GetObject
+  - RPC_GetReleaseBucket
+  - RPC_JackUnjackCar
+  - RPC_MoveCarToEndPoint
+  - RPC_PickUpObj
+  - RPC_RepairDirtIssue
+  - RPC_RequestSpawnAndPickUp
+  - RPC_SafeDestruction
+  - RPC_SetCosmeticParent
+  - RPC_SetObjectActive
+  - RPC_SyncCash
+  - RPC_SyncDirtAlpha
+  - RPC_SyncGameOverEvent
+  - RPC_SyncInitialization
+  - RPC_SyncSkinColor
+  - RPC_SyncSuds
+  - RPC_SyncWorkParticles
+  - RPC_UnlockGate
+  - RPC_UpdateCarProgress
+  - RPC_VehicleTimeOut
+  - RPC_WashDirtIssue
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

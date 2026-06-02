@@ -64,6 +64,7 @@ public class Car : Vehicle
     /// <returns>-1, 0, 1</returns>
     internal int JackCar(PlayerController player)
     {
+        if (player.GrabbedObj == null) { return 0; }
         if (!player.GrabbedObj.TryGetComponent(out Jack jack)) { return 0; }
 
         Vector3 dirToReference = (player.transform.position - transform.position).normalized;
@@ -109,7 +110,8 @@ public class Car : Vehicle
         Vector3 dirToReference = (player.transform.position - transform.position).normalized;
         float dot              = Vector3.Dot(transform.forward, dirToReference);
 
-        _jack.PickUp(player);
+        _jack.EnablePicking();
+        NetworkHandler.RequestPickUpObject(player, _jack.gameObject);
 
         _jack    = null;
         IsJacked = false;

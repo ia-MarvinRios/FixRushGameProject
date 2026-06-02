@@ -65,6 +65,16 @@ public class VManager : MonoBehaviourPun
         _spawnIntervalWaitTime = new WaitForSeconds(_spawnInterval);
     }
 
+    private void OnEnable()
+    {
+        GameManager.OnLevelTimeOut += Stop;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnLevelTimeOut -= Stop;
+    }
+
     private void Start()
     {
         if (!PhotonNetwork.IsMasterClient) { return; }
@@ -124,6 +134,41 @@ public class VManager : MonoBehaviourPun
 
             yield return new WaitForSeconds(1.5f);
         }
+    }
+
+    private void Stop()
+    {
+        if (_spawnCoroutine != null)
+        {
+            StopCoroutine(_spawnCoroutine);
+            _spawnCoroutine = null;
+        }
+
+        foreach (GameObject obj in QueueVehicles)
+        {
+            if (obj != null)
+            {
+                PhotonNetwork.Destroy(obj);
+            }
+        }
+        foreach (GameObject obj in InReparationVehicles)
+        {
+            if (obj != null)
+            {
+                PhotonNetwork.Destroy(obj);
+            }
+        }
+        foreach (GameObject obj in DestructionQueueVehicles)
+        {
+            if (obj != null)
+            {
+                PhotonNetwork.Destroy(obj);
+            }
+        }
+
+        QueueVehicles.Clear();
+        InReparationVehicles.Clear();
+        DestructionQueueVehicles.Clear();
     }
 
     #region SPAWN_LOGIC

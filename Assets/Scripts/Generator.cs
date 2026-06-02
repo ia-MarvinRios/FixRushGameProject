@@ -17,27 +17,50 @@ public class Generator : Interactable
             return;
         }
 
-        GameObject obj = PhotonNetwork.InstantiateRoomObject(_prefab.name, transform.position, Quaternion.identity);
-
-        // Ask Master to queue object destruction
         photonView.RPC(
-            nameof(RPC_QueueDestruction), 
-            RpcTarget.MasterClient, 
-            obj.GetComponent<PhotonView>().ViewID,
-            _destructionDelay
+            nameof(RPC_RequestSpawnAndPickUp), 
+            RpcTarget.MasterClient,
+            player.GetComponent<PhotonView>().ViewID
         );
-
-        player.PickUpObject(obj);
     }
 
     #region RPCs
 
     [PunRPC]
-    private void RPC_QueueDestruction(int objectViewID, float delay)
+    private void RPC_RequestSpawnAndPickUp(int playerViewID)
     {
-        GameObject obj = PhotonView.Find(objectViewID)?.gameObject;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // Instantiate the object on the Master Client
+            GameObject obj = PhotonNetwork.Instantiate(_prefab.name, transform.position, Quaternion.identity);
+            int objectViewID = obj.GetComponent<PhotonView>().ViewID;
 
-        GarbajeCollector.Instance.QueueDestruction(obj, delay);
+            // Queue object destruction
+            GarbajeCollector.Instance.QueueDestruction(obj, _destructionDelay);
+
+            // Send RPC
+            photonView.RPC(
+                nameof(RPC_GetObject),
+                RpcTarget.All,
+                playerViewID,
+                objectViewID
+            );
+        }
+    }
+
+    [PunRPC]
+    private void RPC_GetObject(int playerViewID, int objectViewID)
+    {
+        PhotonView playerView = PhotonView.Find(playerViewID);
+        if (!playerView.IsMine) { return; }
+
+        PlayerController player = playerView.GetComponent<PlayerController>();
+        GameObject obj = PhotonView.Find(objectViewID).gameObject;
+
+        if (player != null && obj != null)
+        {
+            player.PickUpObject(obj);
+        }
     }
 
     #endregion
