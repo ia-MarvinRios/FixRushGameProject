@@ -94,7 +94,7 @@ public class vNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback, I
     {
         photonView.RPC(
             nameof(RPC_JackUnjackCar),
-            RpcTarget.Others,
+            RpcTarget.All,
             photonView.ViewID,
             player.GetComponent<PhotonView>().ViewID,
             jack
