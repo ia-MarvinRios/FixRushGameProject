@@ -22,8 +22,8 @@ public class LoginUIManager : MonoBehaviour
     [SerializeField] private Button btnRegistrar;
     [SerializeField] private TMP_Text textoErrorRegistro;
 
-    [Header("Escena a cargar tras login exitoso")]
-    [SerializeField] private string nombreEscenaJuego = "MenuPrincipal";
+    //[Header("Escena a cargar tras login exitoso")]
+    //[SerializeField] private string nombreEscenaJuego = "MenuPrincipal";
 
 
     private void Start()
@@ -61,7 +61,7 @@ public class LoginUIManager : MonoBehaviour
                 Debug.Log($"Login OK: {data.nickname} | Dinero: {data.dinero} | Nivel: {data.nivel}");
 
                 // Cargar la escena principal del juego
-                UnityEngine.SceneManagement.SceneManager.LoadScene(nombreEscenaJuego);
+                //UnityEngine.SceneManagement.SceneManager.LoadScene(nombreEscenaJuego);
             },
 
             onError: msg =>

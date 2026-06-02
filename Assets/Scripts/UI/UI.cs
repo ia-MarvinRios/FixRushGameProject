@@ -28,20 +28,20 @@ public class UI : MonoBehaviour
     {
         PhotonManager.Instance.OnRoomJoin += OpenLobbyScreen;
 
-        // Set nickname field to the current Photon nickname if it exists
-        if (!string.IsNullOrEmpty(PhotonManager.Instance.MyNickname))
-        {
-            _nicknameField.text = PhotonManager.Instance.MyNickname;
-        }
+        //// Set nickname field to the current Photon nickname if it exists
+        //if (!string.IsNullOrEmpty(PhotonManager.Instance.MyNickname))
+        //{
+        //    _nicknameField.text = PhotonManager.Instance.MyNickname;
+        //}
 
-        // Build Info
-        SetBuildInfoText();
+        //// Build Info
+        //SetBuildInfoText();
 
-        // Restore nickname from PlayerSettings if it exists
-        if (!string.IsNullOrEmpty(_playerSettings.Nickname))
-        {
-            _nicknameField.text = _playerSettings.Nickname;
-        }
+        //// Restore nickname from PlayerSettings if it exists
+        //if (!string.IsNullOrEmpty(_playerSettings.Nickname))
+        //{
+        //    _nicknameField.text = _playerSettings.Nickname;
+        //}
 
         // Audio
         AudioManager.Instance.PlayAllMusic(true);
