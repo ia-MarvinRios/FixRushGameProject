@@ -21408,8 +21408,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 600, y: 400}
+  m_AnchoredPosition: {x: 2.1928, y: 40.567}
+  m_SizeDelta: {x: 604.3856, y: 481.1341}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2035733274
 MonoBehaviour:
@@ -27031,8 +27031,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3432ff35e0cc33542821e2746bf7ff25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
-  offset: {x: 0, y: 2, z: -4}
-  smoothSpeed: 5
+  offset: {x: 0, y: -3, z: -3.25}
+  smoothTime: 0.15
+  movementTolerance: 0.08
+  stopTolerance: 0.01
+  ignoreYMovement: 1
 --- !u!33 &7148912495325737626
 MeshFilter:
   m_ObjectHideFlags: 0

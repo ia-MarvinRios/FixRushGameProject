@@ -2,14 +2,23 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [SerializeField] private Vector3 offset;
-    [SerializeField] private float smoothSpeed = 5f;
+    [Header("Follow")]
+    [SerializeField] private Vector3 offset = new Vector3(0f, 10f, -8f);
+    [SerializeField] private float smoothTime = 0.15f;
+
+    [Header("Tolerancia")]
+    [SerializeField] private float movementTolerance = 0.08f;
+    [SerializeField] private float stopTolerance = 0.01f;
+    [SerializeField] private bool ignoreYMovement = true;
 
     private Transform target;
+    private Vector3 velocity = Vector3.zero;
 
-    void LateUpdate()
+    private Vector3 stableTargetPosition;
+    private bool hasStablePosition = false;
+
+    private void LateUpdate()
     {
-        // Buscar player local si aún no existe
         if (target == null)
         {
             if (PlayerSpawner.Instance != null &&
@@ -23,16 +32,50 @@ public class CameraFollow : MonoBehaviour
             }
         }
 
-        // Movimiento suave
-        Vector3 desiredPosition = target.position + offset;
+        Vector3 currentTargetPosition = target.position;
 
-        transform.position = Vector3.Lerp(
+        if (!hasStablePosition)
+        {
+            stableTargetPosition = currentTargetPosition;
+            hasStablePosition = true;
+        }
+
+        Vector3 movementDelta = currentTargetPosition - stableTargetPosition;
+
+        if (ignoreYMovement)
+        {
+            movementDelta.y = 0f;
+        }
+
+        // Solo actualiza la posición objetivo si el player se movió lo suficiente
+        if (movementDelta.magnitude >= movementTolerance)
+        {
+            if (ignoreYMovement)
+            {
+                currentTargetPosition.y = stableTargetPosition.y;
+            }
+
+            stableTargetPosition = currentTargetPosition;
+        }
+
+        Vector3 desiredPosition = stableTargetPosition + offset;
+
+        // Si la cámara ya está demasiado cerca, no seguir moviéndola
+        if ((transform.position - desiredPosition).sqrMagnitude <= stopTolerance * stopTolerance)
+        {
+            transform.position = desiredPosition;
+            velocity = Vector3.zero;
+            return;
+        }
+
+        transform.position = Vector3.SmoothDamp(
             transform.position,
             desiredPosition,
-            smoothSpeed * Time.deltaTime
+            ref velocity,
+            smoothTime
         );
 
-        // Opcional:
-        transform.LookAt(target);
+        // No uses LookAt si te genera temblor
+        // transform.LookAt(target);
     }
 }
