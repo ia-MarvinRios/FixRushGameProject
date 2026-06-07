@@ -37,10 +37,13 @@ namespace FixRush
     }
 
     [System.Serializable]
-    public struct Cosmetic
+    public class Cosmetic
     {
+        public int id;
         public string Name;
         public bool Unlocked;
+        public int BuyPrice;
+        public Sprite Sprite;
         public GameObject Prefab;
     }
 
@@ -93,6 +96,7 @@ namespace FixRush
 
         public Type IssueType { get; }
         public bool IsFixed { get; }
+        public int ReparationFee { get; }
 
         /// <summary>
         /// Cleans up the issue, such as hiding UI elements, resetting variables, etc. This method is called after the issue has been fixed and is no longer needed.
@@ -102,5 +106,13 @@ namespace FixRush
         /// Coroutine that handles the process of fixing the issue. This method is called when the player starts interacting with the issue.
         /// </summary>
         IEnumerator FixingCoroutine();
+    }
+
+    [System.Serializable]
+    public class ReparationPlatform
+    {
+        public bool Unlocked;
+        public bool Taken;
+        public Transform Target;
     }
 }

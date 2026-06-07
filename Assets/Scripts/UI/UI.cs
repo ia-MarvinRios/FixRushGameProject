@@ -1,15 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-
-/* ---- PARA EL QUE LEA ESTO: ----
- * Esta clase se encarga de manejar la UI principal del juego, maneja el cambio de estado activo de los
- * objetos del menú. Otras clases como "PlayerList" se encargan de actualizar los elementos específicos dentro de cada panel.
- * Esta clase trabaja en conjunto con "PhotonManager" para actualizar la UI en función del estado de la conexión y la sala.
- * --------------------------------------------------------------------------------------------------------------------------
-*/
 
 public class UI : MonoBehaviour
 {
@@ -45,6 +36,12 @@ public class UI : MonoBehaviour
 
         // Build Info
         SetBuildInfoText();
+
+        // Restore nickname from PlayerSettings if it exists
+        if (!string.IsNullOrEmpty(_playerSettings.Nickname))
+        {
+            _nicknameField.text = _playerSettings.Nickname;
+        }
 
         // Audio
         AudioManager.Instance.PlayAllMusic(true);
@@ -97,6 +94,7 @@ public class UI : MonoBehaviour
         {
             // Set the player's nickname in Photon
             PhotonManager.Instance.SetNickname(_nicknameField.text);
+            _playerSettings.Nickname = _nicknameField.text;
 
             return true;
         }
@@ -121,6 +119,13 @@ public class UI : MonoBehaviour
 
         // Show the room selection panel and hide the main menu
         _roomSelectionPanel.SetActive(true);
+        _mainMenuPanel.SetActive(false);
+    }
+
+    public void EnterLobby()
+    {
+        if (!CheckNickname()) { return; }
+
         _mainMenuPanel.SetActive(false);
     }
 

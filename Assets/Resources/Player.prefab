@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6385811049665243957}
-  - component: {fileID: 8040896003897355167}
+  - component: {fileID: 3141403324767024230}
   - component: {fileID: 807180346065615471}
   - component: {fileID: 2170886952062733389}
   - component: {fileID: 2453003754471218011}
@@ -74,7 +74,7 @@ Transform:
   - {fileID: 4948002578282382267}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8040896003897355167
+--- !u!114 &3141403324767024230
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -83,15 +83,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1549537976254818863}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec7cb1e428395bc48b71d4672adf2223, type: 3}
+  m_Script: {fileID: 11500000, guid: 9d0f9774266e0394083c59dfc79004fa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  m_EditorClassIdentifier: Assembly-CSharp::OnlinePlayer
   Player: {fileID: 11400000, guid: 1b0cc9b4585edbd428823a59ca4dc910, type: 2}
+  _characterController: {fileID: 2453003754471218011}
   Model1: {fileID: 3252203373830510300}
   Model2: {fileID: 7865679350224227619}
-  _characterController: {fileID: 2453003754471218011}
-  _networkHandler: {fileID: 807180346065615471}
   ObjRoot: {fileID: 9191127004246503959}
+  _networkHandler: {fileID: 807180346065615471}
 --- !u!114 &807180346065615471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,7 +120,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScriptsToIgnore
   _scriptsToIgnore:
   - {fileID: 807180346065615471}
-  - {fileID: 8040896003897355167}
 --- !u!143 &2453003754471218011
 CharacterController:
   m_ObjectHideFlags: 0

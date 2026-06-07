@@ -11,10 +11,12 @@ GameObject:
   - component: {fileID: 8421346935905492020}
   - component: {fileID: 5161564234407941580}
   - component: {fileID: -8886895257451304577}
+  - component: {fileID: 1034534696331080287}
   - component: {fileID: 2280545167127304173}
   - component: {fileID: 7230443037918401744}
   - component: {fileID: 445062166251024855}
   - component: {fileID: -3076293207498256503}
+  - component: {fileID: 4633492157566472239}
   m_Layer: 0
   m_Name: Jeep
   m_TagString: Untagged
@@ -35,6 +37,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3511343809527596351}
   - {fileID: 7841624716250992471}
   - {fileID: 6812356105816538077}
   - {fileID: 1868998633210326215}
@@ -45,6 +48,8 @@ Transform:
   - {fileID: 3778947656080574904}
   - {fileID: 5511478764476620718}
   - {fileID: 6523666919632130119}
+  - {fileID: 1600934890019726593}
+  - {fileID: 3289419272462330494}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5161564234407941580
@@ -59,20 +64,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7098bc52e2a262441b2f2386d8cacd7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Car
-  QueueIndex: -1
+  _queueIndex: -1
+  PatienceGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 0, b: 0, a: 1}
+    key1: {r: 0.25882354, g: 1, b: 0, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 2
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
   NetworkHandler: {fileID: -8886895257451304577}
   Agent: {fileID: 2280545167127304173}
+  mAnimator: {fileID: 1034534696331080287}
   _collider: {fileID: 7230443037918401744}
   _dirtDecal: {fileID: 1582213242461436174}
   _dirtMaterial: {fileID: 2100000, guid: 6707faffe9b35be4cb4be7c306501066, type: 2}
   _sudsParticles: {fileID: 6830723250297209350}
+  _sliderRoot: {fileID: 3511343809527596351}
   TriggerPrefab: {fileID: 7018675178099524341, guid: 647d3c08175fa484c9f11faf5ffae2d1, type: 3}
-  _issueTypes: 0100000000000000
-  _jackRootFront: {fileID: 0}
+  _issueTypes: 0000000001000000
+  _jackRootFront: {fileID: 1600934890019726593}
   TiresFront:
   - {fileID: 5294424614357234976}
   - {fileID: 640862923507001270}
-  _jackRootRear: {fileID: 0}
+  _jackRootRear: {fileID: 3289419272462330494}
   TiresRear:
   - {fileID: 4351963690080167560}
   - {fileID: 7016126486968856583}
@@ -88,6 +125,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61b189b7d62472c40a0bb66deee8ba11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::vNetworkHandler
+  _vehicle: {fileID: 5161564234407941580}
+--- !u!95 &1034534696331080287
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81186785566514930}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2ff76d07526cd0e498e505174b04f388, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!195 &2280545167127304173
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -150,7 +210,9 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: -8886895257451304577}
   - {fileID: -3076293207498256503}
+  - {fileID: 4633492157566472239}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -167,6 +229,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: PhotonUnityNetworking.Utilities::Photon.Pun.UtilityScripts.SmoothSyncMovement
   SmoothingDelay: 5
+--- !u!114 &4633492157566472239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81186785566514930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonAnimatorView
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 9
+    SynchronizeType: 1
+    Name: JackBack
+  - Type: 9
+    SynchronizeType: 1
+    Name: JackFront
+  - Type: 9
+    SynchronizeType: 1
+    Name: Base
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!1 &640862923507001270
 GameObject:
   m_ObjectHideFlags: 0
@@ -462,6 +551,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2759552840391519661
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3289419272462330494}
+  m_Layer: 0
+  m_Name: JackRootRear
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3289419272462330494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2759552840391519661}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: 0, y: -0.35, z: -1.47}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8421346935905492020}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &4351963690080167560
 GameObject:
   m_ObjectHideFlags: 0
@@ -576,6 +696,37 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!1 &4909154237496766660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1600934890019726593}
+  m_Layer: 0
+  m_Name: JackRootFront
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1600934890019726593
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4909154237496766660}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.25, z: 1.422}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8421346935905492020}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5294424614357234976
 GameObject:
   m_ObjectHideFlags: 0
@@ -1162,3 +1313,34 @@ VisualEffect:
       m_Array: []
     m_Bool:
       m_Array: []
+--- !u!1 &9010436935927999609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3511343809527596351}
+  m_Layer: 0
+  m_Name: SliderRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3511343809527596351
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9010436935927999609}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.001, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8421346935905492020}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

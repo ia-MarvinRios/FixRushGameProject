@@ -15,8 +15,5 @@ public class RoomCard : MonoBehaviour
         _roomInfoText.text = $"{roomData.Name} {roomData.PlayerCount}/{roomData.MaxPlayers}";
     }
 
-    public void JoinRoom()
-    {
-        PhotonManager.Instance.JoinRoom(_roomName);
-    }
+    public void JoinRoom() { PhotonManager.Instance.JoinRoom(_roomName); }
 }

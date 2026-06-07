@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using UnityEngine;
 using FixRush;
+using System;
 
 /// <summary>
 /// Handles the player spawning and the avatar loading for remote and local players.
@@ -15,11 +16,14 @@ public class PlayerSpawner : MonoBehaviourPun
     [Header("Player Spawning")]
     [SerializeField] private PlayerSettings _playerSettings;
     [SerializeField] private GameObject _playerPrefab;
+    [SerializeField] private bool _defaultSpawnOnStart = true;
 
     [Header("Level Data Reference")]
     [SerializeField] internal LevelData LevelData;
 
     internal PlayerController Controller { get; private set; }
+
+    public static event Action<PlayerController> OnLocalPlayerSpawned;
 
     private void Awake()
     {
@@ -27,7 +31,7 @@ public class PlayerSpawner : MonoBehaviourPun
     }
     private void Start()
     {
-        SpawnPlayer();
+        if (_defaultSpawnOnStart) { SpawnPlayer(); }
     }
 
     /// <summary>
@@ -87,27 +91,18 @@ public class PlayerSpawner : MonoBehaviourPun
         // Get player data
         Hashtable spawnData = ToHashtable(PhotonManager.Instance.GetThisPlayerData());
 
-        // Sync player spawn on server
-        photonView.RPC(
-            nameof(RPC_SyncPlayerSpawnOnServer),
-            RpcTarget.MasterClient,
-            playerPv.ViewID,
-            spawnData,
-            false
-        );
+        OnLocalPlayerSpawned?.Invoke(Controller);
     }
 
-
-    #region RPCs
-
-    [PunRPC]
-    private void RPC_SyncPlayerSpawnOnServer(int playerViewID, Hashtable spawnData, bool left)
+    public void SpawnPlayer(Transform spawnPosition)
     {
-        if (!PhotonNetwork.IsMasterClient) { return; }
+        // Do spawning
+        PlayerController playerController = Instantiate(
+            _playerPrefab,
+            spawnPosition.position,
+            Quaternion.identity
+        ).GetComponent<PlayerController>();
 
-        if (left) { GameManager.Instance.UnregisterPlayer(playerViewID); }
-        else { GameManager.Instance.RegisterPlayer(playerViewID, spawnData); }
+        Controller = playerController;
     }
-
-    #endregion
 }

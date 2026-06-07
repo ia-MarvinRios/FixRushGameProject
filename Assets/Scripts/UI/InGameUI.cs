@@ -14,10 +14,13 @@ public class InGameUI : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private GameObject _pauseMenuPanel;
-    [SerializeField] private TMP_Text _taskPanelText;
+    [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private TMP_Text _hintDescription;
+    [SerializeField] private TMP_Text _taskPanelText;
     [SerializeField] private GameObject _taskProgressPanel;
     [SerializeField] private Slider _taskProgressSlider;
+    [SerializeField] private TMP_Text _cashText;
+    [SerializeField] internal TMP_Text TimeText;
     [SerializeField] internal GameObject Manual;
 
     [Header("Animations")]
@@ -25,8 +28,11 @@ public class InGameUI : MonoBehaviour
 
     // Tasks
     private float _currentProgress = 0f;
-    private float _modifier = 1f;
+    private float _modifier        = 1f;
     private Coroutine _taskProgressCoroutine;
+
+    // Cash
+    private Coroutine _cashGrowCoroutine;
 
     internal PlayerNetworkHandler NetworkHandler { get; private set; }
 
@@ -35,34 +41,36 @@ public class InGameUI : MonoBehaviour
         Instance = this;
     }
 
+    private void OnEnable()
+    {
+        GameManager.OnLevelTimeOut += HandleGameOver;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnLevelTimeOut -= HandleGameOver;
+    }
+
     private void Start()
     {
         // Audio
         AudioManager.Instance.PlayAllMusic(true);
     }
 
-    public void MainMenu()
-    {
-        PhotonManager.Instance.LeaveRoom();
-    }
+    public void MainMenu() { PhotonManager.Instance.LeaveRoom(); }
+    public void QuitGame() { Application.Quit(); }
+    public void TogglePauseMenu() { _pauseMenuPanel.SetActive(!_pauseMenuPanel.activeSelf); }
+    internal void LinkNetworkHandler(PlayerNetworkHandler networkHandler) { NetworkHandler = networkHandler; }
 
-    public void QuitGame()
-    {
-        Application.Quit();
-    }
-
-    public void TogglePauseMenu()
-    {
-        _pauseMenuPanel.SetActive(!_pauseMenuPanel.activeSelf);
-
-    }
+    #region TASKS
 
     public void ShowTaskPanel(bool show, IIssue.Type issueType = IIssue.Type.Dirty)
     {
         _animator.SetBool("ShowTaskPanel", show);
 
-        string description = issueType switch {
-            IIssue.Type.Dirty => "Car is dirty",
+        string description = issueType switch
+        {
+            IIssue.Type.Dirty => "Vehicle is dirty",
             IIssue.Type.Tires => "Replace Tires",
             _ => "unknown"
         };
@@ -75,21 +83,6 @@ public class InGameUI : MonoBehaviour
             AudioManager.Instance.PlaySoundByName("TaskCompleted");
         }
 
-    }
-
-    public void ShowHint(string hint, float duration = 2f)
-    {
-        _hintDescription.text = hint;
-
-        StartCoroutine(ShowHintCoroutine(duration));
-    }
-    private IEnumerator ShowHintCoroutine(float delay)
-    {
-        _animator.SetBool("ShowHint", true);
-
-        yield return new WaitForSeconds(delay);
-
-        _animator.SetBool("ShowHint", false);
     }
 
     public void StartTaskProgress(float duration)
@@ -129,6 +122,56 @@ public class InGameUI : MonoBehaviour
         StopTaskProgress(true);
     }
 
-    internal void LinkNetworkHandler(PlayerNetworkHandler networkHandler) { NetworkHandler = networkHandler; }
+    #endregion
 
+    #region GLOBAL
+
+    // Los hints son los consejos de abajo a la derecha.
+    public void ShowHint(string hint, float duration = 2f)
+    {
+        _hintDescription.text = hint;
+
+        StartCoroutine(ShowHintCoroutine(duration));
+    }
+    private IEnumerator ShowHintCoroutine(float delay)
+    {
+        _animator.SetBool("ShowHint", true);
+
+        yield return new WaitForSeconds(delay);
+
+        _animator.SetBool("ShowHint", false);
+    }
+
+    internal void UpdateCashUI(int targetCash)
+    {
+        if (_cashGrowCoroutine != null)
+        {
+            StopCoroutine(_cashGrowCoroutine);
+        }
+
+        _cashGrowCoroutine = StartCoroutine(GrowCashCoroutine(targetCash));
+    }
+
+    private IEnumerator GrowCashCoroutine(int targetCash)
+    {
+        WaitForSeconds interval = new WaitForSeconds(0.05f);
+
+        int currentCash = int.Parse(_cashText.text);
+
+        while (currentCash != targetCash)
+        {
+            currentCash += System.Math.Sign(targetCash - currentCash);
+
+            _cashText.text = currentCash.ToString();
+
+            yield return interval;
+        }
+    }
+
+    private void HandleGameOver()
+    {
+        _gameOverPanel.SetActive(true);
+    }
+
+    #endregion
 }

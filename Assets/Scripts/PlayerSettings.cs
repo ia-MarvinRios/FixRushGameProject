@@ -6,6 +6,7 @@ public class PlayerSettings : ScriptableObject
     [Header("In-Game Settings")]
     public string Nickname = string.Empty;
     public float MoveSpeed = 5f;
+    public float Money = 0f;
     [Space(10)]
     [Header("Avatar")]
     public int Hat;

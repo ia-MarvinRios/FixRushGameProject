@@ -1,8 +1,6 @@
 using Photon.Pun;
 using UnityEngine;
 using FixRush;
-using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEngine.VFX;
 
 public class PlayerNetworkHandler : MonoBehaviourPun, IPunInstantiateMagicCallback

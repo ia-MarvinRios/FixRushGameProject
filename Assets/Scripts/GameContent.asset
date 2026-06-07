@@ -13,25 +13,46 @@ MonoBehaviour:
   m_Name: GameContent
   m_EditorClassIdentifier: Assembly-CSharp::GameContent
   Bodies:
-  - Name: Body01
+  - id: 0
+    Name: Body01
     Unlocked: 1
+    BuyPrice: 0
+    Sprite: {fileID: 21300000, guid: 8b0a7e36de3754e92b5866d0dd24edef, type: 3}
     Prefab: {fileID: 5066491826347664535, guid: 0ae4a93db575e834ead260816e761c65, type: 3}
-  - Name: ChubbyBody
+  - id: 0
+    Name: ChubbyBody
     Unlocked: 0
+    BuyPrice: 200
+    Sprite: {fileID: -580518156, guid: 01aedcda154acdc48915489188dbc4ba, type: 3}
     Prefab: {fileID: 4315119664445337559, guid: 9a555d882a8ab0b458c115951d247489, type: 3}
-  - Name: FemaleBody
+  - id: 0
+    Name: FemaleBody
     Unlocked: 0
+    BuyPrice: 200
+    Sprite: {fileID: 424340872, guid: c0d95bb279a21e040a4e5d0520ed783b, type: 3}
     Prefab: {fileID: 3004252982231233445, guid: 567ddae4602d17c47a43c19c77d9f621, type: 3}
   Hats:
-  - Name: Hair01
+  - id: 0
+    Name: Hair01
     Unlocked: 1
+    BuyPrice: 0
+    Sprite: {fileID: 21300000, guid: 8b0a7e36de3754e92b5866d0dd24edef, type: 3}
     Prefab: {fileID: 8297864872639466317, guid: 0ebb602e69c4c974d8bccf343aaa5bef, type: 3}
-  - Name: Blonde
+  - id: 0
+    Name: Blonde
     Unlocked: 0
+    BuyPrice: 200
+    Sprite: {fileID: 708457637, guid: d3310062ec5eff14cafcaa067624011e, type: 3}
     Prefab: {fileID: 648907300441370630, guid: 4ea28f5ba4f1f3243a3ae6e1b5ef4b53, type: 3}
-  - Name: 80
+  - id: 0
+    Name: 80
     Unlocked: 0
+    BuyPrice: 200
+    Sprite: {fileID: 1677431560, guid: c47ece8270b050343ba0b51be8b04e6a, type: 3}
     Prefab: {fileID: 2735528980077814136, guid: 3209d3eba2471f84ea58d7b2fb9799c7, type: 3}
-  - Name: Cap
+  - id: 0
+    Name: Cap
     Unlocked: 0
+    BuyPrice: 350
+    Sprite: {fileID: -13539222, guid: cfc2c78b38584a945841e10f5771c7d6, type: 3}
     Prefab: {fileID: 3855904710626097197, guid: ed6b1fd57fb62da428cf11c46a96ef14, type: 3}

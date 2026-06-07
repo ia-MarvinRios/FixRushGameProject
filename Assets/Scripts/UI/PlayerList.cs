@@ -229,16 +229,36 @@ public class PlayerList : MonoBehaviour
     public void SwitchHat(int factor)
     {
         int length = _gameContent.Hats.Length;
-        int newIndex = (_playerSettings.Hat + factor + length) % length;
 
-        PhotonManager.Instance.SetIntProperty("hat", newIndex);
+        int index = _playerSettings.Hat;
+
+        for (int i = 0; i < length; i++)
+        {
+            index = (index + factor + length) % length;
+
+            if (_gameContent.Hats[index].Unlocked)
+            {
+                PhotonManager.Instance.SetIntProperty("hat", index);
+                return;
+            }
+        }
     }
     public void SwitchBody(int factor)
     {
         int length = _gameContent.Bodies.Length;
-        int newIndex = (_playerSettings.Body + factor + length) % length;
 
-        PhotonManager.Instance.SetIntProperty("body", newIndex);
+        int index = _playerSettings.Body;
+
+        for (int i = 0; i < length; i++)
+        {
+            index = (index + factor + length) % length;
+
+            if (_gameContent.Bodies[index].Unlocked)
+            {
+                PhotonManager.Instance.SetIntProperty("body", index);
+                return;
+            }
+        }
     }
     public void SetSkinTone(Image skinTone)
     {
